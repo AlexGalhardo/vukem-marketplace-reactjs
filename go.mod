@@ -3,10 +3,10 @@ module github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs
 go 1.27.2
 
 require (
-	github.com/AlexGalhardo/vukem v0.22.0
+	github.com/AlexGalhardo/vukem v0.23.0
 	github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
-	github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0
+	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0
 	github.com/google/go-cmp v0.7.0
 	go.mongodb.org/mongo-driver/v2 v2.9.2
@@ -35,7 +35,7 @@ require (
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/telemetry v0.0.0-20261010193011-f71dc92da45e // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 	golang.org/x/vuln v1.9.0 // indirect
 	modernc.org/libc v1.77.1 // indirect
