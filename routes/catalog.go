@@ -43,6 +43,11 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		}
 
 		pub := storefront.New(svc, acc).WithReviews(rv.ProductBlock)
+
+		if pub.Questions, err = Questions(r, app, deps, acc); err != nil {
+			return err
+		}
+
 		r.Get("/", pub.Home).Name("home")
 		r.Get("/search", pub.Search).Name("catalog.search")
 		r.Get("/c/{slug}", pub.Category).Name("catalog.category")
@@ -56,8 +61,13 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		r.Get("/sell", h.ShowOpen).Name("shop.create").Use(verified...)
 		r.Post("/sell", h.Open).Name("shop.store").Use(verified...)
 
+		db, err := app.DB()
+		if err != nil {
+			return err
+		}
+
 		r.Group("/seller", func(g *router.Group) {
-			g.Use(verified...)
+			g.Use(append(verified, requireShop(acc, db))...)
 			g.Get("", h.Dashboard).Name("seller.dashboard")
 			g.Get("/settings", h.Settings).Name("seller.settings")
 			g.Put("/settings", h.UpdateSettings).Name("seller.settings.update")

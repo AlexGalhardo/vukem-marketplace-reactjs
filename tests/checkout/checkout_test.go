@@ -480,9 +480,9 @@ func TestSellerRefundReversesTransfer(t *testing.T) {
 	soA := e.Int64(t, `SELECT id FROM seller_orders WHERE shop_id = ?`, m.shopA)
 	path := "/seller/orders/" + strconv.FormatInt(soA, 10) + "/refund"
 
-	// Not the owner: not found.
+	// Another seller: not found; a user without a shop: sent to /sell.
 	e.Client(t, m.sellerB).PostJSON(path, nil).AssertNotFound()
-	e.Client(t, m.buyer).PostJSON(path, nil).AssertNotFound()
+	e.Client(t, m.buyer).PostJSON(path, nil).AssertRedirect("/sell")
 
 	seller := e.Client(t, m.sellerA).WithHeader("Referer", "/seller/payouts")
 	seller.PostJSON(path, nil).AssertRedirect("/seller/payouts")

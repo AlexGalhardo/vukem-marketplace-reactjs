@@ -62,6 +62,7 @@ export default function SiteHeader(): JSX.Element {
 	const page = usePage<SharedProps>();
 	const { t } = useT();
 	const user = page.props.auth?.user ?? null;
+	const hasShop = page.props.auth?.hasShop ?? false;
 	const cartCount = page.props.cartCount ?? 0;
 	const q = typeof window === "undefined" ? "" : (new URLSearchParams(window.location.search).get("q") ?? "");
 
@@ -125,7 +126,7 @@ export default function SiteHeader(): JSX.Element {
 						<Link href="/search?sort=newest" className={pill}>
 							{t("storefront.header.new")}
 						</Link>
-						<Link href={user ? "/seller" : "/sell"} className={pill}>
+						<Link href={hasShop ? "/seller" : "/sell"} className={pill}>
 							{t("nav.sell")}
 						</Link>
 						<Link href="/contact" className={pill}>

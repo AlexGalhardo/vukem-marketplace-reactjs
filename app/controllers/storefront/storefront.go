@@ -5,6 +5,7 @@ package storefront
 import (
 	"errors"
 	"io"
+	"maps"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,6 +36,13 @@ type Handlers struct {
 	svc     *catalog.Service
 	acc     *accounts.Accounts
 	reviews ReviewsBlock
+	// Questions adds the product page's question props (nil: none).
+	Questions ProductPropser
+}
+
+// ProductPropser returns extra props for a product page.
+type ProductPropser interface {
+	ProductProps(c *web.Ctx, p catalog.ProductDetail) (inertia.Props, error)
 }
 
 // New returns the handlers.
@@ -241,6 +249,15 @@ func (h *Handlers) Product(c *web.Ctx) error {
 		}
 
 		props["reviews"] = block
+	}
+
+	if h.Questions != nil {
+		extra, err := h.Questions.ProductProps(c, p)
+		if err != nil {
+			return err
+		}
+
+		maps.Copy(props, extra)
 	}
 
 	return inertia.Render(c, "Catalog/Product", props)

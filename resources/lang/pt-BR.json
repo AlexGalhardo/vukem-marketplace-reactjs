@@ -88,6 +88,10 @@
 					"label": "API GraphQL",
 					"description": "Atende /graphql para quem tem chave de API. Desativado: o endpoint responde 404; REST e gRPC não mudam."
 				},
+				"product_questions": {
+					"label": "Perguntas nos produtos",
+					"description": "Compradores conectados podem perguntar aos vendedores na página do produto. Desligado: o formulário some e novas perguntas são recusadas; as perguntas existentes continuam visíveis e os vendedores ainda podem responder."
+				},
 				"reviews": {
 					"label": "Avaliações de produtos",
 					"description": "Compradores avaliam o que compraram, marcam avaliações como úteis e as lojas respondem. Desativado: escrever, votar e responder dão 404; as avaliações publicadas continuam visíveis."
@@ -370,7 +374,8 @@
 			"images_added": "Fotos enviadas.",
 			"product_created": "Rascunho salvo. Adicione fotos e depois publique.",
 			"saved": "Alterações salvas.",
-			"shop_opened": "Sua loja está aberta. Anuncie seu primeiro produto."
+			"shop_opened": "Sua loja está aberta. Anuncie seu primeiro produto.",
+			"open_shop_first": "Abra sua loja para acessar a área do vendedor."
 		},
 		"form": {
 			"archive": "Arquivar",
@@ -781,8 +786,7 @@
 			"buy_now": "Comprar agora",
 			"reviews": "Opiniões do produto",
 			"no_reviews": "Ainda não há avaliações.",
-			"questions": "Perguntas e respostas",
-			"questions_soon": "Perguntas ao vendedor ainda não estão disponíveis nesta demonstração."
+			"questions": "Perguntas e respostas"
 		},
 		"cart": {
 			"summary": "Resumo da compra",
@@ -817,6 +821,88 @@
 			"project": "Projeto",
 			"framework": "Feito com vukem",
 			"disclaimer": "Projeto de demonstração open-source, sem afiliação com o Mercado Livre."
+		}
+	},
+	"errors": {
+		"not_found": "Não encontramos esta página",
+		"forbidden": "Você não tem acesso a esta página",
+		"too_many": "Muitas solicitações, tente de novo em instantes",
+		"server": "Algo deu errado do nosso lado",
+		"generic": "Algo deu errado",
+		"home": "Ir para a página inicial"
+	},
+	"qna": {
+		"title": "Perguntas e respostas",
+		"ask_label": "Pergunte ao vendedor",
+		"ask_hint": "Entre {min} e {max} caracteres. Links, e-mails e telefones não são permitidos: mantenha a conversa aqui para continuar protegido.",
+		"ask_submit": "Perguntar",
+		"asking": "Enviando…",
+		"login_to_ask": "Entre para perguntar ao vendedor",
+		"own_product": "Este produto é seu. Responda às perguntas na sua área de vendedor.",
+		"own_product_link": "Ir para minhas perguntas",
+		"disabled": "Novas perguntas estão pausadas no momento.",
+		"empty": "Ainda não há perguntas. Seja o primeiro a perguntar.",
+		"asked_by": "{name} perguntou",
+		"answer_label": "Resposta do vendedor",
+		"awaiting": "Aguardando a resposta do vendedor",
+		"count": "{count} perguntas",
+		"pagination": "Páginas de perguntas",
+		"previous": "Perguntas mais recentes",
+		"next": "Perguntas mais antigas",
+		"page_of": "Página {page} de {last}",
+		"chars": "{count}/{max}",
+		"errors": {
+			"no_contact": "Para sua segurança, mantenha a conversa na plataforma: links, e-mails, perfis de redes sociais e telefones não são permitidos.",
+			"own_product": "Você não pode fazer perguntas sobre os produtos da sua própria loja.",
+			"too_short": "Escreva pelo menos {min} caracteres.",
+			"too_long": "Use no máximo {max} caracteres.",
+			"rate_limited": "Você fez muitas perguntas em pouco tempo. Aguarde alguns minutos."
+		},
+		"flash": {
+			"asked": "Sua pergunta foi enviada ao vendedor.",
+			"answered": "Sua resposta foi publicada.",
+			"hidden": "A pergunta foi ocultada.",
+			"unhidden": "A pergunta voltou a ficar visível."
+		},
+		"mail": {
+			"subject": "Nova pergunta sobre {product}",
+			"hello": "Olá, {name}.",
+			"body": "Um comprador fez uma pergunta sobre {product}:",
+			"action": "Responder à pergunta",
+			"footer": "Respostas rápidas ajudam o comprador a decidir. As respostas ficam públicas na página do produto."
+		},
+		"seller": {
+			"nav": "Perguntas",
+			"title": "Perguntas dos compradores",
+			"intro": "Responda rápido: as respostas aparecem na página do produto para todos os compradores.",
+			"filters": "Filtrar perguntas",
+			"unanswered": "Sem resposta ({count})",
+			"answered": "Respondidas",
+			"empty_unanswered": "Nenhuma pergunta aguardando resposta.",
+			"empty_answered": "Nenhuma pergunta respondida ainda.",
+			"about": "Sobre {product}",
+			"answer_label": "Sua resposta",
+			"answer_hint": "Até {max} caracteres. Links, e-mails e telefones não são permitidos.",
+			"answer_submit": "Publicar resposta",
+			"edit_submit": "Atualizar resposta",
+			"answering": "Publicando…",
+			"live": "Nova pergunta recebida. A lista foi atualizada."
+		},
+		"admin": {
+			"link": "Moderar perguntas de produtos",
+			"title": "Perguntas de produtos",
+			"intro": "Oculte perguntas que violam as regras. Perguntas ocultas somem da página do produto e da caixa do vendedor.",
+			"filters": "Filtrar perguntas",
+			"all": "Todas",
+			"hidden": "Ocultas",
+			"empty": "Nenhuma pergunta.",
+			"shop": "Loja: {shop}",
+			"asker": "Perguntado por {name} (usuário #{id})",
+			"hidden_badge": "Oculta",
+			"hidden_reason": "Motivo: {reason}",
+			"reason_label": "Motivo para ocultar",
+			"hide": "Ocultar",
+			"unhide": "Mostrar novamente"
 		}
 	},
 	"reviews": {

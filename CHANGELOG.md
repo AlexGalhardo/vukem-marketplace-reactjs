@@ -61,6 +61,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - MongoDB database name comes from `MONGO_DATABASE`, else the `MONGO_URL` path, else `marketplace`, so Railway's plugin URL (no path) works unchanged.
 - vukem bumped to v0.22.0: read-only visits no longer create sessions, and `vukemtest` sends the asset version from `Inertia("")` (local test helper removed).
 
+### Fixed
+
+- Seller-only routes (`/seller/*`, payouts, refunds, webhooks) send users without a shop to `/sell` with a message instead of a raw "Record not found" 404; footer and header show seller links only to shop owners; Inertia visits that fail render the app's Error page (status, safe message) instead of vukem's raw HTML page.
+
 ### Security
 
 - Linking Google to an unverified local account also clears its 2FA, API keys, pending reset links, the shop's payout destinations and webhooks; sign-up is rate limited per IP.

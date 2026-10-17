@@ -1,34 +1,13 @@
 import { z } from "zod";
 
+import { containsContact } from "./moderation";
+
 // Review rules, mirroring app/reviews/input.go and app/moderation (the
 // server is the source of truth): 1 to 5 stars, optional title and text,
 // lengths counted in code points (Go runes), no links, emails or phones.
 export const TITLE_MAX = 80;
 export const BODY_MAX = 2000;
 export const REPLY_MAX = 1000;
-
-const url = /\b(?:https?:\/\/|www\.)\S+/i;
-const domain =
-	/\b[a-z0-9][a-z0-9-]*\.(?:com|net|org|br|io|me|app|dev|info|biz|co|link|shop|store|site|online|xyz|ly|gl)\b/i;
-const email = /[a-z0-9._%+-]+\s*(?:@|\(at\)|\[at\])\s*[a-z0-9-]+(?:\s*(?:\.|\(dot\)|\[dot\])\s*[a-z]{2,})+/i;
-const handle = /\b(?:whats\s*app|whatsapp|zap|telegram|wa\.me|t\.me|instagram|insta)\b/i;
-
-function hasPhone(text: string): boolean {
-	let digits = 0;
-	for (const char of text) {
-		if (/\p{Nd}/u.test(char)) {
-			digits++;
-			if (digits >= 8) return true;
-		} else if (!" .-()+".includes(char)) {
-			digits = 0;
-		}
-	}
-	return false;
-}
-
-export function containsContact(text: string): boolean {
-	return url.test(text) || domain.test(text) || email.test(text) || handle.test(text) || hasPhone(text);
-}
 
 export const length = (value: string): number => Array.from(value.trim()).length;
 

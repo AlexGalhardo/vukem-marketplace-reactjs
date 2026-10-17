@@ -31,6 +31,7 @@ func Web() func(r *router.Router, app *vukem.App) error {
 		r.UseServer(probes.Middleware)
 		r.UseServer(middleware.StaticFS(resources.Public(), middleware.StaticConfig{Prefix: "/"}))
 		r.Use(app.Inertia.Middleware, shareProps(app))
+		r.Services().Errors = controllers.ErrorPages
 
 		// "/" (home) is registered by the catalog routes.
 		r.Post("/locale", controllers.SetLocale(app.I18n, app.Config.Env != config.Development)).Name("locale.update")

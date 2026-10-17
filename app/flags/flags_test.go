@@ -38,6 +38,7 @@ func TestDefaults(t *testing.T) {
 		flags.CardCheckout:      true,
 		flags.PixCheckout:       true,
 		flags.GraphQLAPI:        true,
+		flags.ProductQuestions:  true,
 		flags.Reviews:           true,
 	}
 	if diff := cmp.Diff(want, f.All(t.Context())); diff != "" {

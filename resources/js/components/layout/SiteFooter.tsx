@@ -1,10 +1,11 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import type { JSX } from "react";
 
 import { type MessageKey, useT } from "../../lib/i18n";
+import type { SharedProps } from "../../types";
 import { CardIcon, ShieldIcon, TruckIcon } from "../icons";
 
-const columns: { title: MessageKey; links: { href: string; label: MessageKey }[] }[] = [
+const columns: { title: MessageKey; links: { href: string; label: MessageKey; shopOnly?: boolean }[] }[] = [
 	{
 		title: "storefront.footer.buy",
 		links: [
@@ -18,8 +19,8 @@ const columns: { title: MessageKey; links: { href: string; label: MessageKey }[]
 		title: "storefront.footer.sell",
 		links: [
 			{ href: "/sell", label: "storefront.footer.open_shop" },
-			{ href: "/seller", label: "storefront.footer.seller_area" },
-			{ href: "/seller/payouts", label: "storefront.footer.payouts" },
+			{ href: "/seller", label: "storefront.footer.seller_area", shopOnly: true },
+			{ href: "/seller/payouts", label: "storefront.footer.payouts", shopOnly: true },
 		],
 	},
 	{
@@ -42,6 +43,8 @@ const perks: { icon: (p: { className?: string }) => JSX.Element; title: MessageK
 // with the non-affiliation note.
 export default function SiteFooter(): JSX.Element {
 	const { t } = useT();
+	// Seller-only links would bounce users without a shop to /sell.
+	const hasShop = usePage<SharedProps>().props.auth?.hasShop ?? false;
 
 	return (
 		<footer className="mt-12 bg-card text-ink">
@@ -65,13 +68,15 @@ export default function SiteFooter(): JSX.Element {
 						<div key={col.title}>
 							<h2 className="mb-2 text-sm font-semibold">{t(col.title)}</h2>
 							<ul className="space-y-1.5 text-sm">
-								{col.links.map((l) => (
-									<li key={l.href}>
-										<Link href={l.href} className="text-muted hover:text-ink hover:underline">
-											{t(l.label)}
-										</Link>
-									</li>
-								))}
+								{col.links
+									.filter((l) => hasShop || !l.shopOnly)
+									.map((l) => (
+										<li key={l.href}>
+											<Link href={l.href} className="text-muted hover:text-ink hover:underline">
+												{t(l.label)}
+											</Link>
+										</li>
+									))}
 							</ul>
 						</div>
 					))}

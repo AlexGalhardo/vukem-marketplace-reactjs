@@ -43,6 +43,9 @@ const (
 	PixCheckout Key = "pix_checkout"
 	// GraphQLAPI serves the /graphql endpoint of the public API.
 	GraphQLAPI Key = "graphql_api"
+	// ProductQuestions lets signed-in users ask on product pages. Off:
+	// existing questions stay visible and sellers can still answer.
+	ProductQuestions Key = "product_questions"
 	// Reviews lets buyers review what they bought, vote reviews helpful and
 	// shops reply; existing reviews stay visible while it is off.
 	Reviews Key = "reviews"
@@ -67,6 +70,7 @@ func Definitions() []Definition {
 		{Key: CardCheckout, Default: true},
 		{Key: PixCheckout, Default: true},
 		{Key: GraphQLAPI, Default: true},
+		{Key: ProductQuestions, Default: true},
 		{Key: Reviews, Default: true},
 	}
 }
