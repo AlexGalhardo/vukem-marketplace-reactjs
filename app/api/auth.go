@@ -86,12 +86,12 @@ func (a *Authenticator) Middleware(next http.Handler) http.Handler {
 			p, err := a.fromKey(r.Context(), header)
 			if err != nil {
 				if !errors.Is(err, ErrInvalidKey) {
-					c.HandleError(err)
+					fail(w, r, err)
 					return
 				}
 
 				web.SecurityEvent(r, "api.key_rejected")
-				c.HandleError(errInvalidKey)
+				fail(w, r, errInvalidKey)
 
 				return
 			}
@@ -141,9 +141,9 @@ func Require(scope string) func(http.Handler) http.Handler {
 
 			switch {
 			case !ok:
-				web.NewCtx(w, r, web.ServicesFrom(r.Context())).HandleError(errUnauthenticated)
+				fail(w, r, errUnauthenticated)
 			case !p.Can(scope):
-				web.NewCtx(w, r, web.ServicesFrom(r.Context())).HandleError(errMissingScope(scope))
+				fail(w, r, errMissingScope(scope))
 			default:
 				next.ServeHTTP(w, r)
 			}
@@ -157,13 +157,23 @@ func Allow(scope string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if p, ok := PrincipalFrom(r.Context()); ok && !p.Can(scope) {
-				web.NewCtx(w, r, web.ServicesFrom(r.Context())).HandleError(errMissingScope(scope))
+				fail(w, r, errMissingScope(scope))
 				return
 			}
 
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// fail renders an auth error as problem+json whatever the Accept header
+// says, like vukem's APIGuard failures: API routes never answer HTML.
+// Only the error path sees the forced Accept.
+func fail(w http.ResponseWriter, r *http.Request, err error) {
+	// workaround(vukem): auth cannot force problem+json for custom API authenticators
+	r = r.Clone(r.Context())
+	r.Header.Set("Accept", "application/json")
+	web.NewCtx(w, r, web.ServicesFrom(r.Context())).HandleError(err)
 }
 
 // RateKey buckets requests per API key, per session user, or per IP for

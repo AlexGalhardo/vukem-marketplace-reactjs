@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
+	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -173,6 +174,16 @@ func TestKeysInvalidTokensLookAlike(t *testing.T) {
 	// A bad Authorization header is a 401 even with a valid session.
 	apifixture.ActingAs(t, app, app.Client(t), u).WithHeader("Authorization", apifixture.Bearer("mkt_nope")).
 		GetJSON("/api/v1/cart/items").AssertProblem(401)
+
+	// API errors stay problem+json even for a client asking for HTML, like
+	// vukem's APIGuard failures.
+	html := app.Client(t).WithHeader("Accept", "text/html")
+	html.WithHeader("Authorization", apifixture.Bearer("mkt_nope")).Get("/api/v1/cart/items").AssertProblem(401)
+	html.WithHeader("Authorization", apifixture.Bearer("mkt_nope")).
+		Do(http.MethodPost, "/graphql", strings.NewReader(`{"query":"{ categories { slug } }"}`), "application/json").
+		AssertProblem(401)
+	app.Client(t).WithHeader("Accept", "text/html").Get("/api/v1/cart/items").AssertProblem(401).
+		AssertHeaderContains("WWW-Authenticate", "Bearer")
 }
 
 func TestKeysRevokedAndExpired(t *testing.T) {
