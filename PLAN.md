@@ -385,6 +385,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - 2026-10-17 — vukem v0.25.0 adopted (see CHANGELOG): queue and scheduler in serve, lazy Redis/Mongo, `app.ReadyHandler`, routes after boot, app seeders, keyed errors, session versions, contrib/stripe v1 calls, gRPC own port, OTel metrics, Telegram `SendSync` (`TELEGRAM_LOG=false` set on Railway). Kept: `platform.RedisOptions` (lazy store funcs cannot fall back to cookie sessions / sync queue without Redis), Stripe Accounts v2 calls (typed helpers expected in v0.26.0). Next: active sessions list (`UserSessions`/`RevokeSession`), O.*, M.*, S.*.
 
+- 2026-10-17 — Railway: `TRUSTED_PROXIES=100.64.0.0/10` (edge peers seen in the `peer` log field), `CLIENT_IP_HEADER=X-Real-IP`, `TRUST_FORWARDED_PROTO=true` (HSTS now sent; client IPs resolved), `TELEGRAM_LOG=false`. Open: queued mail to Mailtrap SMTP (`sandbox.smtp.mailtrap.io:2525`) times out from Railway (outbound SMTP blocked on the plan); needs an HTTP mail API transport or a plan that allows SMTP.
+
 ## 9. Operations
 
 ### 9.1 Commands
