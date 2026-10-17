@@ -87,6 +87,10 @@
 				"graphql_api": {
 					"label": "GraphQL API",
 					"description": "Serves /graphql for API key holders. Off: the endpoint answers 404; REST and gRPC are unaffected."
+				},
+				"reviews": {
+					"label": "Product reviews",
+					"description": "Buyers review what they bought, vote reviews helpful and shops reply. Off: writing, voting and replying answer 404; published reviews stay visible."
 				}
 			}
 		}
@@ -813,6 +817,83 @@
 			"project": "Project",
 			"framework": "Built with vukem",
 			"disclaimer": "Open-source demo project, not affiliated with Mercado Livre."
+		}
+	},
+	"reviews": {
+		"title": "Reviews",
+		"none": "No reviews yet.",
+		"none_hint": "Bought this product? Your review helps other buyers.",
+		"average": "{avg} out of 5",
+		"count_one": "{count} rating",
+		"count_other": "{count} ratings",
+		"distribution": "Ratings by stars",
+		"stars_one": "{stars} star",
+		"stars_other": "{stars} stars",
+		"bar": "{stars} stars: {count}",
+		"sort": "Sort by",
+		"sort_newest": "Newest",
+		"sort_helpful": "Most helpful",
+		"list": "Customer reviews",
+		"verified": "Verified purchase",
+		"recommend_yes": "Recommends this product",
+		"recommend_no": "Does not recommend this product",
+		"by": "{name} · {date}",
+		"seller_reply": "Reply from the seller",
+		"helpful": "Helpful",
+		"helpful_count_one": "{count} person found this helpful",
+		"helpful_count_other": "{count} people found this helpful",
+		"helpful_voted": "You found this helpful",
+		"write": "Write a review",
+		"reply_label": "Reply to this review",
+		"reply_submit": "Publish reply",
+		"reply_hint": "Shown under the review. One reply per review, up to {max} characters.",
+		"form": {
+			"title": "Review your purchase",
+			"intro": "Tell other buyers what you think of {product}.",
+			"rating": "Your rating",
+			"star": "{n} of 5 stars",
+			"rating_required": "Choose from 1 to 5 stars.",
+			"title_label": "Title (optional)",
+			"body_label": "Your review (optional)",
+			"counter": "{count} of {max} characters",
+			"recommend": "Would you recommend this product?",
+			"recommend_yes": "Yes",
+			"recommend_no": "No",
+			"recommend_skip": "Rather not say",
+			"rules": "Be respectful. Links, emails and phone numbers are not allowed.",
+			"submit": "Publish review",
+			"back": "Back to the product"
+		},
+		"flash": {
+			"created": "Thanks! Your review is published.",
+			"voted": "Thanks for your feedback.",
+			"replied": "Your reply is published.",
+			"hidden": "The review is hidden.",
+			"shown": "The review is visible again."
+		},
+		"errors": {
+			"contact": "Links, emails and phone numbers are not allowed.",
+			"already_reviewed": "You already reviewed this purchase.",
+			"already_replied": "This review already has a reply.",
+			"own_review": "You cannot vote on your own review.",
+			"too_long": "Use at most {max} characters.",
+			"reply_required": "Write a reply.",
+			"reason": "Give a reason of 3 to 500 characters."
+		},
+		"admin": {
+			"title": "Reviews",
+			"link": "Reviews moderation",
+			"intro": "Hide reviews that break the rules. Hidden reviews leave the product page and its average; every change is audited.",
+			"filter": "Show",
+			"filter_all": "All reviews",
+			"filter_hidden": "Hidden only",
+			"empty": "No reviews to show.",
+			"product": "Product",
+			"hidden_badge": "Hidden",
+			"hidden_reason": "Reason: {reason}",
+			"reason": "Reason to hide",
+			"hide": "Hide",
+			"unhide": "Show again"
 		}
 	}
 }

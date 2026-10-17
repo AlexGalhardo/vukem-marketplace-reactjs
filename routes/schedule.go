@@ -8,6 +8,7 @@ import (
 	"github.com/AlexGalhardo/vukem/schedule"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/maintenance"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
 )
 
 // Schedule declares the scheduled tasks. Run them with "vukem schedule:work"
@@ -47,4 +48,8 @@ func Schedule(s *schedule.Schedule, app *vukem.App) {
 	s.Func("maintenance:prune-tokens", p.Tokens).HourlyAt(5).WithoutOverlapping()
 	s.Func("maintenance:prune-provider-events", p.ProviderEvents).DailyAt("03:15").WithoutOverlapping()
 	s.Func("maintenance:prune-webhook-deliveries", p.WebhookDeliveries).DailyAt("03:30").WithoutOverlapping()
+	// Ratings change in the review transactions; this rebuild only repairs
+	// drift from manual SQL or batch imports.
+	s.Func("reviews:recalculate-ratings", func(ctx context.Context) error { return reviews.Recalculate(ctx, db) }).
+		DailyAt("04:10").WithoutOverlapping()
 }

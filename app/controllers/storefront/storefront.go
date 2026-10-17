@@ -26,15 +26,26 @@ const (
 	maxRecent = 12
 )
 
+// ReviewsBlock builds the reviews section of a product page for the
+// current viewer (controllers/reviews.Handlers.ProductBlock).
+type ReviewsBlock func(c *web.Ctx, productID, shopID int64) (any, error)
+
 // Handlers serves the storefront.
 type Handlers struct {
-	svc *catalog.Service
-	acc *accounts.Accounts
+	svc     *catalog.Service
+	acc     *accounts.Accounts
+	reviews ReviewsBlock
 }
 
 // New returns the handlers.
 func New(svc *catalog.Service, acc *accounts.Accounts) *Handlers {
 	return &Handlers{svc: svc, acc: acc}
+}
+
+// WithReviews adds the reviews section to the product page.
+func (h *Handlers) WithReviews(fn ReviewsBlock) *Handlers {
+	h.reviews = fn
+	return h
 }
 
 // userID is the signed-in user's id, or 0 for guests.
@@ -214,13 +225,25 @@ func (h *Handlers) Product(c *web.Ctx) error {
 		}
 	}
 
-	if !inertia.IsPrefetch(c.Request()) {
+	// Partial reloads (sorting or paging the reviews) are not new views.
+	if !inertia.IsPrefetch(c.Request()) && c.Request().Header.Get("X-Inertia-Partial-Data") == "" {
 		uid, anon := h.visitor(c)
 		h.svc.RecordView(ctx, p, uid, anon)
 		remember(c, p.ID)
 	}
 
-	return inertia.Render(c, "Catalog/Product", inertia.Props{"product": p, "more": related})
+	props := inertia.Props{"product": p, "more": related}
+
+	if h.reviews != nil {
+		block, err := h.reviews(c, p.ID, p.Shop.ID)
+		if err != nil {
+			return err
+		}
+
+		props["reviews"] = block
+	}
+
+	return inertia.Render(c, "Catalog/Product", props)
 }
 
 // Shop renders the storefront /s/{slug}.

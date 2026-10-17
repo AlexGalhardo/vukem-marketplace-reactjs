@@ -43,6 +43,9 @@ const (
 	PixCheckout Key = "pix_checkout"
 	// GraphQLAPI serves the /graphql endpoint of the public API.
 	GraphQLAPI Key = "graphql_api"
+	// Reviews lets buyers review what they bought, vote reviews helpful and
+	// shops reply; existing reviews stay visible while it is off.
+	Reviews Key = "reviews"
 )
 
 // Definition describes a flag.
@@ -64,6 +67,7 @@ func Definitions() []Definition {
 		{Key: CardCheckout, Default: true},
 		{Key: PixCheckout, Default: true},
 		{Key: GraphQLAPI, Default: true},
+		{Key: Reviews, Default: true},
 	}
 }
 

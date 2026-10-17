@@ -87,6 +87,10 @@
 				"graphql_api": {
 					"label": "API GraphQL",
 					"description": "Atende /graphql para quem tem chave de API. Desativado: o endpoint responde 404; REST e gRPC não mudam."
+				},
+				"reviews": {
+					"label": "Avaliações de produtos",
+					"description": "Compradores avaliam o que compraram, marcam avaliações como úteis e as lojas respondem. Desativado: escrever, votar e responder dão 404; as avaliações publicadas continuam visíveis."
 				}
 			}
 		}
@@ -813,6 +817,83 @@
 			"project": "Projeto",
 			"framework": "Feito com vukem",
 			"disclaimer": "Projeto de demonstração open-source, sem afiliação com o Mercado Livre."
+		}
+	},
+	"reviews": {
+		"title": "Avaliações",
+		"none": "Ainda não há avaliações.",
+		"none_hint": "Comprou este produto? Sua avaliação ajuda outros compradores.",
+		"average": "{avg} de 5",
+		"count_one": "{count} avaliação",
+		"count_other": "{count} avaliações",
+		"distribution": "Avaliações por estrelas",
+		"stars_one": "{stars} estrela",
+		"stars_other": "{stars} estrelas",
+		"bar": "{stars} estrelas: {count}",
+		"sort": "Ordenar por",
+		"sort_newest": "Mais recentes",
+		"sort_helpful": "Mais úteis",
+		"list": "Opiniões dos compradores",
+		"verified": "Compra verificada",
+		"recommend_yes": "Recomenda este produto",
+		"recommend_no": "Não recomenda este produto",
+		"by": "{name} · {date}",
+		"seller_reply": "Resposta do vendedor",
+		"helpful": "É útil",
+		"helpful_count_one": "{count} pessoa achou útil",
+		"helpful_count_other": "{count} pessoas acharam útil",
+		"helpful_voted": "Você achou útil",
+		"write": "Avaliar produto",
+		"reply_label": "Responder a esta avaliação",
+		"reply_submit": "Publicar resposta",
+		"reply_hint": "Aparece abaixo da avaliação. Uma resposta por avaliação, até {max} caracteres.",
+		"form": {
+			"title": "Avalie sua compra",
+			"intro": "Conte a outros compradores o que você achou de {product}.",
+			"rating": "Sua nota",
+			"star": "{n} de 5 estrelas",
+			"rating_required": "Escolha de 1 a 5 estrelas.",
+			"title_label": "Título (opcional)",
+			"body_label": "Sua avaliação (opcional)",
+			"counter": "{count} de {max} caracteres",
+			"recommend": "Você recomendaria este produto?",
+			"recommend_yes": "Sim",
+			"recommend_no": "Não",
+			"recommend_skip": "Prefiro não dizer",
+			"rules": "Seja respeitoso. Links, emails e telefones não são permitidos.",
+			"submit": "Publicar avaliação",
+			"back": "Voltar ao produto"
+		},
+		"flash": {
+			"created": "Obrigado! Sua avaliação foi publicada.",
+			"voted": "Obrigado pelo retorno.",
+			"replied": "Sua resposta foi publicada.",
+			"hidden": "A avaliação foi ocultada.",
+			"shown": "A avaliação voltou a aparecer."
+		},
+		"errors": {
+			"contact": "Links, emails e telefones não são permitidos.",
+			"already_reviewed": "Você já avaliou esta compra.",
+			"already_replied": "Esta avaliação já tem uma resposta.",
+			"own_review": "Você não pode votar na sua própria avaliação.",
+			"too_long": "Use no máximo {max} caracteres.",
+			"reply_required": "Escreva uma resposta.",
+			"reason": "Informe um motivo de 3 a 500 caracteres."
+		},
+		"admin": {
+			"title": "Avaliações",
+			"link": "Moderação de avaliações",
+			"intro": "Oculte avaliações que violam as regras. Avaliações ocultas saem da página do produto e da média; toda mudança é auditada.",
+			"filter": "Mostrar",
+			"filter_all": "Todas as avaliações",
+			"filter_hidden": "Só as ocultas",
+			"empty": "Nenhuma avaliação para mostrar.",
+			"product": "Produto",
+			"hidden_badge": "Oculta",
+			"hidden_reason": "Motivo: {reason}",
+			"reason": "Motivo para ocultar",
+			"hide": "Ocultar",
+			"unhide": "Mostrar de novo"
 		}
 	}
 }
