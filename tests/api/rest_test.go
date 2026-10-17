@@ -242,13 +242,15 @@ func TestRESTOpenAPIAndDocs(t *testing.T) {
 		t.Fatalf("docs page scripts do not carry the CSP nonce: %s", page.Header("Content-Security-Policy"))
 	}
 
-	// Scripts stay nonce-only; Scalar needs inline styles (feedback entry).
-	scriptSrc := regexp.MustCompile(`script-src[^;]*`).FindString(page.Header("Content-Security-Policy"))
-	if strings.Contains(scriptSrc, "unsafe") {
-		t.Errorf("script-src allows unsafe sources: %s", scriptSrc)
+	csp := page.Header("Content-Security-Policy")
+	for _, directive := range []string{"script-src", "style-src"} {
+		got := regexp.MustCompile(directive + `[^;]*`).FindString(csp)
+		if want := directive + " 'self' 'nonce-" + nonce[1] + "'"; got != want {
+			t.Errorf("%s = %q, want nonce-only %q", directive, got, want)
+		}
 	}
 
-	page.AssertSee("/api/v1/openapi.json").AssertHeaderContains("Content-Security-Policy", "script-src 'self' 'nonce-")
+	page.AssertSee("/api/v1/openapi.json")
 	c.Get("/docs/api/scalar.js").AssertOK()
 }
 
