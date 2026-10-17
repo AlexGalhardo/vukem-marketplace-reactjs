@@ -14,7 +14,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 
 | # | Decision | Why |
 | --- | --- | --- |
-| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.22.0`), no `replace` | Battle-test the released framework, like any user |
+| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.23.0`), no `replace` | Battle-test the released framework, like any user |
 | D2 | Frontend Inertia **v3** (stable: `@inertiajs/react` 3.9.1 is `latest` on npm, 2026-10-17) + React 19 + TypeScript strict | Server-driven pages, no client router or API layer for pages |
 | D3 | Base UI (`@base-ui/react` 1.9.0, headless) styled with pure Tailwind v4; no shadcn | Accessible behaviour, our own look |
 | D4 | i18n EN + PT-BR from one set of JSON catalogs (`resources/lang`) read by vukem i18n and imported by React | No drift between server and client strings |
@@ -44,7 +44,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | Layer | Version |
 | --- | --- |
 | Go toolchain | 1.27.2 |
-| vukem | v0.22.0 (+ `drivers/postgres` v0.3.0, `drivers/redis` v0.1.0, `drivers/mongo` v0.1.0; later `drivers/s3`, `drivers/otel`, `contrib/graphql`, `contrib/grpc` v0.1.0) |
+| vukem | v0.23.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.1.0, `drivers/mongo` v0.1.0; later `drivers/s3`, `drivers/otel`, `contrib/graphql`, `contrib/grpc`, `contrib/stripe`, `contrib/imaging` v0.1.0) |
 | pgx / go-redis / mongo-driver | v5.11.0 / v9.23.0 / v2.9.2 |
 | stripe-go | v87.0.0 (`github.com/stripe/stripe-go/v87`, Payments phase) |
 | Bun | 1.4.3 |
@@ -375,6 +375,7 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 - 2026-10-17 — Foundation complete (F.1–F.11), CI green on first push.
 - 2026-10-17 — Auth started: A.2 done (scaffold ported, Redis throttles, e2e).
 - 2026-10-17 — A.1, A.3, A.6, A.7 done (make-admin, admin 2FA gate, 10 recovery codes, Mailtrap helper + verification test). Open in Auth: A.1b seeders, A.3b queued mail + verified redirect, A.4 reset hardening, A.5 Google hardening, A.8 account pages/i18n.
+- 2026-10-17 — Owner secrets configured on Railway and GitHub Actions: Mailtrap (sandbox shared with another app: filter by unique recipient, never clean the inbox, email suites serialized), AbacatePay dev key + webhook secret, Google OAuth (localhost redirects 3000/3333/4444/5173; production URI pending), Telegram bot token (chat id pending). Stripe test endpoints exist (platform + Connect → `/webhooks/stripe`); Stripe test keys (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRETS` with platform + Connect whsec) set on Railway and GitHub Actions; Stripe integration tests run in CI when present. Google production redirect URIs and AbacatePay webhook URLs configured by the owner. Local `stripe listen` must be logged into the same Stripe account as the keys.
 
 ## 9. Operations
 

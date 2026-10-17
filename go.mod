@@ -5,11 +5,11 @@ go 1.27.2
 require (
 	connectrpc.com/connect v1.21.1
 	connectrpc.com/grpchealth v1.5.0
-	github.com/AlexGalhardo/vukem v0.22.0
+	github.com/AlexGalhardo/vukem v0.23.0
 	github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0
 	github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
-	github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0
+	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
@@ -40,7 +40,7 @@ require (
 	golang.org/x/sync v0.24.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/telemetry v0.0.0-20261010193011-f71dc92da45e // indirect
-	golang.org/x/text v0.42.0 // indirect
+	golang.org/x/text v0.43.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect
 	golang.org/x/vuln v1.9.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 // indirect
