@@ -43,5 +43,45 @@
 	"admin": {
 		"title": "Administração",
 		"intro": "Moderação, repasses e o livro-razão chegam na fase de administração."
+	},
+	"api": {
+		"keys": {
+			"title": "Chaves de API",
+			"intro": "Use uma chave de API para chamar as APIs REST, GraphQL e gRPC a partir dos seus próprios scripts. Cada chave só faz o que os escopos dela permitem.",
+			"docs": "Ler a referência da API",
+			"create_title": "Criar uma chave",
+			"name": "Nome",
+			"name_hint": "Algo que diga onde a chave é usada, como \"Script de estoque\".",
+			"scopes": "Escopos",
+			"expires": "Expira",
+			"expires_never": "Nunca",
+			"expires_days": "Em {days} dias",
+			"create": "Criar chave",
+			"created_title": "Copie sua nova chave agora",
+			"created_body": "Esta é a única vez que \"{name}\" aparece. Guarde-a em um gerenciador de senhas ou cofre de segredos; se perdê-la, revogue e crie outra.",
+			"copy": "Copiar chave",
+			"copied": "Copiada",
+			"list_title": "Suas chaves",
+			"limit": "{count} de {max} chaves ativas.",
+			"empty": "Nenhuma chave ainda. Crie uma acima para começar a usar a API.",
+			"prefix": "Chave",
+			"last_used": "Último uso",
+			"never_used": "Nunca usada",
+			"expires_at": "Expira em",
+			"status_active": "Ativa",
+			"status_revoked": "Revogada",
+			"status_expired": "Expirada",
+			"revoke": "Revogar",
+			"revoke_confirm": "Revogar \"{name}\"? Tudo que a usa para de funcionar na hora.",
+			"back": "Voltar ao painel"
+		},
+		"scope": {
+			"catalog:read": "Ler o catálogo",
+			"cart:read": "Ler seu carrinho",
+			"cart:write": "Alterar seu carrinho",
+			"orders:read": "Ler seus pedidos",
+			"shop:read": "Ler sua loja",
+			"shop:write": "Gerenciar sua loja"
+		}
 	}
 }
