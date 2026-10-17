@@ -388,5 +388,212 @@
 			"published": "Published",
 			"suspended": "Suspended"
 		}
+	},
+	"cart": {
+		"title": "Your cart",
+		"empty": "Your cart is empty.",
+		"empty_cta": "Browse products",
+		"sold_by": "Sold by {shop}",
+		"quantity": "Quantity",
+		"remove": "Remove",
+		"each": "{price} each",
+		"subtotal": "Products ({count})",
+		"checkout": "Continue to checkout",
+		"shipping_note": "Shipping is calculated at checkout from your address.",
+		"has_issues": "Remove or adjust the items marked below to check out.",
+		"issue": {
+			"unpublished": "No longer for sale",
+			"shop_suspended": "Shop unavailable",
+			"own_shop": "From your own shop",
+			"out_of_stock": "Out of stock",
+			"insufficient_stock": "Only {stock} left"
+		},
+		"add": "Add to cart",
+		"adding": "Adding…",
+		"login_to_buy": "Log in to buy",
+		"freight": {
+			"title": "Shipping",
+			"cep": "CEP",
+			"calculate": "Calculate",
+			"result": "{price} to {uf}, about {days} business days",
+			"invalid": "Enter a valid 8-digit CEP.",
+			"error": "Shipping could not be calculated. Try again."
+		},
+		"flash": {
+			"added": "Added to your cart.",
+			"removed": "Removed from your cart."
+		},
+		"errors": {
+			"own_shop": "You cannot buy from your own shop.",
+			"unavailable": "This product is not available.",
+			"out_of_stock": "This product is out of stock.",
+			"cart_full": "Your cart is full (50 products).",
+			"quantity_range": "Choose a quantity between 1 and 99.",
+			"insufficient_stock": "There is not enough stock for that quantity."
+		}
+	},
+	"checkout": {
+		"steps": {
+			"label": "Checkout steps",
+			"address": "Address",
+			"payment": "Payment",
+			"pay": "Pay"
+		},
+		"address": {
+			"title": "Where should we deliver?",
+			"choose": "Deliver here",
+			"manage": "Manage addresses",
+			"none": "Add an address to continue.",
+			"add": "Add an address"
+		},
+		"payment": {
+			"title": "Review and pay",
+			"deliver_to": "Delivering to",
+			"change": "Change",
+			"from": "From {shop}",
+			"shipping_days": "Shipping {price}, about {days} business days",
+			"products": "Products",
+			"shipping": "Shipping",
+			"total": "Total",
+			"method": "Payment method",
+			"card": "Card",
+			"card_hint": "You pay on the secure Stripe page.",
+			"pix": "PIX",
+			"pix_hint": "Scan a QR code or paste the code in your bank app.",
+			"card_off": "Card payments are not available right now.",
+			"card_seller": "A seller in your cart does not accept cards yet.",
+			"pix_off": "PIX is not available right now.",
+			"place": "Pay {total}"
+		},
+		"pix": {
+			"title": "Pay with PIX",
+			"instructions": "Open your bank app, choose PIX and scan the code, or copy the code below.",
+			"copy": "Copy code",
+			"copied": "Copied",
+			"code": "PIX copy-and-paste code",
+			"expires": "Pay before {time}.",
+			"waiting": "Waiting for the payment…",
+			"paid": "Payment received. Thank you!",
+			"expired": "This code expired. Place the order again from your cart.",
+			"simulate": "Simulate payment (dev mode)",
+			"back": "Back to the store",
+			"qr_alt": "PIX QR code",
+			"no_qr": "Copy the code below to pay."
+		},
+		"success": {
+			"title": "Thank you!",
+			"paid": "Your payment was confirmed.",
+			"pending": "We are waiting for the payment confirmation. Refresh this page in a moment.",
+			"closed": "This order is no longer waiting for payment.",
+			"order": "Order {id}",
+			"total": "Total"
+		},
+		"status": {
+			"pending": "Waiting for payment",
+			"paid": "Paid",
+			"partially_refunded": "Partially refunded",
+			"refunded": "Refunded",
+			"canceled": "Canceled",
+			"expired": "Expired"
+		},
+		"errors": {
+			"cart_empty": "Your cart is empty.",
+			"cart_unavailable": "Some items in your cart cannot be bought now. Review your cart.",
+			"method": "Choose card or PIX.",
+			"card_disabled": "Card payments are not available right now.",
+			"pix_disabled": "PIX is not available right now.",
+			"shop_no_card": "A seller in your cart does not accept cards yet. Pay with PIX.",
+			"provider": "The payment provider did not respond. Try again in a moment.",
+			"address": "Choose one of your addresses.",
+			"not_refundable": "This order cannot be refunded."
+		},
+		"flash": {
+			"refunded": "Order refunded."
+		},
+		"addresses": {
+			"title": "Your addresses",
+			"add": "Add address",
+			"edit": "Edit",
+			"delete": "Delete",
+			"make_default": "Make default",
+			"default": "Default",
+			"save": "Save address",
+			"cancel": "Cancel",
+			"empty": "You have no saved addresses yet.",
+			"recipient": "Recipient",
+			"cep": "CEP",
+			"street": "Street",
+			"number": "Number",
+			"complement": "Complement (optional)",
+			"district": "District",
+			"city": "City",
+			"uf": "State",
+			"phone": "Phone (optional)",
+			"is_default": "Use as my default address",
+			"lookup": "Find address",
+			"lookup_failed": "We could not find this CEP. Fill in the address by hand.",
+			"flash": {
+				"saved": "Address saved.",
+				"deleted": "Address deleted."
+			},
+			"errors": {
+				"too_many": "You can keep up to 20 addresses.",
+				"cep": "Enter a valid 8-digit CEP.",
+				"uf_mismatch": "The state does not match the CEP.",
+				"phone": "Enter a valid phone number."
+			}
+		},
+		"payouts": {
+			"title": "Payouts",
+			"balance": "Balance from PIX sales",
+			"requested": "Requested",
+			"available": "Available",
+			"request": "Request payout",
+			"amount": "Amount in R$",
+			"min": "Minimum {amount}.",
+			"history": "Payout history",
+			"none": "No payouts yet.",
+			"status": {
+				"requested": "Requested",
+				"paid": "Paid",
+				"rejected": "Rejected"
+			},
+			"card_title": "Card payments",
+			"card_ready": "Card sales are paid straight to your Stripe account.",
+			"card_pending": "Finish your Stripe setup to accept card payments.",
+			"card_connect": "Set up Stripe payouts",
+			"card_continue": "Continue Stripe setup",
+			"card_off": "Card payments are not available right now.",
+			"flash": {
+				"requested": "Payout requested."
+			},
+			"errors": {
+				"too_small": "The minimum payout is R$ 10,00.",
+				"over_balance": "The amount is above your available balance.",
+				"not_pending": "This payout is no longer waiting for payment.",
+				"e2e": "Enter the PIX end-to-end id: E followed by 31 letters and digits.",
+				"e2e_used": "This end-to-end id is already recorded.",
+				"stripe_disabled": "Card payments are not available right now.",
+				"stripe_failed": "Stripe did not respond. Try again in a moment."
+			}
+		},
+		"admin_payouts": {
+			"title": "Payouts to pay",
+			"intro": "Pay each seller by PIX from the platform account, then record the end-to-end id here.",
+			"shop": "Shop",
+			"amount": "Amount",
+			"requested_at": "Requested on",
+			"e2e": "End-to-end id",
+			"mark_paid": "Record payment",
+			"reason": "Reason",
+			"reject": "Reject",
+			"none": "Nothing to pay.",
+			"paid_title": "Recently paid",
+			"paid_at": "Paid on",
+			"flash": {
+				"paid": "Payment recorded.",
+				"rejected": "Payout rejected."
+			}
+		}
 	}
 }

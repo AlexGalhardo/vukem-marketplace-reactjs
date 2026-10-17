@@ -4,6 +4,7 @@ package authtest
 import (
 	"testing"
 
+	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
@@ -21,6 +22,20 @@ func ActingAs(tb testing.TB, app *vukemtest.App, c *vukemtest.Client, u models.U
 	acc, err := accounts.New(app.App)
 	if err != nil {
 		tb.Fatal(err)
+	}
+
+	db, err := app.DB()
+	if err != nil {
+		tb.Fatal(err)
+	}
+
+	// The stamp covers the stored password hash, so use the stored row:
+	// fixtures often return a partial user.
+	id := u.ID
+
+	u, err = orm.QueryOf[models.User](db).Find(tb.Context(), id)
+	if err != nil {
+		tb.Fatalf("authtest: load user %d: %v", id, err)
 	}
 
 	m, err := app.Sessions()

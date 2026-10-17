@@ -17,5 +17,6 @@ func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 		Admin,
 		API,
 		Catalog(deps),
+		Commerce(deps),
 	}
 }

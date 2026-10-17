@@ -388,5 +388,212 @@
 			"published": "Publicado",
 			"suspended": "Suspenso"
 		}
+	},
+	"cart": {
+		"title": "Seu carrinho",
+		"empty": "Seu carrinho está vazio.",
+		"empty_cta": "Ver produtos",
+		"sold_by": "Vendido por {shop}",
+		"quantity": "Quantidade",
+		"remove": "Remover",
+		"each": "{price} cada",
+		"subtotal": "Produtos ({count})",
+		"checkout": "Continuar a compra",
+		"shipping_note": "O frete é calculado no checkout a partir do seu endereço.",
+		"has_issues": "Remova ou ajuste os itens marcados abaixo para continuar.",
+		"issue": {
+			"unpublished": "Não está mais à venda",
+			"shop_suspended": "Loja indisponível",
+			"own_shop": "Da sua própria loja",
+			"out_of_stock": "Sem estoque",
+			"insufficient_stock": "Restam só {stock}"
+		},
+		"add": "Adicionar ao carrinho",
+		"adding": "Adicionando…",
+		"login_to_buy": "Entre para comprar",
+		"freight": {
+			"title": "Frete",
+			"cep": "CEP",
+			"calculate": "Calcular",
+			"result": "{price} para {uf}, cerca de {days} dias úteis",
+			"invalid": "Digite um CEP válido com 8 dígitos.",
+			"error": "Não foi possível calcular o frete. Tente de novo."
+		},
+		"flash": {
+			"added": "Adicionado ao carrinho.",
+			"removed": "Removido do carrinho."
+		},
+		"errors": {
+			"own_shop": "Você não pode comprar da sua própria loja.",
+			"unavailable": "Este produto não está disponível.",
+			"out_of_stock": "Este produto está sem estoque.",
+			"cart_full": "Seu carrinho está cheio (50 produtos).",
+			"quantity_range": "Escolha uma quantidade entre 1 e 99.",
+			"insufficient_stock": "Não há estoque suficiente para essa quantidade."
+		}
+	},
+	"checkout": {
+		"steps": {
+			"label": "Etapas da compra",
+			"address": "Endereço",
+			"payment": "Pagamento",
+			"pay": "Pagar"
+		},
+		"address": {
+			"title": "Onde devemos entregar?",
+			"choose": "Entregar aqui",
+			"manage": "Gerenciar endereços",
+			"none": "Adicione um endereço para continuar.",
+			"add": "Adicionar endereço"
+		},
+		"payment": {
+			"title": "Revise e pague",
+			"deliver_to": "Entrega em",
+			"change": "Alterar",
+			"from": "De {shop}",
+			"shipping_days": "Frete {price}, cerca de {days} dias úteis",
+			"products": "Produtos",
+			"shipping": "Frete",
+			"total": "Total",
+			"method": "Forma de pagamento",
+			"card": "Cartão",
+			"card_hint": "Você paga na página segura da Stripe.",
+			"pix": "PIX",
+			"pix_hint": "Leia o QR code ou cole o código no app do seu banco.",
+			"card_off": "Pagamento com cartão indisponível no momento.",
+			"card_seller": "Um vendedor do seu carrinho ainda não aceita cartão.",
+			"pix_off": "PIX indisponível no momento.",
+			"place": "Pagar {total}"
+		},
+		"pix": {
+			"title": "Pague com PIX",
+			"instructions": "Abra o app do seu banco, escolha PIX e leia o código, ou copie o código abaixo.",
+			"copy": "Copiar código",
+			"copied": "Copiado",
+			"code": "Código PIX copia e cola",
+			"expires": "Pague até {time}.",
+			"waiting": "Aguardando o pagamento…",
+			"paid": "Pagamento recebido. Obrigado!",
+			"expired": "Este código expirou. Faça o pedido de novo pelo carrinho.",
+			"simulate": "Simular pagamento (modo dev)",
+			"back": "Voltar à loja",
+			"qr_alt": "QR code PIX",
+			"no_qr": "Copie o código abaixo para pagar."
+		},
+		"success": {
+			"title": "Obrigado!",
+			"paid": "Seu pagamento foi confirmado.",
+			"pending": "Estamos aguardando a confirmação do pagamento. Atualize esta página em instantes.",
+			"closed": "Este pedido não está mais aguardando pagamento.",
+			"order": "Pedido {id}",
+			"total": "Total"
+		},
+		"status": {
+			"pending": "Aguardando pagamento",
+			"paid": "Pago",
+			"partially_refunded": "Reembolsado em parte",
+			"refunded": "Reembolsado",
+			"canceled": "Cancelado",
+			"expired": "Expirado"
+		},
+		"errors": {
+			"cart_empty": "Seu carrinho está vazio.",
+			"cart_unavailable": "Alguns itens do carrinho não podem ser comprados agora. Revise o carrinho.",
+			"method": "Escolha cartão ou PIX.",
+			"card_disabled": "Pagamento com cartão indisponível no momento.",
+			"pix_disabled": "PIX indisponível no momento.",
+			"shop_no_card": "Um vendedor do seu carrinho ainda não aceita cartão. Pague com PIX.",
+			"provider": "O provedor de pagamento não respondeu. Tente de novo em instantes.",
+			"address": "Escolha um dos seus endereços.",
+			"not_refundable": "Este pedido não pode ser reembolsado."
+		},
+		"flash": {
+			"refunded": "Pedido reembolsado."
+		},
+		"addresses": {
+			"title": "Seus endereços",
+			"add": "Adicionar endereço",
+			"edit": "Editar",
+			"delete": "Excluir",
+			"make_default": "Tornar padrão",
+			"default": "Padrão",
+			"save": "Salvar endereço",
+			"cancel": "Cancelar",
+			"empty": "Você ainda não tem endereços salvos.",
+			"recipient": "Destinatário",
+			"cep": "CEP",
+			"street": "Rua",
+			"number": "Número",
+			"complement": "Complemento (opcional)",
+			"district": "Bairro",
+			"city": "Cidade",
+			"uf": "Estado",
+			"phone": "Telefone (opcional)",
+			"is_default": "Usar como meu endereço padrão",
+			"lookup": "Buscar endereço",
+			"lookup_failed": "Não encontramos este CEP. Preencha o endereço manualmente.",
+			"flash": {
+				"saved": "Endereço salvo.",
+				"deleted": "Endereço excluído."
+			},
+			"errors": {
+				"too_many": "Você pode guardar até 20 endereços.",
+				"cep": "Digite um CEP válido com 8 dígitos.",
+				"uf_mismatch": "O estado não corresponde ao CEP.",
+				"phone": "Digite um telefone válido."
+			}
+		},
+		"payouts": {
+			"title": "Repasses",
+			"balance": "Saldo de vendas por PIX",
+			"requested": "Solicitado",
+			"available": "Disponível",
+			"request": "Solicitar repasse",
+			"amount": "Valor em R$",
+			"min": "Mínimo de {amount}.",
+			"history": "Histórico de repasses",
+			"none": "Nenhum repasse ainda.",
+			"status": {
+				"requested": "Solicitado",
+				"paid": "Pago",
+				"rejected": "Recusado"
+			},
+			"card_title": "Pagamentos com cartão",
+			"card_ready": "As vendas no cartão vão direto para sua conta Stripe.",
+			"card_pending": "Conclua o cadastro na Stripe para aceitar cartão.",
+			"card_connect": "Configurar repasses na Stripe",
+			"card_continue": "Continuar cadastro na Stripe",
+			"card_off": "Pagamento com cartão indisponível no momento.",
+			"flash": {
+				"requested": "Repasse solicitado."
+			},
+			"errors": {
+				"too_small": "O repasse mínimo é de R$ 10,00.",
+				"over_balance": "O valor é maior que o seu saldo disponível.",
+				"not_pending": "Este repasse não está mais aguardando pagamento.",
+				"e2e": "Digite o id fim a fim do PIX: E seguido de 31 letras e números.",
+				"e2e_used": "Este id fim a fim já foi registrado.",
+				"stripe_disabled": "Pagamento com cartão indisponível no momento.",
+				"stripe_failed": "A Stripe não respondeu. Tente de novo em instantes."
+			}
+		},
+		"admin_payouts": {
+			"title": "Repasses a pagar",
+			"intro": "Pague cada vendedor por PIX pela conta da plataforma e registre aqui o id fim a fim.",
+			"shop": "Loja",
+			"amount": "Valor",
+			"requested_at": "Solicitado em",
+			"e2e": "Id fim a fim",
+			"mark_paid": "Registrar pagamento",
+			"reason": "Motivo",
+			"reject": "Recusar",
+			"none": "Nada a pagar.",
+			"paid_title": "Pagos recentemente",
+			"paid_at": "Pago em",
+			"flash": {
+				"paid": "Pagamento registrado.",
+				"rejected": "Repasse recusado."
+			}
+		}
 	}
 }

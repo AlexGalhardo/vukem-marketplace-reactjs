@@ -9,6 +9,7 @@ require (
 	github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0
 	github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0
 	github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0
+	github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0

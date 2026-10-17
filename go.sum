@@ -12,6 +12,8 @@ github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0 h1:wbf2QNvqiRniXT/yUsBlxyN65eT
 github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0/go.mod h1:Lyv95eyisA2pvtBL4nQLUL8GjGVKS70kJVcdHSSErG8=
 github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0 h1:r6s0D4QnLYnvmefnDjne3qU0rE62Xn0FGpFeN2mO2PU=
 github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0/go.mod h1:7lqXZ2uJBiuiwmnbFR2oOlcE5sAY8yvtXFy+5krpRPk=
+github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0 h1:JpOc9B8fOlkRlkjlWifs1zi2cjSZlAFGOQhl1tBsT+w=
+github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0/go.mod h1:XQ2vA1zm5/gAZ/+HIuPYGEhQAfvnjjjI/xkTwUqWjG4=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0 h1:yzvnesRSb9PRhfyq8zqWDVXQFN1LaXfVS12XItSAJ3I=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0/go.mod h1:eODVAbEprXjx9GGoHvD4YIPEUfwvO5xN1v2Ef5twGpM=
 github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0 h1:1LZo9IMbfLUrV5f2vn5KzDxMJBJudQrwRE5txAmNkmY=
