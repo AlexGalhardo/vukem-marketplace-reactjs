@@ -31,7 +31,7 @@ jobs:
           allow_issue_writing: false
           fail_action: false
       - name: nuclei
-        uses: projectdiscovery/nuclei-action@v3.1.0
+        uses: projectdiscovery/nuclei-action@v3.1.1
         with:
           args: -u http://localhost:3200 -severity medium,high,critical -o nuclei.txt
       - uses: actions/upload-artifact@v7.0.2
