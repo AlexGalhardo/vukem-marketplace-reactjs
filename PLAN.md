@@ -387,6 +387,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - 2026-10-17 — Railway: `TRUSTED_PROXIES=100.64.0.0/10` (edge peers seen in the `peer` log field), `CLIENT_IP_HEADER=X-Real-IP`, `TRUST_FORWARDED_PROTO=true` (HSTS now sent; client IPs resolved), `TELEGRAM_LOG=false`. Open: queued mail to Mailtrap SMTP (`sandbox.smtp.mailtrap.io:2525`) times out from Railway (outbound SMTP blocked on the plan); needs an HTTP mail API transport or a plan that allows SMTP.
 
+- 2026-10-17 — vukem v0.26.0 (typed Stripe Accounts v2, Mailtrap API mailer documented). Owner items done: Google login/sign-up, name rules, email verification off by default, admin feature flags (`/admin/flags`), storefront redesign, demo catalog (100 sellers / 2000 products) and documented dev accounts. Not available without new data: free-shipping badge, product condition, cart line images.
+
 ## 9. Operations
 
 ### 9.1 Commands

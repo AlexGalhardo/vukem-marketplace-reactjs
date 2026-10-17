@@ -40,10 +40,17 @@ All notable changes to this project are documented here. The format follows [Kee
 - OpenTelemetry metrics (HTTP, outbound HTTP, DB, queue) over OTLP, configured by `OTEL_*` env.
 - Demo catalog seeder: 100 sellers with one shop each across the 27 UFs and 2000 published pt-BR products (10–30 per shop) with shared placeholder images; deterministic and idempotent; `demo:catalog [--fresh] [--allow-production]` (refuses production without the flag).
 - Compose one-shot `seed` service (bucket + `db:seed`) and a README "Contas de desenvolvimento" table for the fixed admin, buyer and seller accounts.
+- Admin feature flags at `/admin/flags` (typed, cached 30 s in Redis, defaults on any error, audit log of who/when/old→new): email verification, user 2FA, admin 2FA (locked on), Google login, card checkout, PIX checkout, GraphQL API.
+- Continue with Google on login and register (new Google identities create the account).
+- Storefront redesign in the big LatAm marketplace style with our own brand: header with deliver-to CEP, banner carousel, shortcut panels, offer shelves, category grid, cards with installments and stars, search filter column with list/grid view, product buy box with buy now, reviews summary and Q&A placeholder, cart summary, footer with a non-affiliation note; light and dark tokens with AA contrast; skip link.
+- Product cards carry `rating_avg_x100` and `rating_count`.
+- Project-scoped Impeccable design skill (cli-v4.6.0) and zod 4.6.7 for client-side form validation.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
 
+- Email verification is off by default (`email_verification` flag); sign-up lands on the dashboard.
+- Names must be 4–24 characters with whitespace collapsed and the first letter capitalized (server `z` rule mirrored by zod in the forms).
 - vukem bumped to v0.26.0 (`contrib/graphql` v0.3.0, `contrib/grpc` v0.3.0, `contrib/stripe` v0.3.0, `drivers/redis` v0.4.0): Stripe Accounts v2 calls use contrib/stripe's typed helpers (our JSON client removed), SQL built from pieces goes through `database.RebindChecked`, and production mail is documented as `MAIL_MAILER=mailtrap` (Railway blocks SMTP; Mailpit stays local).
 - vukem bumped to v0.25.0 (`drivers/otel` v0.2.0, `drivers/redis` v0.3.0, `drivers/s3` v0.3.0, `contrib/graphql` v0.2.0, `contrib/grpc` v0.2.0, `contrib/stripe` v0.2.0). Adopted: the queue worker in serve (`QUEUE_IN_SERVE`, `app/workers` removed), `database.Rebind`, `uuid.NewV7`, app seeders (`WithAppSeeders`), lazy Redis/MongoDB clients (`OpenLazy`) so the app boots while they are down, `/ready` from `app.ReadyHandler` (the database check is now `db`), catalog routes after boot (`WithRoutesAfterBoot`), keyed vukem errors (no English message matching), session versions (`users.session_version`) instead of the password stamp, Stripe v1 calls through `contrib/stripe`, GraphQL Go-name folding, the gRPC server on its own router and port, `ServeOpenAPIWith`, nonce-only CSP on `/docs/api`, `Disk.CreateBucket`, Telegram `SendSync` with `TELEGRAM_LOG=false` (replaces `TELEGRAM_MIN_LEVEL`, `TELEGRAM_API_URL` removed), and DB/queue/mail spans from `drivers/otel` (SQL text is no longer exported).
 - Accessibility fixes from the axe scans: text on blue, green and red backgrounds uses theme tokens with AA contrast in both themes (`on-action`, `on-status`, darker success/danger), text links use `action-600`, and the language menu's accessible name keeps its visible code.
@@ -56,6 +63,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Security
 
+- Linking Google to an unverified local account also clears its 2FA, API keys, pending reset links, the shop's payout destinations and webhooks; sign-up is rate limited per IP.
 - The demo shop seeder refuses `APP_ENV=production` and uses `SEED_PASSWORD` (it could create `seller@example.com` with a fixed password).
 - API authentication failures (401/403) are always problem+json, even for `Accept: text/html`; `HTTP_H2C` alone never opens the gRPC port in production.
 - Login, 2FA and auth-mail rate limits are stored in Redis, so they hold across instances.
