@@ -10,6 +10,8 @@ import (
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/drivers/redis"
+
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
 )
 
 // RedisConfig is read from the environment before vukem.New runs.
@@ -36,6 +38,9 @@ func RedisOptions(ctx context.Context, deps *Deps) ([]vukem.Option, error) {
 		return nil, fmt.Errorf("platform: redis config: %w", err)
 	}
 
+	// Process-local until Redis is configured below.
+	deps.Realtime = realtime.NewHub(nil, "", nil)
+
 	if cfg.URL == "" {
 		if src.Env() == config.Production {
 			return nil, errRedisRequired
@@ -55,6 +60,7 @@ func RedisOptions(ctx context.Context, deps *Deps) ([]vukem.Option, error) {
 	deps.Redis = rc
 	deps.redisPrefix = cfg.Prefix
 	deps.AddCheck("redis", rc.Ping)
+	deps.Realtime = realtime.NewHub(rc, cfg.Prefix+"realtime", nil)
 
 	return []vukem.Option{
 		vukem.WithCacheStore(rc.CacheStore(cfg.Prefix + "cache:")),

@@ -15,6 +15,8 @@ import (
 
 	"github.com/AlexGalhardo/vukem/drivers/mongo"
 	"github.com/AlexGalhardo/vukem/drivers/redis"
+
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
 )
 
 // Deps holds the infrastructure clients. Fields stay nil when the
@@ -22,6 +24,8 @@ import (
 type Deps struct {
 	Redis *redis.Client
 	Mongo *mongo.Client
+	// Realtime publishes per-user SSE events (over Redis when set).
+	Realtime *realtime.Hub
 
 	redisPrefix string
 
