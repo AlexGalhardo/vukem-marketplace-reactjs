@@ -247,21 +247,21 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
   → verify: `go test ./tests/ -run 'Register|Login|Reset|TwoFactor|Social'`; `bunx playwright test e2e/auth.spec.ts` (register → verify notice → logout → login → dashboard)
 - [x] A.1 `users:make-admin <email>` command (CLI only), `role` column (default `user`, mass-assignment safe), `/admin` behind `accounts.RequireAdmin` (404 for non-admins, redirect to `/user/two-factor` until 2FA is confirmed)
   → verify: `go test ./tests/ -run 'MakeAdmin|NotAdmins|AdminArea'`
-- [ ] A.1b Demo seeders (buyer, seller, admin with 2FA secret printed once)
+- [x] A.1b Demo seeders (buyer, seller, admin with 2FA secret printed once)
   → verify: `vukem db:seed` on a fresh compose database
 - [x] A.3 Email verification over SMTP to the Mailtrap Sandbox, read back through the Sandbox API and followed (`tests/integration/email_test.go`, skips without `MAILTRAP_*`/`SMTP_*`; CI passes the repo secrets)
   → verify: `go test -tags integration ./tests/integration -run Mailtrap -v` (PASS with secrets, SKIP without)
-- [ ] A.3b Queue the auth mails (off the request path) and a `verified` middleware that redirects Inertia visits to the notice
+- [x] A.3b Queue the auth mails (off the request path) and a `verified` middleware that redirects Inertia visits to the notice
   → verify: `go test ./tests/ -run Verified`
-- [ ] A.4 Password reset: generic response, async mail, token hashed, 1h, single use; invalidate other sessions on change
-  → verify: `go test ./tests/accounts -run Reset`; abuse test for token reuse and user enumeration timing
-- [ ] A.5 Google sign-in (vukem social), link by verified email only, PKCE + state, replay-safe in Redis
-  → verify: `go test ./tests/accounts -run Google` with fake provider
+- [x] A.4 Password reset: generic response, async mail, token hashed, 1h, single use; invalidate other sessions on change
+  → verify: `go test ./tests/ -run Reset`; abuse test for token reuse and user enumeration timing
+- [x] A.5 Google sign-in (vukem social), link by verified email only, PKCE + state, replay-safe in Redis
+  → verify: `go test ./tests/ -run Google` with fake provider
 - [x] A.6 TOTP 2FA: enable (QR as `data:` image, no raw HTML), confirm, 10 hashed recovery codes, challenge after password, replay protection, throttled in Redis; mandatory for admins (A.1)
   → verify: `go test ./tests/accounts -run TwoFactor`; abuse: reused code, skipped challenge, recovery code reuse
 - [x] A.7 Mailtrap test helper (`internal/testing/mailtrap`: net/http client for `/api/sandboxes/{id}/messages`, `WaitFor` by recipient + subject, `HTML`/`Text`, `FindLink`, `Clean`; `FromEnv` skips without secrets)
   → verify: `go test -race ./internal/testing/mailtrap` (httptest fake, no network)
-- [ ] A.8 Account pages: profile, password, 2FA, active sessions; i18n complete for auth strings
+- [x] A.8 Account pages: profile, password, 2FA, active sessions; i18n complete for auth strings
   → verify: e2e `auth.spec.ts` (register → verify mail → login → enable 2FA → logout → challenge)
 
 ### C — Catalog
@@ -319,14 +319,14 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 ### X — Public APIs
 
-- [ ] X.1 API keys (`mkt_<prefix>_<secret>`, hashed, scopes, max 20, owner-scoped revoke, per-key rate limit)
+- [x] X.1 API keys (`mkt_<prefix>_<secret>`, hashed, scopes, max 20, owner-scoped revoke, per-key rate limit)
   → verify: `go test ./tests/api -run Keys`
-- [ ] X.2 REST v1 + OpenAPI + Scalar, idempotency with explicit scope
+- [x] X.2 REST v1 + OpenAPI + Scalar, idempotency with explicit scope
   → verify: `AssertMatchesOpenAPI` on every endpoint test
-- [ ] X.3 GraphQL (`contrib/graphql`) with depth/complexity limits
+- [x] X.3 GraphQL (`contrib/graphql`) with depth/complexity limits
   → verify: `go test ./tests/graphql`
-- [ ] X.4 gRPC (`contrib/grpc`) on `GRPC_PORT`, API key interceptor
-  → verify: bufconn tests
+- [x] X.4 gRPC (`contrib/grpc`) on `GRPC_PORT`, API key interceptor
+  → verify: `go test ./tests/api -run GRPC` (grpctest, connect-go, all four protocols)
 - [ ] X.5 Outgoing seller webhooks (signed, queued, retried, delivery log, SSRF-safe)
   → verify: `go test ./tests/webhooks`
 
@@ -376,6 +376,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 - 2026-10-17 — Auth started: A.2 done (scaffold ported, Redis throttles, e2e).
 - 2026-10-17 — A.1, A.3, A.6, A.7 done (make-admin, admin 2FA gate, 10 recovery codes, Mailtrap helper + verification test). Open in Auth: A.1b seeders, A.3b queued mail + verified redirect, A.4 reset hardening, A.5 Google hardening, A.8 account pages/i18n.
 - 2026-10-17 — Owner secrets configured on Railway and GitHub Actions: Mailtrap (sandbox shared with another app: filter by unique recipient, never clean the inbox, email suites serialized), AbacatePay dev key + webhook secret, Google OAuth (localhost redirects 3000/3333/4444/5173; production URI pending), Telegram bot token (chat id pending). Stripe test endpoints exist (platform + Connect → `/webhooks/stripe`); Stripe test keys (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRETS` with platform + Connect whsec) set on Railway and GitHub Actions; Stripe integration tests run in CI when present. Google production redirect URIs and AbacatePay webhook URLs configured by the owner. Local `stripe listen` must be logged into the same Stripe account as the keys.
+
+- 2026-10-17 — Lead resumed: MONGO_DATABASE support, centralized catalog/commerce/API migrations, vukem v0.23.0. Parallel streams in worktrees (auth, catalog, checkout, apis, ops). Merged: apis (X.1–X.4; REST seller writes, `freight` and X.5 still open), auth (A.1b, A.3b, A.4, A.5, A.8; no active-sessions list: vukem cannot enumerate sessions). gRPC stays off in production until `GRPC_TLS_*` or `GRPC_INSECURE_PLAINTEXT=true` is set. Tests that need a logged-in user use `apifixture.ActingAs` (stamped session), not `vukemtest.ActingAs`.
 
 ## 9. Operations
 
