@@ -14,11 +14,11 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/sqlbind"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/authtest"
 )
 
 // NewApp boots the app on in-memory SQLite with extra env.
@@ -28,26 +28,11 @@ func NewApp(tb testing.TB, env map[string]string) *vukemtest.App {
 	return vukemtest.New(tb, bootstrap.New, vukemtest.Options{Env: env})
 }
 
-// ActingAs logs c in as u with a stamped session, like a real login
-// through accounts.Login.
+// ActingAs logs c in as u with a stamped session.
 func ActingAs(tb testing.TB, app *vukemtest.App, c *vukemtest.Client, u models.User) *vukemtest.Client {
 	tb.Helper()
 
-	acc, err := accounts.New(app.App)
-	if err != nil {
-		tb.Fatal(err)
-	}
-
-	m, err := app.Sessions()
-	if err != nil {
-		tb.Fatal(err)
-	}
-
-	for _, ck := range m.Cookies(tb.Context(), acc.SessionValues(u)) {
-		c.WithCookie(ck.Name, ck.Value)
-	}
-
-	return c
+	return authtest.ActingAs(tb, app, c, u)
 }
 
 // DB returns the app database.

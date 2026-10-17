@@ -10,12 +10,16 @@ github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0 h1:jE24TDcmNKR2psddOcQTB+eq
 github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0/go.mod h1:zio073OiT6KDNGuiZLN01BjNH4ldSnEWMas+hyyXQU4=
 github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0 h1:wbf2QNvqiRniXT/yUsBlxyN65eTQnpA6Tl+bgcl6qg0=
 github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0/go.mod h1:Lyv95eyisA2pvtBL4nQLUL8GjGVKS70kJVcdHSSErG8=
+github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0 h1:r6s0D4QnLYnvmefnDjne3qU0rE62Xn0FGpFeN2mO2PU=
+github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0/go.mod h1:7lqXZ2uJBiuiwmnbFR2oOlcE5sAY8yvtXFy+5krpRPk=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0 h1:yzvnesRSb9PRhfyq8zqWDVXQFN1LaXfVS12XItSAJ3I=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0/go.mod h1:eODVAbEprXjx9GGoHvD4YIPEUfwvO5xN1v2Ef5twGpM=
 github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0 h1:1LZo9IMbfLUrV5f2vn5KzDxMJBJudQrwRE5txAmNkmY=
 github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0/go.mod h1:DYXTl6+wYdG/+EnMsnLTxQxDpxyi38Axa4JE7140SUI=
 github.com/AlexGalhardo/vukem/drivers/redis v0.1.0 h1:BtYsg/biXx3+YugBuB+m76X+aGXwkPsZDDwex/huF1w=
 github.com/AlexGalhardo/vukem/drivers/redis v0.1.0/go.mod h1:1j0JHX0lsg5md1GSdbRKSY+cLZ/cpVGAd4gj41rctqw=
+github.com/AlexGalhardo/vukem/drivers/s3 v0.1.0 h1:U+2IPHzqkLzW32lxJ4H/G22yhF7yGiqez8CQqpZxbxg=
+github.com/AlexGalhardo/vukem/drivers/s3 v0.1.0/go.mod h1:x/YFEgPsx6/duIT93ohTXo6C/dH8fiUzA7DisEFzze8=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=
 github.com/bsm/ginkgo/v2 v2.12.0/go.mod h1:SwYbGRRDovPVboqFv0tPTcG1sN61LM1Z4ARdbAV9g4c=
 github.com/bsm/gomega v1.27.10 h1:yeMWxP2pV2fG3FgAODIY8EiRE3dy0aeFYt4l7wh6yKA=
@@ -86,6 +90,8 @@ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACk
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
 golang.org/x/crypto v0.57.0 h1:3ZVCjf8Ggz7zneR/EHRVx68Ctf+2pmIMP2UFhh9cC6M=
 golang.org/x/crypto v0.57.0/go.mod h1:Fdz0i5U6CoizGwLda9DttjSk6qlZo25zYNtR+ycvuZA=
+golang.org/x/image v0.47.0 h1:za/8gVz++PPZqmZJBNSISICN5Rrj5zixP/8K++fgmqo=
+golang.org/x/image v0.47.0/go.mod h1:IkN5o4A7vq55vXN8FWjjnhg9Rs2GOtffqsSi9mWAKYE=
 golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
 golang.org/x/mod v0.42.0 h1:ICeL3t2L30ljSPHHxDnR4fqVcBt/zR2zJAb9juavmQg=
 golang.org/x/mod v0.42.0/go.mod h1:u5fzIrRInkL8MaO1cbRkUHT64v303YIT5KEqpNr7jRs=

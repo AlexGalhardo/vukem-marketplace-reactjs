@@ -35,7 +35,7 @@ func Web(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		r.UseServer(middleware.StaticFS(resources.Public(), middleware.StaticConfig{Prefix: "/"}))
 		r.Use(app.Inertia.Middleware, shareProps(app))
 
-		r.Get("/", controllers.Home).Name("home")
+		// "/" (home) is registered by the catalog routes.
 		r.Post("/locale", controllers.SetLocale(app.I18n, app.Config.Env != config.Development)).Name("locale.update")
 
 		return nil
