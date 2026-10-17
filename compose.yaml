@@ -8,7 +8,7 @@ services:
       context: .
       args:
         APP_VERSION: local
-    environment:
+    environment: &app-env
       APP_ENV: development
       APP_DEBUG: "true"
       APP_URL: http://localhost:${MKT_APP_PORT:-3200}
@@ -29,6 +29,10 @@ services:
       S3_USE_PATH_STYLE: "true"
       S3_INSECURE_HTTP: "true"
       LOG_FORMAT: json
+      # The worker and scheduler services below do this work, so serve
+      # does not run them in process (the single-service default).
+      QUEUE_WORKER_IN_PROCESS: "false"
+      SCHEDULER_IN_PROCESS: "false"
     command: ["sh", "-c", "/app/app migrate && exec /app/app"]
     ports:
       - "${MKT_APP_PORT:-3200}:3000"
@@ -44,6 +48,37 @@ services:
         condition: service_started
       rustfs:
         condition: service_started
+
+  # Queue worker and scheduler: the same image and binary as app, started
+  # with another vukem command. app runs the migrations, so both wait for it
+  # to be healthy. They serve no HTTP, so the image healthcheck is off.
+  worker:
+    build:
+      context: .
+      args:
+        APP_VERSION: local
+    environment: *app-env
+    command: ["/app/app", "queue:work"]
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+  scheduler:
+    build:
+      context: .
+      args:
+        APP_VERSION: local
+    environment: *app-env
+    command: ["/app/app", "schedule:work"]
+    healthcheck:
+      disable: true
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
 
   postgres:
     image: postgres:18.6-alpine
