@@ -159,3 +159,21 @@ func TestHomeSections(t *testing.T) {
 	app.Client(t).Inertia("").WithHeader("Accept-Language", "pt-BR").Get("/").AssertOK().AssertInertia("Home").
 		PropEquals("categories.0.name", "Eletrônicos, Áudio e Vídeo")
 }
+
+// Product cards carry the rating so lists can draw stars.
+func TestSearchCardsCarryRating(t *testing.T) {
+	t.Parallel()
+
+	app := newApp(t)
+	owner, _ := seller(t, app, "stars@example.com", "Loja Estrelas", "SP")
+	p := product(t, app, owner, productSpec{title: "Lanterna LED", category: "tools", price: 4990, stock: 5})
+
+	if _, err := mustDB(t, app).ExecContext(t.Context(),
+		"UPDATE products SET rating_avg_x100 = ?, rating_count = ? WHERE id = ?", 450, 12, p.ID); err != nil {
+		t.Fatal(err)
+	}
+
+	app.Client(t).Inertia("").Get("/search?q=lanterna").AssertOK().AssertInertia("Catalog/Search").
+		PropEquals("results.data.0.rating_avg_x100", float64(450)).
+		PropEquals("results.data.0.rating_count", float64(12))
+}

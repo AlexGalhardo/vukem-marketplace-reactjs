@@ -7,5 +7,5 @@ import AppLayout from "./layouts/AppLayout";
 createInertiaApp({
 	layout: () => AppLayout,
 	nonce: document.querySelector<HTMLMetaElement>('meta[property="csp-nonce"]')?.nonce,
-	progress: { color: "#4f46e5" },
+	progress: { color: "#2968c8" },
 });

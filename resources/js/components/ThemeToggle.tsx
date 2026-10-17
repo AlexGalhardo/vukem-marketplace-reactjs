@@ -15,7 +15,7 @@ export default function ThemeToggle(): JSX.Element {
 			pressed={theme === "dark"}
 			onPressedChange={(pressed) => setTheme(pressed ? "dark" : "light")}
 			data-testid="theme-toggle"
-			className="flex size-9 items-center justify-center rounded-full text-brand-900 hover:bg-black/10 dark:text-ink dark:hover:bg-white/10"
+			className="flex size-9 items-center justify-center rounded-full text-on-header hover:bg-header-hover"
 		>
 			{theme === "dark" ? <MoonIcon /> : <SunIcon />}
 		</Toggle>

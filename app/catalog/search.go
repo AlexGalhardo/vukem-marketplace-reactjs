@@ -36,6 +36,9 @@ type ProductCard struct {
 	ShipFromUF string    `json:"ship_from_uf"`
 	ImageURL   string    `json:"image_url"`
 	CreatedAt  time.Time `json:"created_at"`
+	// RatingAvgX100 and RatingCount drive the stars on product cards.
+	RatingAvgX100 int `json:"rating_avg_x100"`
+	RatingCount   int `json:"rating_count"`
 }
 
 // Sort orders.
@@ -227,7 +230,7 @@ func (s *Service) searchWith(ctx context.Context, q Query, mode matchMode) (Page
 	limit, offset := b.arg(q.PerPage), b.arg((q.Page-1)*q.PerPage)
 
 	rows, err := s.db.QueryContext(ctx, `SELECT p.id, p.slug, p.title, p.price_cents, p.stock, s.slug, s.name,
-		s.ship_from_uf, p.created_at, `+firstImageSQL+from+` ORDER BY `+order+` LIMIT `+limit+` OFFSET `+offset, b.args...)
+		s.ship_from_uf, p.created_at, p.rating_avg_x100, p.rating_count, `+firstImageSQL+from+` ORDER BY `+order+` LIMIT `+limit+` OFFSET `+offset, b.args...)
 	if err != nil {
 		return Page[ProductCard]{}, fmt.Errorf("search products: %w", err)
 	}
@@ -254,7 +257,7 @@ func scanCards(rows *sql.Rows) ([]ProductCard, error) {
 		)
 
 		if err := rows.Scan(&c.ID, &c.Slug, &c.Title, &c.PriceCents, &c.Stock, &c.ShopSlug, &c.ShopName,
-			&c.ShipFromUF, &c.CreatedAt, &img, &width); err != nil {
+			&c.ShipFromUF, &c.CreatedAt, &c.RatingAvgX100, &c.RatingCount, &img, &width); err != nil {
 			return nil, fmt.Errorf("scan product card: %w", err)
 		}
 
@@ -283,7 +286,7 @@ func (s *Service) ProductCards(ctx context.Context, ids []int64) ([]ProductCard,
 	in := b.list(ids)
 
 	rows, err := s.db.QueryContext(ctx, `SELECT p.id, p.slug, p.title, p.price_cents, p.stock, s.slug, s.name,
-		s.ship_from_uf, p.created_at, `+firstImageSQL+` FROM products p JOIN shops s ON s.id = p.shop_id
+		s.ship_from_uf, p.created_at, p.rating_avg_x100, p.rating_count, `+firstImageSQL+` FROM products p JOIN shops s ON s.id = p.shop_id
 		WHERE `+visibleSQL+` AND p.id IN (`+in+`)`, b.args...)
 	if err != nil {
 		return nil, fmt.Errorf("load product cards: %w", err)

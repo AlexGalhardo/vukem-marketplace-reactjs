@@ -17,7 +17,7 @@ export default function Contact(): JSX.Element {
 	return (
 		<>
 			<Head title={t("contact.title")} />
-			<div className="mx-auto max-w-2xl rounded-lg bg-card px-6 py-8 shadow-sm">
+			<div className="mx-auto max-w-2xl rounded-md bg-card px-6 py-8 shadow-card">
 				<h1 className="text-2xl font-semibold text-ink">{t("contact.title")}</h1>
 				<p className="mt-2 max-w-prose text-muted">{t("contact.intro")}</p>
 				<form onSubmit={submit} className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -72,7 +72,7 @@ export default function Contact(): JSX.Element {
 						<button
 							type="submit"
 							disabled={form.processing}
-							className="rounded-md bg-action-600 px-5 py-2.5 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
+							className="rounded-md bg-action-500 px-5 py-2.5 font-medium text-on-action hover:bg-action-600 disabled:opacity-50"
 						>
 							{form.processing ? t("contact.sending") : t("contact.submit")}
 						</button>

@@ -27,7 +27,7 @@ export default function CheckoutAddress({ addresses, selectedId }: Props): JSX.E
 			<CheckoutSteps current="address" />
 			<h1 className="mb-4 text-2xl font-semibold">{t("checkout.address.title")}</h1>
 			{addresses.length === 0 ? (
-				<div className="rounded-md bg-card p-6">
+				<div className="rounded-md bg-card p-6 shadow-card">
 					<p className="mb-3 text-muted">{t("checkout.address.none")}</p>
 					<Link href="/account/addresses" className="font-medium text-action-600 hover:underline">
 						{t("checkout.address.add")}

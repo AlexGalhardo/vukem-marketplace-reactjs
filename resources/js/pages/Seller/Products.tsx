@@ -20,17 +20,17 @@ export default function Products({ products }: { products: Page<SellerProduct> }
 				<h1 className="text-2xl font-semibold text-ink">{t("seller.products.title")}</h1>
 				<Link
 					href="/seller/products/new"
-					className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700"
+					className="rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600"
 				>
 					{t("seller.products.new")}
 				</Link>
 			</div>
 			{products.data.length === 0 ? (
-				<p className="rounded-md bg-card px-4 py-8 text-center text-muted shadow-sm">
+				<p className="rounded-md bg-card px-4 py-8 text-center text-muted shadow-card">
 					{t("seller.products.empty")}
 				</p>
 			) : (
-				<div className="overflow-x-auto rounded-md bg-card shadow-sm">
+				<div className="overflow-x-auto rounded-md bg-card shadow-card">
 					<table className="w-full text-left text-sm">
 						<thead className="border-b border-line text-muted">
 							<tr>

@@ -705,5 +705,114 @@
 			"events": "Escolha pelo menos um evento.",
 			"limit": "Você pode ter no máximo {max} endpoints."
 		}
+	},
+	"storefront": {
+		"header": {
+			"skip": "Pular para o conteúdo",
+			"deliver_to": "Enviar para",
+			"enter_cep": "Informe seu CEP",
+			"nav_label": "Atalhos da loja",
+			"new": "Novidades",
+			"help": "Ajuda",
+			"cart_count": "{count} itens"
+		},
+		"price": {
+			"installments": "em até {count}x {part}"
+		},
+		"banner": {
+			"label": "Destaques",
+			"carousel": "carrossel",
+			"slide": "slide",
+			"position": "Slide {n} de {total}",
+			"previous": "Slide anterior",
+			"next": "Próximo slide",
+			"pause": "Pausar slides",
+			"play": "Reproduzir slides",
+			"deals_title": "Preços mais baixos, todo dia",
+			"deals_body": "O catálogo ordenado do produto mais barato para cima.",
+			"deals_cta": "Ver menores preços",
+			"sell_title": "Sua loja aberta em minutos",
+			"sell_body": "Anuncie produtos, receba por PIX ou cartão e acompanhe cada pedido."
+		},
+		"shortcuts": {
+			"login_title": "Acesse sua conta para aproveitar mais",
+			"login_body": "Acompanhe pedidos e salve endereços.",
+			"login_cta": "Acessar",
+			"account_title": "Suas compras",
+			"account_body": "Pedidos, endereços e segurança em um só lugar.",
+			"account_cta": "Abrir painel",
+			"cep_title": "Seu CEP de entrega",
+			"cep_body": "Confira preço e prazo do envio antes de comprar.",
+			"cep_cta": "Gerenciar endereços",
+			"pay_title": "PIX ou cartão",
+			"pay_body": "Pague na hora com PIX ou com cartão de crédito.",
+			"pay_cta": "Ver produtos",
+			"budget_title": "Até R$ 100",
+			"budget_body": "Achados que cabem no bolso.",
+			"budget_cta": "Ver produtos",
+			"sell_title": "Venda com a gente",
+			"sell_body": "Abra uma loja e alcance compradores no Brasil todo.",
+			"sell_cta": "Começar a vender"
+		},
+		"shelf": {
+			"previous": "Rolar {title} para trás",
+			"next": "Rolar {title} para frente"
+		},
+		"search": {
+			"applied": "Filtros aplicados",
+			"remove_filter": "Remover filtro {filter}",
+			"all_categories": "Todas as categorias",
+			"up_to": "Até {max}",
+			"between": "{min} a {max}",
+			"over": "Mais de {min}",
+			"view": "Visualização dos resultados",
+			"view_list": "Ver em lista",
+			"view_grid": "Ver em grade"
+		},
+		"product": {
+			"all": "Todos os produtos",
+			"in_category": "Anunciado em",
+			"buy_box": "Opções de compra",
+			"stock_available": "Estoque disponível",
+			"buy_now": "Comprar agora",
+			"reviews": "Opiniões do produto",
+			"no_reviews": "Ainda não há avaliações.",
+			"questions": "Perguntas e respostas",
+			"questions_soon": "Perguntas ao vendedor ainda não estão disponíveis nesta demonstração."
+		},
+		"cart": {
+			"summary": "Resumo da compra",
+			"shipping_later": "No checkout",
+			"decrease": "Diminuir quantidade",
+			"increase": "Aumentar quantidade",
+			"available": "{count} disponíveis"
+		},
+		"perks": {
+			"pay_title": "PIX ou cartão",
+			"pay_body": "Pague na hora com PIX ou com cartão de crédito no checkout.",
+			"ship_title": "Envio calculado por CEP",
+			"ship_body": "Preço e prazo calculados por região antes de você comprar.",
+			"safe_title": "Conta protegida",
+			"safe_body": "Sessões seguras, login em duas etapas e chaves de API com escopo."
+		},
+		"footer": {
+			"label": "Links do site",
+			"buy": "Comprar",
+			"all_products": "Todos os produtos",
+			"deals": "Menores preços",
+			"newest": "Novidades",
+			"cart": "Carrinho",
+			"sell": "Vender",
+			"open_shop": "Abrir sua loja",
+			"seller_area": "Área do vendedor",
+			"payouts": "Repasses",
+			"help": "Ajuda",
+			"purchases": "Compras",
+			"addresses": "Endereços",
+			"contact": "Fale conosco",
+			"project": "Projeto",
+			"framework": "Feito com vukem",
+			"disclaimer": "Projeto de demonstração open-source, sem afiliação com o Mercado Livre."
+		}
 	}
 }

@@ -35,7 +35,7 @@ export default function WebhookDeliveries({ endpoint, deliveries }: Props): JSX.
 			<h1 className="mt-2 text-2xl font-semibold text-ink">{t("webhooks.deliveries")}</h1>
 			<p className="mt-1 break-all font-mono text-sm text-muted">{endpoint.url}</p>
 
-			<div className="mt-6 overflow-x-auto rounded-lg bg-card shadow-sm">
+			<div className="mt-6 overflow-x-auto rounded-md bg-card shadow-card">
 				{deliveries.length === 0 ? (
 					<p className="px-5 py-4 text-sm text-muted">{t("webhooks.no_deliveries")}</p>
 				) : (

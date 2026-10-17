@@ -46,6 +46,9 @@ export interface ProductCard {
 	ship_from_uf: string;
 	image_url: string;
 	created_at: string;
+	// Average rating ×100 and review count (0 when unrated).
+	rating_avg_x100: number;
+	rating_count: number;
 }
 
 export interface Page<T> {

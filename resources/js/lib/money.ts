@@ -43,3 +43,16 @@ export function formatMoney(cents: number, locale: string): string {
 export function formatDateTime(iso: string, locale: string): string {
 	return new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(new Date(iso));
 }
+
+// installmentPlan splits a price into up to `max` monthly parts of at
+// least `minPartCents`, rounding each part up to a whole cent; null when
+// the price is too low to split. Display only: checkout charges the total.
+export function installmentPlan(
+	cents: number,
+	max = 10,
+	minPartCents = 500,
+): { count: number; partCents: number } | null {
+	const count = Math.min(max, Math.floor(cents / minPartCents));
+	if (count < 2) return null;
+	return { count, partCents: Math.ceil(cents / count) };
+}

@@ -3,22 +3,34 @@
 /* Dark mode follows the .dark class set on <html> before paint (app.html). */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Design tokens. Inspired by big LatAm marketplaces (warm yellow header,
-   blue actions) without copying any brand. Components use these tokens,
-   never raw hex values. */
+/* Design tokens. Layout and colour family follow big LatAm marketplaces
+   (yellow header, grey canvas, white panels, blue actions) without copying
+   any brand. Components use these tokens, never raw hex values. Every
+   text pair is AA (4.5:1) in both themes. */
 @theme {
-	--font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+	--font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
 	--color-brand-50: #fffbe6;
 	--color-brand-100: #fff3b0;
 	--color-brand-300: #ffe566;
-	--color-brand-400: #ffdb15;
+	--color-brand-400: #fff159;
 	--color-brand-500: #f5cc00;
 	--color-brand-900: #3d3300;
 
-	--color-action-500: #2d6cdf;
+	/* The top bar: yellow by day, warm charcoal by night. */
+	--color-header: #fff159;
+	--color-on-header: #333333;
+	--color-header-muted: #5c5622;
+	--color-header-hover: rgb(0 0 0 / 0.07);
+	/* The logo mark: ink on the yellow bar, yellow on the dark one. */
+	--color-mark: #333333;
+
+	--color-action-500: #2968c8;
 	--color-action-600: #1f57c3;
 	--color-action-700: #17449b;
+	/* Soft secondary action (add to cart): action-600 text on it is AA. */
+	--color-action-soft: #e3edfb;
+	--color-action-soft-hover: #d0e0f8;
 	/* Text on action backgrounds: white on the light theme's blues, near-black on the dark theme's lighter blues. */
 	--color-on-action: #ffffff;
 	--color-on-status: #ffffff;
@@ -26,33 +38,85 @@
 	/* AA (4.5:1) against white as text and as a background for white text. */
 	--color-success-600: #006b35;
 	--color-danger-600: #c62828;
+	--color-warning-600: #8a5300;
+	--color-star: #2968c8;
 
-	--color-surface: #f2f2f2;
+	/* Home banner slides (white text on all three, both themes). */
+	--color-banner-1: #2457a8;
+	--color-banner-2: #0d5c35;
+	--color-banner-3: #33302a;
+	--color-banner-sky: #9cc1f7;
+
+	--color-surface: #ededed;
 	--color-card: #ffffff;
+	--color-sunken: #f5f5f5;
 	--color-ink: #1f1f1f;
 	--color-muted: #5f5f5f;
-	--color-line: #e2e2e2;
+	--color-line: #e0e0e0;
+
+	--shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.12);
+	--shadow-lift: 0 7px 16px 0 rgb(0 0 0 / 0.1), 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 @layer base {
 	.dark {
-		--color-surface: #0f1012;
-		--color-card: #1a1b1e;
+		--color-header: #24231c;
+		--color-on-header: #f2efd6;
+		--color-header-muted: #d8d3a0;
+		--color-header-hover: rgb(255 255 255 / 0.08);
+		--color-mark: #fff159;
+
+		--color-surface: #121212;
+		--color-card: #1d1d1f;
+		--color-sunken: #18181a;
 		--color-ink: #ededee;
-		--color-muted: #a1a1a6;
-		--color-line: #2c2d31;
-		--color-action-500: #5b8ef0;
-		--color-action-600: #7aa4f4;
+		--color-muted: #a8a8ad;
+		--color-line: #2f2f33;
+		--color-action-500: #6ea0f5;
+		--color-action-600: #8bb3f7;
 		--color-action-700: #a3c0f8;
+		--color-action-soft: #25324a;
+		--color-action-soft-hover: #2e3d59;
 		--color-on-action: #0b1220;
 		--color-on-status: #111111;
 		--color-success-600: #4cd68b;
 		--color-danger-600: #ff7b7b;
+		--color-warning-600: #f2b84b;
+		--color-star: #8bb3f7;
+
+		--shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.5);
+		--shadow-lift: 0 8px 20px 0 rgb(0 0 0 / 0.55);
+	}
+
+	.dark {
+		color-scheme: dark;
+	}
+
+	html {
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	a,
+	button,
+	summary {
+		touch-action: manipulation;
+	}
+
+	::selection {
+		background-color: var(--color-brand-400);
+		color: #1f1f1f;
 	}
 
 	:focus-visible {
 		outline: 2px solid var(--color-action-500);
 		outline-offset: 2px;
+	}
+
+	input,
+	select,
+	textarea {
+		accent-color: var(--color-action-500);
+		caret-color: var(--color-action-500);
 	}
 
 	@media (prefers-reduced-motion: reduce) {
@@ -61,6 +125,14 @@
 		*::after {
 			animation-duration: 0.01ms !important;
 			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
 		}
+	}
+}
+
+@utility scrollbar-none {
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
 	}
 }
