@@ -409,23 +409,27 @@ func TestUploadRustFS(t *testing.T) {
 	}
 }
 
-// ensureBucket checks the bucket accepts writes, creating it first when
-// the local RustFS has none (the s3 driver has no CreateBucket).
+// ensureBucket creates the bucket (a no-op when it exists) and checks it
+// accepts writes.
 func ensureBucket(t *testing.T, disk storage.Disk, envs map[string]string) error {
 	t.Helper()
 
-	p := "healthcheck/" + word(8) + ".txt"
-
-	err := storage.PutBytes(t.Context(), disk, p, []byte("ok"))
-	if err != nil && strings.Contains(err.Error(), "NoSuchBucket") {
-		if err := createBucket(t.Context(), envs); err != nil {
-			return err
-		}
-
-		err = storage.PutBytes(t.Context(), disk, p, []byte("ok"))
+	cfg, err := config.Load[s3.Config](config.MapSource(envs))
+	if err != nil {
+		return err
 	}
 
+	s3disk, err := s3.New(cfg)
 	if err != nil {
+		return err
+	}
+
+	if err := s3disk.CreateBucket(t.Context()); err != nil {
+		return err
+	}
+
+	p := "healthcheck/" + word(8) + ".txt"
+	if err := storage.PutBytes(t.Context(), disk, p, []byte("ok")); err != nil {
 		return err
 	}
 
@@ -434,14 +438,4 @@ func ensureBucket(t *testing.T, disk storage.Disk, envs map[string]string) error
 	}
 
 	return nil
-}
-
-// createBucket creates the local bucket through the app's dev helper.
-func createBucket(ctx context.Context, envs map[string]string) error {
-	cfg, err := config.Load[s3.Config](config.MapSource(envs))
-	if err != nil {
-		return err
-	}
-
-	return catalog.CreateBucket(ctx, cfg, config.Development)
 }
