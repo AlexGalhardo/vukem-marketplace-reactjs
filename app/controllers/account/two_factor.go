@@ -177,7 +177,7 @@ func (h *TwoFactorHandlers) Challenge(c *web.Ctx) error {
 
 	accounts.ClearTwoFactorChallenge(c)
 
-	if err := h.a.Web.Login(c, u, auth.Remember(remember)); err != nil {
+	if err := h.a.Login(c, u, auth.Remember(remember)); err != nil {
 		return err
 	}
 

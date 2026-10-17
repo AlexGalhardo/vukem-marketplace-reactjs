@@ -90,7 +90,7 @@ func (h *Handlers) Login(c *web.Ctx) error {
 		return err
 	}
 
-	if err := h.a.Web.Login(c, u, auth.Remember(in.Remember)); err != nil {
+	if err := h.a.Login(c, u, auth.Remember(in.Remember)); err != nil {
 		return err
 	}
 
@@ -114,7 +114,7 @@ func (h *Handlers) Register(c *web.Ctx) error {
 		return err
 	}
 
-	if err := h.a.Web.Login(c, u); err != nil {
+	if err := h.a.Login(c, u); err != nil {
 		return err
 	}
 

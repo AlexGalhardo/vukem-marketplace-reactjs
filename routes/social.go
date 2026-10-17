@@ -43,7 +43,7 @@ func Social(r *router.Router, app *vukem.App) error {
 			return c.Redirect("/two-factor-challenge")
 		}
 
-		if err := acc.Web.Login(c, u); err != nil {
+		if err := acc.Login(c, u); err != nil {
 			return err
 		}
 

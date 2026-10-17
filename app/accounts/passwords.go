@@ -19,10 +19,33 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 )
 
-// SendResetLink emails a single-use password reset link. Unknown emails
-// are silently ignored so the form never reveals who has an account.
+// PasswordResetJob sends a password reset link from the queue. Every
+// request dispatches one, whether or not the email has an account, so the
+// forgot-password response takes the same time for both (no enumeration).
+type PasswordResetJob struct {
+	Email  string `json:"email"`
+	Locale string `json:"locale"`
+}
+
+// Kind implements queue.Job.
+func (PasswordResetJob) Kind() string { return "accounts.password_reset" }
+
+// resetCooldown is the minimum time between two reset mails to one
+// address, so the form cannot be used to flood an inbox.
+const resetCooldown = time.Minute
+
+// RequestPasswordReset queues the reset link for email. It does no lookup:
+// the job does, off the request path.
+func (a *Accounts) RequestPasswordReset(ctx context.Context, email, locale string) error {
+	job := PasswordResetJob{Email: strings.ToLower(strings.TrimSpace(email)), Locale: locale}
+	return a.queue.Dispatch(ctx, job)
+}
+
+// SendResetLink emails a single-use password reset link (the token is
+// stored as a SHA-256 digest). Unknown emails, and a second request within
+// resetCooldown, are silently ignored.
 func (a *Accounts) SendResetLink(ctx context.Context, email string) error {
-	email = strings.ToLower(email)
+	email = strings.ToLower(strings.TrimSpace(email))
 
 	u, err := a.Users.ByCredentials(ctx, map[string]string{"email": email})
 	if errors.Is(err, auth.ErrUserNotFound) {
@@ -33,21 +56,33 @@ func (a *Accounts) SendResetLink(ctx context.Context, email string) error {
 		return err
 	}
 
-	token := rand.Text()
 	d := a.DB.Dialect()
 
-	if _, err := a.DB.ExecContext(
-		ctx,
-		"DELETE FROM password_resets WHERE email = "+d.Placeholder(1),
-		email,
-	); err != nil {
-		return err
+	var last time.Time
+
+	err = a.DB.QueryRowContext(ctx, "SELECT created_at FROM password_resets WHERE email = "+d.Placeholder(1), email).
+		Scan(&last)
+	if err == nil && a.now().Before(last.Add(resetCooldown)) {
+		return nil
 	}
 
-	if _, err := a.DB.ExecContext(ctx, "INSERT INTO password_resets (email, hash, created_at) VALUES ("+
-		d.Placeholder(
-			1,
-		)+", "+d.Placeholder(2)+", "+d.Placeholder(3)+")", email, digest(token), a.now().UTC()); err != nil {
+	token := rand.Text()
+
+	err = a.DB.Tx(ctx, func(tx *database.Tx) error {
+		if _, err := tx.ExecContext(
+			ctx,
+			"DELETE FROM password_resets WHERE email = "+d.Placeholder(1),
+			email,
+		); err != nil {
+			return err
+		}
+
+		_, err := tx.ExecContext(ctx, "INSERT INTO password_resets (email, hash, created_at) VALUES ("+
+			d.Placeholder(1)+", "+d.Placeholder(2)+", "+d.Placeholder(3)+")", email, digest(token), a.now().UTC())
+
+		return err
+	})
+	if err != nil {
 		return err
 	}
 

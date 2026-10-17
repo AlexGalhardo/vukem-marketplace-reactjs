@@ -1,6 +1,7 @@
 package account
 
 import (
+	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/inertia"
 	"github.com/AlexGalhardo/vukem/web"
 
@@ -18,7 +19,7 @@ func (h *Handlers) SendResetLink(c *web.Ctx) error {
 		return err
 	}
 
-	if err := h.a.SendResetLink(c.Context(), in.Email); err != nil {
+	if err := h.a.RequestPasswordReset(c.Context(), in.Email, i18n.Locale(c.Context())); err != nil {
 		return err
 	}
 
@@ -42,6 +43,10 @@ func (h *Handlers) Reset(c *web.Ctx) error {
 	if _, err := h.a.ResetPassword(c.Context(), in.Email, in.Token, in.Password); err != nil {
 		return err
 	}
+
+	// The new password hash ends every session of the account (session
+	// stamp); this browser gets a fresh session id as well.
+	c.Session().Regenerate()
 
 	inertia.Flash(c, "status", "Your password was reset. You can log in now.")
 
