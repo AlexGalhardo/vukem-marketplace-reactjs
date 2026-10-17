@@ -84,7 +84,12 @@ func FromApp(app *vukem.App, mongoClient func() *mongo.Client) (*Service, error)
 		return nil, err
 	}
 
-	cfg := Config{DB: db, Cache: c, Disk: disk, Log: app.Log, Now: app.Now}
+	q, err := app.Queue()
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := Config{DB: db, Cache: c, Disk: disk, Queue: q, Log: app.Log, Now: app.Now}
 	if mongoClient != nil {
 		cfg.Recorder = NewMongoRecorder(mongoClient)
 	}

@@ -150,7 +150,10 @@ func TestShopIDOR(t *testing.T) {
 		productSpec{title: "Produto da Alice", price: 5000, stock: 3, status: catalog.StatusDraft},
 	)
 
-	img, err := service(t, app).AddProductImage(t.Context(), alice.ID, p.ID, bytes.NewReader(jpegBytes(t, 50, 50)), "")
+	img, err := service(
+		t,
+		app,
+	).SaveProductImage(t.Context(), alice.ID, p.ID, "a.jpg", bytes.NewReader(jpegBytes(t, 50, 50)))
 	if err != nil {
 		t.Fatal(err)
 	}

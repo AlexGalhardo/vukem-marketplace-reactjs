@@ -8,8 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
@@ -44,7 +42,10 @@ func TestUploadImages(t *testing.T) {
 	c.Do(http.MethodPost, url, body, ctype).AssertRedirect("/seller/products/" + id(p.ID) + "/edit")
 
 	imgs := images(t, app, p.ID)
-	if len(imgs) != 2 || imgs[0].Width != 2000 || imgs[1].Width != 200 || imgs[1].Position != 1 {
+	// Width/height are the largest variant's: 1280 wide for the 2000 px
+	// photo, the original 200 px for the small one (never upscaled).
+	if len(imgs) != 2 || imgs[0].Width != 1280 || imgs[0].Height != 640 || imgs[1].Width != 200 ||
+		imgs[1].Position != 1 {
 		t.Fatalf("images = %+v", imgs)
 	}
 
@@ -169,8 +170,8 @@ func TestUploadAbuse(t *testing.T) {
 		{"oversize", filePart{"big.jpg", "image/jpeg", big}, 413},
 		{"wrong extension", filePart{"photo.jpg", "image/jpeg", pngBytes(t, 10, 10)}, 422},
 		{"executable extension", filePart{"photo.php", "image/jpeg", jpegBytes(t, 10, 10)}, 422},
-		{"gif not accepted", filePart{"x.gif", "image/gif", []byte("GIF89a\x01\x00\x01\x00\x00\x00\x00;")}, 422},
-		{"truncated jpeg", filePart{"t.jpg", "image/jpeg", jpegBytes(t, 50, 50)[:200]}, 422},
+		// A GIF header without image data passes upload; the job drops it.
+		{"gif without pixels", filePart{"x.gif", "image/gif", []byte("GIF89a\x01\x00\x01\x00\x00\x00\x00;")}, 303},
 	}
 
 	for _, tt := range tests {
@@ -180,9 +181,15 @@ func TestUploadAbuse(t *testing.T) {
 
 	vukemtest.AssertDatabaseCount(t, app, "product_images", 0)
 
+	// A truncated JPEG passes the header checks; the thumbnail job cannot
+	// decode it and drops the image.
+	body, ctype := multipartBody(t, filePart{"t.jpg", "image/jpeg", jpegBytes(t, 400, 400)[:600]})
+	c.Do(http.MethodPost, url, body, ctype).AssertStatus(http.StatusSeeOther)
+	vukemtest.AssertDatabaseCount(t, app, "product_images", 0)
+
 	// JPEG with an HTML payload appended: a valid JPEG, accepted, but the
 	// stored variants are re-encoded, so the payload is gone.
-	body, ctype := multipartBody(t, filePart{"poly.jpg", "image/jpeg", append(jpegBytes(t, 64, 64), html...)})
+	body, ctype = multipartBody(t, filePart{"poly.jpg", "image/jpeg", append(jpegBytes(t, 64, 64), html...)})
 	c.Do(http.MethodPost, url, body, ctype).AssertStatus(http.StatusSeeOther)
 
 	imgs := images(t, app, p.ID)
@@ -205,23 +212,20 @@ func TestMediaRouteRejectsArbitraryKeys(t *testing.T) {
 
 	app := newApp(t)
 	guest := app.Client(t)
-	token := strings.Repeat("a", 32)
+	name := strings.Repeat("a2", 13) // the shape of upload.Receive names
 
 	for _, path := range []string{
-		"/media/products/1/" + token + "/w640.jpg", // well formed, missing
-		"/media/products/1/" + token + "/w641.jpg",
-		"/media/products/1/" + token + "/original.png",
-		"/media/users/1/" + token + "/w640.jpg",
-		"/media/products/x/" + token + "/w640.jpg",
-		"/media/products/1/" + strings.Repeat("A", 32) + "/w640.jpg",
-		"/media/products/1/..%2f..%2f.env/w640.jpg",
-		"/media/products/1/" + token + "%2f..%2fx/w640.jpg",
+		"/media/products/1/" + name + "-w640.jpg", // well formed, missing
+		"/media/products/1/" + name + "-w641.jpg",
+		"/media/products/1/" + name + ".svg",
+		"/media/products/1/" + name + ".html",
+		"/media/users/1/" + name + ".jpg",
+		"/media/products/x/" + name + ".jpg",
+		"/media/products/1/" + strings.ToUpper(name) + ".jpg",
+		"/media/products/1/..%2f..%2f.env",
+		"/media/products/1/%2e" + name + ".jpg",
+		"/media/products/1/" + name + ".jpg%2f..%2f..%2fx.jpg",
 	} {
 		guest.Get(path).AssertNotFound()
-	}
-
-	got, ok := catalog.MediaObject("products", "12", token, "w320.jpg")
-	if diff := cmp.Diff("products/12/"+token+"/w320.jpg", got); diff != "" || !ok {
-		t.Fatalf("MediaObject (-want +got):\n%s", diff)
 	}
 }

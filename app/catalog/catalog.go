@@ -19,6 +19,7 @@ import (
 	"github.com/AlexGalhardo/vukem/cache"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/errs"
+	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/storage"
 )
 
@@ -49,6 +50,8 @@ type Config struct {
 	Cache *cache.Cache
 	// Disk stores product and shop images (S3 in production).
 	Disk storage.Disk
+	// Queue runs ThumbnailJob; nil makes thumbnails inline (tools, tests).
+	Queue *queue.Queue
 	// Recorder stores search/view history; nil discards it.
 	Recorder Recorder
 	Log      *slog.Logger
@@ -60,6 +63,7 @@ type Service struct {
 	db       *database.DB
 	cache    *cache.Cache
 	disk     storage.Disk
+	queue    *queue.Queue
 	recorder Recorder
 	log      *slog.Logger
 	now      func() time.Time
@@ -73,7 +77,15 @@ func New(cfg Config) (*Service, error) {
 		return nil, errNoDB
 	}
 
-	s := &Service{db: cfg.DB, cache: cfg.Cache, disk: cfg.Disk, recorder: cfg.Recorder, log: cfg.Log, now: cfg.Now}
+	s := &Service{
+		db:       cfg.DB,
+		cache:    cfg.Cache,
+		disk:     cfg.Disk,
+		queue:    cfg.Queue,
+		recorder: cfg.Recorder,
+		log:      cfg.Log,
+		now:      cfg.Now,
+	}
 	if s.log == nil {
 		s.log = slog.New(slog.DiscardHandler)
 	}

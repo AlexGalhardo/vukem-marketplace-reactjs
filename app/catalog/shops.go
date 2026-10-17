@@ -30,7 +30,7 @@ func shopView(s Shop) ShopView {
 		ShipFromUF: s.ShipFromUF, Status: s.Status, StripeReady: s.StripeReady, Since: s.CreatedAt,
 	}
 	if s.LogoKey.Valid {
-		v.LogoURL = MediaURL(s.LogoKey.V, 320)
+		v.LogoURL = "/media/" + s.LogoKey.V // the original until its thumbnail replaces it
 	}
 
 	return v

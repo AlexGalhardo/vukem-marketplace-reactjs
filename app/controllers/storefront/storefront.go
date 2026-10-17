@@ -244,11 +244,13 @@ func (h *Handlers) Shop(c *web.Ctx) error {
 	return inertia.Render(c, "Catalog/Shop", inertia.Props{"shop": shop, "results": page})
 }
 
-// Media streams an image variant. Only well-formed keys and known variant
-// names reach the disk (no arbitrary object reads); keys are random and
-// immutable, so responses cache for a year.
+// Media streams a stored image (variant, or original until processed).
+// Only stored image names reach the disk (no arbitrary object reads);
+// names are random and never rewritten, so responses cache for a year.
 func (h *Handlers) Media(c *web.Ctx) error {
-	p, ok := catalog.MediaObject(c.Param("kind"), c.Param("id"), c.Param("token"), c.Param("file"))
+	p := c.Param("kind") + "/" + c.Param("id") + "/" + c.Param("file")
+
+	ctype, ok := catalog.MediaObject(p)
 	if !ok {
 		return catalog.ErrNotFound
 	}
@@ -264,7 +266,7 @@ func (h *Handlers) Media(c *web.Ctx) error {
 	defer rc.Close()
 
 	w := c.Writer()
-	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Type", ctype)
 	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Content-Security-Policy", "default-src 'none'; sandbox")

@@ -123,8 +123,10 @@ func (s *Service) Search(ctx context.Context, q Query, cached bool) (Page[Produc
 		func(ctx context.Context) (Page[ProductCard], error) { return s.search(ctx, q) })
 }
 
-// firstImageSQL selects the key of a product's first image (alias "p").
-const firstImageSQL = `(SELECT i.key FROM product_images i WHERE i.product_id = p.id ORDER BY i.position, i.id LIMIT 1)`
+// firstImageSQL selects the key and width (0 = not processed yet) of a
+// product's first image (alias "p").
+const firstImageSQL = `(SELECT i.key FROM product_images i WHERE i.product_id = p.id ORDER BY i.position, i.id LIMIT 1),
+	(SELECT i.width FROM product_images i WHERE i.product_id = p.id ORDER BY i.position, i.id LIMIT 1)`
 
 // How the search term matches.
 type matchMode int
@@ -246,17 +248,18 @@ func scanCards(rows *sql.Rows) ([]ProductCard, error) {
 
 	for rows.Next() {
 		var (
-			c   ProductCard
-			img sql.Null[string]
+			c     ProductCard
+			img   sql.Null[string]
+			width sql.Null[int64]
 		)
 
 		if err := rows.Scan(&c.ID, &c.Slug, &c.Title, &c.PriceCents, &c.Stock, &c.ShopSlug, &c.ShopName,
-			&c.ShipFromUF, &c.CreatedAt, &img); err != nil {
+			&c.ShipFromUF, &c.CreatedAt, &img, &width); err != nil {
 			return nil, fmt.Errorf("scan product card: %w", err)
 		}
 
 		if img.Valid {
-			c.ImageURL = MediaURL(img.V, 640)
+			c.ImageURL = imageURL(img.V, width.V > 0, 640)
 		}
 
 		items = append(items, c)

@@ -1,8 +1,6 @@
 package catalog
 
 import (
-	"image"
-	"image/color"
 	"strings"
 	"testing"
 )
@@ -30,32 +28,37 @@ func TestSlugify(t *testing.T) {
 	}
 }
 
-func TestDownscale(t *testing.T) {
+func TestMediaObject(t *testing.T) {
 	t.Parallel()
 
-	src := image.NewRGBA(image.Rect(0, 0, 400, 200))
-	for y := range 200 {
-		for x := range 400 {
-			c := uint8(0)
-			if x%2 == 0 {
-				c = 255
-			}
+	name := strings.Repeat("a2", 13) // upload.Receive names: 26 base32 chars
 
-			src.SetRGBA(x, y, color.RGBA{R: c, G: c, B: c, A: 255})
+	tests := []struct {
+		path, ctype string
+	}{
+		{"products/12/" + name + ".jpg", "image/jpeg"},
+		{"products/12/" + name + "-w640.png", "image/png"},
+		{"shops/1/" + name + ".webp", "image/webp"},
+		{"shops/1/" + name + "-w320.gif", "image/gif"},
+		{"products/12/" + name + "-w641.jpg", ""},
+		{"products/12/" + name + ".svg", ""},
+		{"products/12/" + name + ".html", ""},
+		{"users/12/" + name + ".jpg", ""},
+		{"products/x/" + name + ".jpg", ""},
+		{"products/12/" + strings.ToUpper(name) + ".jpg", ""},
+		{"products/12/../" + name + ".jpg", ""},
+		{"products/12/" + name + ".jpg/../../.env", ""},
+		{"quarantine/." + name + ".jpg", ""},
+	}
+
+	for _, tt := range tests {
+		ctype, ok := MediaObject(tt.path)
+		if ctype != tt.ctype || ok != (tt.ctype != "") {
+			t.Errorf("MediaObject(%q) = %q, %v; want %q", tt.path, ctype, ok, tt.ctype)
 		}
 	}
 
-	dst := downscale(src, 100)
-	if dst.Rect.Dx() != 100 || dst.Rect.Dy() != 50 {
-		t.Fatalf("size = %v, want 100x50", dst.Rect)
-	}
-
-	// Alternating black/white columns average to mid grey.
-	if got := dst.RGBAAt(10, 10).R; got < 120 || got > 135 {
-		t.Fatalf("pixel = %d, want ~127", got)
-	}
-
-	if downscale(src, 400) != src || downscale(src, 1000) != src {
-		t.Fatal("images at most w wide must be returned as is")
+	if got := variantPath("products/12/"+name+".png", 320); got != "products/12/"+name+"-w320.png" {
+		t.Errorf("variantPath = %q", got)
 	}
 }

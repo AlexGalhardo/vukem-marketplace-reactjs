@@ -9,7 +9,6 @@ import (
 	"image/color"
 	"image/png"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/AlexGalhardo/vukem/auth/hash"
@@ -221,7 +220,13 @@ func seedProduct(ctx context.Context, db *database.DB, svc *catalog.Service, sel
 		return err
 	}
 
-	if _, err := svc.AddProductImage(ctx, sellerID, p.ID, bytes.NewReader(img), strings.ToLower(title)); err != nil {
+	if _, err := svc.SaveProductImage(
+		ctx,
+		sellerID,
+		p.ID,
+		catalog.Slugify(title)+".png",
+		bytes.NewReader(img),
+	); err != nil {
 		return fmt.Errorf("seed image for %q: %w", title, err)
 	}
 

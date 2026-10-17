@@ -10,6 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/seller"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/storefront"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/jobs"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
 )
 
@@ -24,6 +25,15 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 			return err
 		}
 
+		q, err := app.Queue()
+		if err != nil {
+			return err
+		}
+
+		if err := q.Register(jobs.Catalog(svc)...); err != nil {
+			return err
+		}
+
 		acc, err := accounts.New(app)
 		if err != nil {
 			return err
@@ -35,7 +45,7 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		r.Get("/c/{slug}", pub.Category).Name("catalog.category")
 		r.Get("/p/{slug}", pub.Product).Name("catalog.product")
 		r.Get("/s/{slug}", pub.Shop).Name("shop.show")
-		r.Get("/media/{kind}/{id}/{token}/{file}", pub.Media).Name("catalog.media")
+		r.Get("/media/{kind}/{id}/{file}", pub.Media).Name("catalog.media")
 
 		h := seller.New(svc, acc)
 		verified := []router.Middleware{auth.Required(acc.Web), auth.Verified(acc.Web)}

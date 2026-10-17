@@ -9,8 +9,6 @@ import (
 
 	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/inertia"
-	"github.com/AlexGalhardo/vukem/storage"
-	"github.com/AlexGalhardo/vukem/upload"
 	"github.com/AlexGalhardo/vukem/web"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
@@ -149,32 +147,15 @@ func (h *Handlers) UpdateSettings(c *web.Ctx) error {
 	return c.Redirect("/seller/settings")
 }
 
-// UploadLogo replaces the shop logo.
+// UploadLogo replaces the shop logo (multipart field "logo").
 func (h *Handlers) UploadLogo(c *web.Ctx) error {
 	uid, err := h.uid(c)
 	if err != nil {
 		return err
 	}
 
-	if _, err := h.svc.MyShop(c.Context(), uid); err != nil {
+	if _, err := h.svc.UploadShopLogo(c, uid); err != nil {
 		return noShop(c, err)
-	}
-
-	scratch := storage.NewMemory("")
-
-	form, err := upload.Receive(c, scratch, catalog.ImageRules(1))
-	if err != nil {
-		return err
-	}
-
-	rc, err := scratch.Open(c.Context(), form.Files[0].Path)
-	if err != nil {
-		return err
-	}
-	defer rc.Close()
-
-	if _, err := h.svc.SetShopLogo(c.Context(), uid, rc); err != nil {
-		return err
 	}
 
 	inertia.Flash(c, "success", i18n.T(c.Context(), "seller.flash.saved"))
@@ -331,7 +312,6 @@ func (h *Handlers) SetStatus(c *web.Ctx) error {
 }
 
 // UploadImages adds images to a product (multipart field "images").
-// Ownership and the free slots are checked before the body is read.
 func (h *Handlers) UploadImages(c *web.Ctx) error {
 	uid, err := h.uid(c)
 	if err != nil {
@@ -343,45 +323,13 @@ func (h *Handlers) UploadImages(c *web.Ctx) error {
 		return err
 	}
 
-	slots, err := h.svc.ImageSlots(c.Context(), uid, id)
-	if err != nil {
+	if _, err := h.svc.UploadProductImages(c, uid, id); err != nil {
 		return err
-	}
-
-	if slots == 0 {
-		return catalog.ErrTooManyImages
-	}
-
-	// Files are streamed to memory (bounded by the rules), decoded and
-	// re-encoded; only the resized variants reach the bucket.
-	scratch := storage.NewMemory("")
-
-	form, err := upload.Receive(c, scratch, catalog.ImageRules(slots))
-	if err != nil {
-		return err
-	}
-
-	for _, f := range form.Files {
-		if err := h.addImage(c, scratch, uid, id, f); err != nil {
-			return err
-		}
 	}
 
 	inertia.Flash(c, "success", i18n.T(c.Context(), "seller.flash.images_added"))
 
 	return c.Redirect(editURL(id))
-}
-
-func (h *Handlers) addImage(c *web.Ctx, scratch storage.Disk, uid, id int64, f upload.File) error {
-	rc, err := scratch.Open(c.Context(), f.Path)
-	if err != nil {
-		return err
-	}
-	defer rc.Close()
-
-	_, err = h.svc.AddProductImage(c.Context(), uid, id, rc, "")
-
-	return err
 }
 
 // ReorderImages saves a new image order.

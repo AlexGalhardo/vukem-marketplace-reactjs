@@ -380,17 +380,20 @@ func TestUploadRustFS(t *testing.T) {
 		t.Fatalf("images after upload: %+v, %v", sp.Images, err)
 	}
 
-	key := strings.TrimSuffix(strings.TrimPrefix(sp.Images[0].URL640, "/media/"), "/w640.jpg")
+	im := sp.Images[0]
+	if im.Processing {
+		t.Fatal("image not processed (QUEUE_CONNECTION should be sync here)")
+	}
 
-	for _, width := range catalog.Widths {
-		obj := key + "/w" + strconv.Itoa(width) + ".jpg"
+	for width, u := range map[int]string{1280: im.URL1280, 640: im.URL640, 320: im.URL320} {
+		obj := strings.TrimPrefix(u, "/media/")
 
 		ok, err := disk.Exists(t.Context(), obj)
 		if err != nil || !ok {
 			t.Fatalf("object %s in bucket: %v %v", obj, ok, err)
 		}
 
-		res := app.Client(t).Get(catalog.MediaURL(key, width)).AssertOK().AssertHeader("Content-Type", "image/jpeg")
+		res := app.Client(t).Get(u).AssertOK().AssertHeader("Content-Type", "image/jpeg")
 
 		cfg, err := jpeg.DecodeConfig(strings.NewReader(res.Body()))
 		if err != nil || cfg.Width != width {
@@ -402,7 +405,7 @@ func TestUploadRustFS(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if ok, _ := disk.Exists(t.Context(), key+"/w640.jpg"); ok {
+	if ok, _ := disk.Exists(t.Context(), strings.TrimPrefix(im.URL640, "/media/")); ok {
 		t.Fatal("variant still in the bucket after delete")
 	}
 }

@@ -23,18 +23,22 @@ const visibleSQL = `p.status = 'published' AND s.status = 'active'`
 
 // ImageView is a product image with its variant URLs.
 type ImageView struct {
-	ID      int64  `json:"id"`
-	URL320  string `json:"url_320"`
-	URL640  string `json:"url_640"`
-	URL1280 string `json:"url_1280"`
-	Width   int    `json:"width"`
-	Height  int    `json:"height"`
-	Alt     string `json:"alt"`
+	ID int64 `json:"id"`
+	// Processing is true until the thumbnail job ran; the URLs then all
+	// point at the uploaded original.
+	Processing bool   `json:"processing"`
+	URL320     string `json:"url_320"`
+	URL640     string `json:"url_640"`
+	URL1280    string `json:"url_1280"`
+	Width      int    `json:"width"`
+	Height     int    `json:"height"`
+	Alt        string `json:"alt"`
 }
 
 func imageView(img ProductImage) ImageView {
 	return ImageView{
-		ID: img.ID, URL320: MediaURL(img.Key, 320), URL640: MediaURL(img.Key, 640), URL1280: MediaURL(img.Key, 1280),
+		ID: img.ID, Processing: img.Width == 0, URL320: imageURL(img.Key, img.Width > 0, 320),
+		URL640: imageURL(img.Key, img.Width > 0, 640), URL1280: imageURL(img.Key, img.Width > 0, 1280),
 		Width: img.Width, Height: img.Height, Alt: img.Alt,
 	}
 }
@@ -359,17 +363,18 @@ func (s *Service) ProductsForCart(ctx context.Context, ids []int64) (map[int64]C
 
 	for rows.Next() {
 		var (
-			cp  CartProduct
-			img sql.Null[string]
+			cp    CartProduct
+			img   sql.Null[string]
+			width sql.Null[int64]
 		)
 
 		if err := rows.Scan(&cp.ID, &cp.ShopID, &cp.ShopSlug, &cp.ShopName, &cp.ShipFromUF, &cp.StripeReady,
-			&cp.Slug, &cp.Title, &cp.PriceCents, &cp.Stock, &cp.WeightGrams, &img); err != nil {
+			&cp.Slug, &cp.Title, &cp.PriceCents, &cp.Stock, &cp.WeightGrams, &img, &width); err != nil {
 			return nil, fmt.Errorf("scan cart product: %w", err)
 		}
 
 		if img.Valid {
-			cp.ImageURL = MediaURL(img.V, 320)
+			cp.ImageURL = imageURL(img.V, width.V > 0, 320)
 		}
 
 		out[cp.ID] = cp
