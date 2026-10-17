@@ -26,7 +26,7 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 		{
 			name: "built-in rule", page: "/register", path: "/register", component: "Auth/Register", field: "password",
 			body: map[string]any{
-				"name": "Tom", "email": "tom2@example.com", "password": "short", "password_confirmation": "short",
+				"name": "Tomas", "email": "tom2@example.com", "password": "short", "password_confirmation": "short",
 			},
 			want: "O campo senha deve ter pelo menos 12 caracteres.",
 		},
@@ -34,7 +34,7 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 			name: "refine message", page: "/register", path: "/register", component: "Auth/Register",
 			field: "password_confirmation",
 			body: map[string]any{
-				"name":                  "Tom",
+				"name":                  "Tomas",
 				"email":                 "tom3@example.com",
 				"password":              "long enough password",
 				"password_confirmation": "x",

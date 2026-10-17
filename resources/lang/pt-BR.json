@@ -144,7 +144,8 @@
 			"confirm_password": "Confirme a senha",
 			"name": "Nome",
 			"save": "Salvar",
-			"back_dashboard": "Voltar ao painel"
+			"back_dashboard": "Voltar ao painel",
+			"name_hint": "De 4 a 24 caracteres."
 		},
 		"login": {
 			"title": "Entrar",

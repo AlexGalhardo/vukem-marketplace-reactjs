@@ -12,7 +12,7 @@ type UpdateProfile struct {
 
 // UpdateProfileSchema validates UpdateProfile.
 var UpdateProfileSchema = z.Struct[UpdateProfile](z.Shape{
-	"name":     z.String().Trim().Min(2).Max(100),
+	"name":     NameSchema(),
 	"email":    z.String().Trim().Email().Max(255),
 	"password": z.String().Max(256).Optional(),
 })

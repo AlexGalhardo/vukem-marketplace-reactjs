@@ -17,6 +17,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
 )
 
 // NewSocial configures the providers listed in names from
@@ -177,8 +178,10 @@ func (a *Accounts) createSocialUser(
 	}
 
 	if name == "" {
-		name = email
+		name, _, _ = strings.Cut(email, "@")
 	}
+
+	name = requests.CapitalizeName(fitName(requests.NormalizeName(name)))
 
 	// No usable password: these users sign in with the provider (or reset).
 	h, err := a.Hasher.Make(rand.Text() + rand.Text())
@@ -197,6 +200,32 @@ func (a *Accounts) createSocialUser(
 	return u, nil
 }
 
+// fitName cuts a provider's (normalized) name to requests.NameMax runes,
+// at the last whole word when there is one. A name shorter than NameMin is
+// kept as the provider sent it; the profile form asks for a longer one on
+// the next edit.
+func fitName(name string) string {
+	r := []rune(name)
+	if len(r) <= requests.NameMax {
+		return name
+	}
+
+	cut := string(r[:requests.NameMax])
+	if r[requests.NameMax] != ' ' {
+		if i := strings.LastIndexByte(cut, ' '); i > 0 {
+			cut = cut[:i]
+		}
+	}
+
+	return strings.TrimSpace(cut)
+}
+
+// lockOutUnverifiedOwner ends everything a pre-hijacker may have set up
+// on an unverified account before its owner proved the address: the
+// password, sessions, remember-me and API tokens, API keys, pending reset
+// links, two-factor enrolment (the attacker's authenticator would lock the
+// owner out) and the shop's payout destinations and webhooks (they would
+// route the owner's money and order data to the attacker).
 func (a *Accounts) lockOutUnverifiedOwner(ctx context.Context, tx database.Executor, u *models.User) error {
 	h, err := a.Hasher.Make(rand.Text() + rand.Text())
 	if err != nil {

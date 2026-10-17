@@ -144,7 +144,8 @@
 			"confirm_password": "Confirm password",
 			"name": "Name",
 			"save": "Save",
-			"back_dashboard": "Back to the dashboard"
+			"back_dashboard": "Back to the dashboard",
+			"name_hint": "4 to 24 characters."
 		},
 		"login": {
 			"title": "Log in",

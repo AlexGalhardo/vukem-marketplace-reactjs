@@ -2,15 +2,32 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import SocialButtons from "../../components/SocialButtons";
 import { button, card, heading, link } from "../../components/ui";
 import { useT } from "../../lib/i18n";
+import { capitalizeName, parseName } from "../../lib/name";
+import type { AuthPageProps } from "../../types";
 
-export default function Register(): JSX.Element {
+export default function Register({ socialProviders = [] }: AuthPageProps): JSX.Element {
 	const { t } = useT();
 	const form = useForm({ name: "", email: "", password: "", password_confirmation: "" });
 
+	// checkName shows the name rule's message, or returns the normalized name.
+	const checkName = (): string | null => {
+		const result = parseName(form.data.name, t("account.errors.name_length"));
+		if ("error" in result) {
+			form.setError("name", result.error);
+			return null;
+		}
+		form.clearErrors("name");
+		return result.name;
+	};
+
 	const submit = (e: FormEvent) => {
 		e.preventDefault();
+		const name = checkName();
+		if (name === null) return;
+		form.transform((data) => ({ ...data, name }));
 		form.post("/register", { onFinish: () => form.reset("password", "password_confirmation") });
 	};
 
@@ -21,10 +38,18 @@ export default function Register(): JSX.Element {
 			<form onSubmit={submit} className="space-y-4">
 				<Field
 					label={t("account.common.name")}
+					hint={t("account.common.name_hint")}
 					autoComplete="name"
+					autoCapitalize="words"
 					required
 					value={form.data.name}
-					onChange={(e) => form.setData("name", e.target.value)}
+					onChange={(e) => {
+						form.setData("name", capitalizeName(e.target.value));
+						// Cleared while typing, not on blur, so the form does not
+						// shift under a click on the submit button.
+						if (form.errors.name) form.clearErrors("name");
+					}}
+					onBlur={() => form.data.name && checkName()}
 					error={form.errors.name}
 				/>
 				<Field
@@ -59,6 +84,7 @@ export default function Register(): JSX.Element {
 					{t("account.register.submit")}
 				</button>
 			</form>
+			<SocialButtons providers={socialProviders} />
 			<p className="mt-6 text-sm">
 				<Link href="/login" className={link}>
 					{t("account.register.have_account")}
