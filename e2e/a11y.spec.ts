@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { type BrowserContext, type Cookie, expect, type Page, test } from "@playwright/test";
 
-import { appCommand, demoPassword, mailpitLink, sessionCookies, testPassword, totp, uniqueEmail } from "./support";
+import { canRunAppCommands, createAdmin, demoPassword, sessionCookies, uniqueEmail } from "./support";
 
 // Accessibility: axe-core scans every page and UI state in light and dark
 // themes, EN and PT-BR, on desktop and mobile (the two Playwright
@@ -154,7 +154,7 @@ test.describe("a11y seller", () => {
 
 test.describe("a11y admin", () => {
 	test.describe.configure({ mode: "serial" });
-	test.skip(process.env.E2E_DOCKER === "0", "needs the compose app container for users:make-admin");
+	test.skip(!canRunAppCommands, "needs the compose app container or E2E_APP_BIN for users:make-admin");
 
 	let cookies: Cookie[] = [];
 
@@ -162,26 +162,7 @@ test.describe("a11y admin", () => {
 	// with the CLI (the only way to create admins).
 	test.beforeAll(async ({ browser }) => {
 		const context = await browser.newContext();
-		const page = await context.newPage();
-		const email = uniqueEmail("a11y-admin");
-
-		await page.goto("/register");
-		await page.getByLabel("Name").fill("Ada Admin");
-		await page.getByLabel("Email").fill(email);
-		await page.getByLabel(/^Password/).fill(testPassword);
-		await page.getByLabel("Confirm password").fill(testPassword);
-		await page.locator('main form button[type="submit"]').click();
-		await expect(page).toHaveURL(/\/email\/verify$/);
-		await page.goto(await mailpitLink(email, "/email/verify/"));
-
-		await page.goto("/user/two-factor");
-		await page.getByRole("button", { name: "Enable two-factor authentication" }).click();
-		const secret = (await page.locator("code").textContent())?.trim() ?? "";
-		await page.getByLabel("Code").fill(totp(secret, Date.now()));
-		await page.getByRole("button", { name: "Confirm" }).click();
-		await expect(page.getByText("Store these recovery codes somewhere safe.")).toBeVisible();
-
-		appCommand("users:make-admin", email);
+		await createAdmin(await context.newPage(), "Ada Admin", uniqueEmail("a11y-admin"));
 		cookies = (await context.storageState()).cookies;
 		await context.close();
 	});
@@ -189,7 +170,7 @@ test.describe("a11y admin", () => {
 	for (const combo of combos) {
 		test(`admin pages ${combo.theme} ${combo.locale}`, async ({ page, context }) => {
 			await prepare(context, combo, cookies);
-			await scanAll(page, combo, ["/admin", "/admin/payouts"]);
+			await scanAll(page, combo, ["/admin", "/admin/payouts", "/admin/flags"]);
 		});
 	}
 });

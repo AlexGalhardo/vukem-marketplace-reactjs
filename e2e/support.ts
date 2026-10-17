@@ -68,11 +68,67 @@ export async function mailpitLink(to: string, pathPrefix: string): Promise<strin
 	throw new Error(`no mail with a ${pathPrefix} link reached ${to}`);
 }
 
+// canRunAppCommands reports whether appCommand can reach the app: the
+// compose container, or a local binary named by E2E_APP_BIN.
+export const canRunAppCommands = process.env.E2E_DOCKER !== "0" || Boolean(process.env.E2E_APP_BIN);
+
 // appCommand runs a command of the compose app container (e.g.
-// users:make-admin). Set E2E_DOCKER=0 when the stack is not compose.
+// users:make-admin). Set E2E_DOCKER=0 when the stack is not compose, and
+// E2E_APP_BIN to the app binary of a local stack (it inherits this
+// process's environment, so run Playwright with the app's variables).
 export function appCommand(...args: string[]): void {
+	const bin = process.env.E2E_APP_BIN;
+	if (bin) {
+		execFileSync(bin, args, { stdio: "pipe" });
+		return;
+	}
 	execFileSync("docker", ["compose", "exec", "-T", "app", "/app/app", ...args], {
 		stdio: "pipe",
 		env: { ...process.env, MSYS_NO_PATHCONV: "1" },
 	});
+}
+
+// register signs up through the form. It lands logged in: on the dashboard,
+// or on the verification notice while the email_verification flag is on;
+// it returns which.
+export async function register(
+	page: Page,
+	name: string,
+	email: string,
+	password: string,
+): Promise<"dashboard" | "verify"> {
+	await page.goto("/register");
+	await page.getByLabel("Name").fill(name);
+	await page.getByLabel("Email").fill(email);
+	await page.getByLabel(/^Password/).fill(password);
+	await page.getByLabel("Confirm password").fill(password);
+	await page.locator('main form button[type="submit"]').click();
+	await expect(page).toHaveURL(/\/(dashboard|email\/verify)$/);
+	return page.url().endsWith("/email/verify") ? "verify" : "dashboard";
+}
+
+// createAdmin registers email with a verified address and confirmed 2FA,
+// then promotes it with the CLI (the only way to create admins). The page
+// stays logged in as the admin.
+export async function createAdmin(page: Page, name: string, email: string): Promise<void> {
+	await register(page, name, email, testPassword);
+	await verifyEmail(page, email);
+
+	await page.goto("/user/two-factor");
+	await page.getByRole("button", { name: "Enable two-factor authentication" }).click();
+	const secret = (await page.locator("code").textContent())?.trim() ?? "";
+	await page.getByLabel("Code").fill(totp(secret, Date.now()));
+	await page.getByRole("button", { name: "Confirm" }).click();
+	await expect(page.getByText("Store these recovery codes somewhere safe.")).toBeVisible();
+
+	appCommand("users:make-admin", email);
+}
+
+// verifyEmail asks for a verification mail and follows its link (Mailpit),
+// so the account keeps working when email_verification is switched on.
+export async function verifyEmail(page: Page, email: string): Promise<void> {
+	await page.goto("/account");
+	await page.getByRole("button", { name: /verification link again/i }).click();
+	await page.goto(await mailpitLink(email, "/email/verify/"));
+	await expect(page).toHaveURL(/\/dashboard$/);
 }
