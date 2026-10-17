@@ -51,8 +51,13 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		r.Get("/sell", h.ShowOpen).Name("shop.create").Use(verified...)
 		r.Post("/sell", h.Open).Name("shop.store").Use(verified...)
 
+		db, err := app.DB()
+		if err != nil {
+			return err
+		}
+
 		r.Group("/seller", func(g *router.Group) {
-			g.Use(verified...)
+			g.Use(append(verified, requireShop(acc, db))...)
 			g.Get("", h.Dashboard).Name("seller.dashboard")
 			g.Get("/settings", h.Settings).Name("seller.settings")
 			g.Put("/settings", h.UpdateSettings).Name("seller.settings.update")

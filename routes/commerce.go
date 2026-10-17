@@ -115,10 +115,19 @@ func commerceRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error
 	r.Post("/checkout/pix/{order}/simulate", h.SimulatePix).Name("checkout.pix.simulate").Use(place...)
 	r.Get("/checkout/success", h.ShowSuccess).Name("checkout.success").Use(verified...)
 
-	r.Get("/seller/payouts", h.ShowSellerPayouts).Name("seller.payouts").Use(verified...)
-	r.Post("/seller/payouts", h.RequestPayout).Name("seller.payouts.request").Use(verified...)
-	r.Post("/seller/payouts/stripe", h.OnboardStripe).Name("seller.payouts.stripe").Use(verified...)
-	r.Post("/seller/orders/{id}/refund", h.RefundSellerOrder).Name("seller.orders.refund").Use(verified...)
+	db, err = app.DB()
+	if err != nil {
+		return err
+	}
+
+	// Seller-only routes outside the /seller group: users without a shop
+	// go to /sell.
+	shopOwner := []router.Middleware{required, h.RequireVerified, requireShop(acc, db)}
+
+	r.Get("/seller/payouts", h.ShowSellerPayouts).Name("seller.payouts").Use(shopOwner...)
+	r.Post("/seller/payouts", h.RequestPayout).Name("seller.payouts.request").Use(shopOwner...)
+	r.Post("/seller/payouts/stripe", h.OnboardStripe).Name("seller.payouts.stripe").Use(shopOwner...)
+	r.Post("/seller/orders/{id}/refund", h.RefundSellerOrder).Name("seller.orders.refund").Use(shopOwner...)
 
 	r.Group("/admin/payouts", func(g *router.Group) {
 		g.Use(acc.RequireAdmin)

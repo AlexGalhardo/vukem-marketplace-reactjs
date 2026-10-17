@@ -49,8 +49,8 @@ func TestPayoutRequestAndBalanceFromLedger(t *testing.T) {
 		PropEquals("summary.availableCents", float64(wantBalance)).
 		PropEquals("stripe.enabled", false)
 
-	// Users without a shop: not found.
-	e.Client(t, e.User(t, true)).Get("/seller/payouts").AssertNotFound()
+	// Users without a shop: sent to /sell.
+	e.Client(t, e.User(t, true)).Get("/seller/payouts").AssertRedirect("/sell")
 	flagtest.RequireEmailVerification(t, e.App)
 	e.Client(t, e.User(t, false)).Get("/seller/payouts").AssertRedirect("/email/verify")
 

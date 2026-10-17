@@ -91,13 +91,19 @@ func shareAuth(acc *accounts.Accounts) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c := web.NewCtx(w, r, web.ServicesFrom(r.Context()))
 
-			inertia.Share(r.Context(), "auth", func(context.Context) (any, error) {
+			inertia.Share(r.Context(), "auth", func(ctx context.Context) (any, error) {
 				u, err := acc.Web.User(c)
 				if err != nil {
-					return map[string]any{"user": nil}, nil //nolint:nilerr // signed out
+					return map[string]any{"user": nil, "hasShop": false}, nil //nolint:nilerr // signed out
 				}
 
-				return map[string]any{"user": u}, nil
+				// Seller links (footer, header) only for shop owners.
+				owns, err := hasShop(ctx, acc.DB, u.ID)
+				if err != nil {
+					return nil, err
+				}
+
+				return map[string]any{"user": u, "hasShop": owns}, nil
 			})
 
 			next.ServeHTTP(w, r)

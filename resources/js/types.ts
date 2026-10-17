@@ -14,7 +14,8 @@ export interface SharedProps {
 	locales: string[];
 	errors: Record<string, string>;
 	// Present once the Auth phase ships.
-	auth?: { user: User | null };
+	// hasShop: the user owns a shop (seller links are shown only then).
+	auth?: { user: User | null; hasShop?: boolean };
 	// Units in the signed-in user's cart (header badge).
 	cartCount?: number;
 	[key: string]: unknown;

@@ -366,7 +366,8 @@
 			"images_added": "Fotos enviadas.",
 			"product_created": "Rascunho salvo. Adicione fotos e depois publique.",
 			"saved": "Alterações salvas.",
-			"shop_opened": "Sua loja está aberta. Anuncie seu primeiro produto."
+			"shop_opened": "Sua loja está aberta. Anuncie seu primeiro produto.",
+			"open_shop_first": "Abra sua loja para acessar a área do vendedor."
 		},
 		"form": {
 			"archive": "Arquivar",
@@ -814,5 +815,13 @@
 			"framework": "Feito com vukem",
 			"disclaimer": "Projeto de demonstração open-source, sem afiliação com o Mercado Livre."
 		}
+	},
+	"errors": {
+		"not_found": "Não encontramos esta página",
+		"forbidden": "Você não tem acesso a esta página",
+		"too_many": "Muitas solicitações, tente de novo em instantes",
+		"server": "Algo deu errado do nosso lado",
+		"generic": "Algo deu errado",
+		"home": "Ir para a página inicial"
 	}
 }

@@ -200,9 +200,10 @@ func TestUserWithoutShopCannotCreateEndpoints(t *testing.T) {
 	}
 
 	c := authtest.ActingAs(t, app, app.Client(t).Inertia(""), u)
-	c.Get(page).AssertInertia("Seller/Webhooks").PropEquals("hasShop", false)
+	c.Get(page).AssertRedirect("/sell")
 	c.PostJSON(page, map[string]any{"url": "https://hooks.example.com/", "events": []string{"order.paid"}}).
-		AssertNotFound()
+		AssertRedirect("/sell")
+	vukemtest.AssertDatabaseCount(t, app, "webhook_endpoints", 0)
 
 	app.Client(t).Get(page).AssertRedirect("/login")
 }

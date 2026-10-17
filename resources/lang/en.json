@@ -366,7 +366,8 @@
 			"images_added": "Photos uploaded.",
 			"product_created": "Draft saved. Add photos, then publish it.",
 			"saved": "Changes saved.",
-			"shop_opened": "Your shop is open. List your first product."
+			"shop_opened": "Your shop is open. List your first product.",
+			"open_shop_first": "Open your shop to use the seller area."
 		},
 		"form": {
 			"archive": "Archive",
@@ -814,5 +815,13 @@
 			"framework": "Built with vukem",
 			"disclaimer": "Open-source demo project, not affiliated with Mercado Livre."
 		}
+	},
+	"errors": {
+		"not_found": "We could not find this page",
+		"forbidden": "You cannot access this page",
+		"too_many": "Too many requests, try again in a moment",
+		"server": "Something went wrong on our side",
+		"generic": "Something went wrong",
+		"home": "Go to the home page"
 	}
 }

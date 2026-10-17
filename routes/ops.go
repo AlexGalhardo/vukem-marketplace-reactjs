@@ -49,10 +49,11 @@ func Ops(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		}
 
 		seller := controllers.SellerWebhooks{Service: wh}
-		r.Get("/seller/webhooks", seller.Index).Name("seller.webhooks").Use(required)
-		r.Post("/seller/webhooks", seller.Store).Name("seller.webhooks.store").Use(required)
-		r.Get("/seller/webhooks/{id}", seller.Show).Name("seller.webhooks.show").Use(required)
-		r.Delete("/seller/webhooks/{id}", seller.Destroy).Name("seller.webhooks.destroy").Use(required)
+		shopOwner := []router.Middleware{required, requireShop(acc, db)}
+		r.Get("/seller/webhooks", seller.Index).Name("seller.webhooks").Use(shopOwner...)
+		r.Post("/seller/webhooks", seller.Store).Name("seller.webhooks.store").Use(shopOwner...)
+		r.Get("/seller/webhooks/{id}", seller.Show).Name("seller.webhooks.show").Use(shopOwner...)
+		r.Delete("/seller/webhooks/{id}", seller.Destroy).Name("seller.webhooks.destroy").Use(shopOwner...)
 
 		events := controllers.Events{Hub: deps.Realtime}
 		// Reconnects are cheap for EventSource; this only stops loops.
