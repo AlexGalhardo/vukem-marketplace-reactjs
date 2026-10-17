@@ -8,11 +8,10 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"os"
 	"time"
 
+	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth/hash"
-	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
 
@@ -97,18 +96,21 @@ var demoProducts = []struct {
 
 func rgb(r, g, b uint8) color.RGBA { return color.RGBA{R: r, G: g, B: b, A: 255} }
 
-// Seed implements vukem.Seeder.
-func (DemoShop) Seed(ctx context.Context, db *database.DB) error {
+// SeedApp implements vukem.AppSeeder: it uses the app's media disk (the
+// memory disk in tests).
+func (DemoShop) SeedApp(ctx context.Context, app *vukem.App) error {
+	db, err := app.DB()
+	if err != nil {
+		return err
+	}
+
 	if err := (Categories{}).Seed(ctx, db); err != nil {
 		return err
 	}
 
-	src, err := config.LoadSource(os.DirFS("."), os.LookupEnv, os.ReadFile)
-	if err != nil {
-		return fmt.Errorf("seed demo shop: load env: %w", err)
-	}
+	src := app.Source
 
-	disk, err := catalog.OpenDisk(src, src.Env(), false)
+	disk, err := catalog.OpenDisk(src, app.Config.Env, app.Kind == vukem.KindTest)
 	if err != nil {
 		return fmt.Errorf("seed demo shop: %w", err)
 	}

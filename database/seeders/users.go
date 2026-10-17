@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"os"
 	"time"
 
+	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth/hash"
 	"github.com/AlexGalhardo/vukem/auth/totp"
 	"github.com/AlexGalhardo/vukem/config"
@@ -34,18 +34,41 @@ var errSeedPasswordShort = errors.New("seeders: SEED_PASSWORD must have at least
 // and recovery codes, logged once when the account is created. Existing
 // accounts are left untouched.
 type Users struct {
-	// Lookup reads configuration; nil reads the process environment and
-	// .env like the app does.
+	// Lookup reads configuration; nil uses the app's configuration.
 	Lookup func(key string) (string, bool)
-	// Log receives the admin's secret; nil uses slog.Default().
+	// Log receives the admin's secret; nil uses the app's logger.
 	Log *slog.Logger
 }
 
-// Seed implements vukem.Seeder.
-func (s Users) Seed(ctx context.Context, db *database.DB) error {
-	lookup, err := s.lookup()
+// SeedApp implements vukem.AppSeeder.
+func (s Users) SeedApp(ctx context.Context, app *vukem.App) error {
+	if s.Lookup == nil {
+		s.Lookup = func(k string) (string, bool) {
+			if k == "APP_ENV" {
+				return string(app.Config.Env), true
+			}
+
+			return app.Source.Lookup(k)
+		}
+	}
+
+	if s.Log == nil {
+		s.Log = app.Log
+	}
+
+	db, err := app.DB()
 	if err != nil {
 		return err
+	}
+
+	return s.Seed(ctx, db)
+}
+
+// Seed seeds with explicit Lookup and Log (tests).
+func (s Users) Seed(ctx context.Context, db *database.DB) error {
+	lookup := s.Lookup
+	if lookup == nil {
+		return errors.New("seeders: Users needs Lookup (run it through db:seed)")
 	}
 
 	if env, _ := lookup("APP_ENV"); config.Env(env) == config.Production {
@@ -89,25 +112,6 @@ func (s Users) Seed(ctx context.Context, db *database.DB) error {
 	}
 
 	return nil
-}
-
-func (s Users) lookup() (func(string) (string, bool), error) {
-	if s.Lookup != nil {
-		return s.Lookup, nil
-	}
-
-	src, err := config.LoadSource(os.DirFS("."), os.LookupEnv, os.ReadFile)
-	if err != nil {
-		return nil, fmt.Errorf("seeders: load env: %w", err)
-	}
-
-	return func(k string) (string, bool) {
-		if k == "APP_ENV" {
-			return string(src.Env()), true
-		}
-
-		return src.Lookup(k)
-	}, nil
 }
 
 func createUser(

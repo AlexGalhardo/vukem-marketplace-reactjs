@@ -17,7 +17,6 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/sqlbind"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/authtest"
 )
 
@@ -52,7 +51,7 @@ func Exec(tb testing.TB, app *vukemtest.App, query string, args ...any) {
 	tb.Helper()
 
 	d := DB(tb, app)
-	if _, err := d.ExecContext(context.WithoutCancel(tb.Context()), sqlbind.Rebind(d.Dialect(), query),
+	if _, err := d.ExecContext(context.WithoutCancel(tb.Context()), database.Rebind(d.Dialect(), query),
 		args...); err != nil {
 		tb.Fatalf("%s: %v", query, err)
 	}
@@ -64,8 +63,9 @@ func insertID(tb testing.TB, app *vukemtest.App, query string, args ...any) int6
 	d := DB(tb, app)
 
 	var id int64
-	if err := d.QueryRowContext(context.WithoutCancel(tb.Context()), sqlbind.Rebind(d.Dialect(), query+" RETURNING id"),
-		args...).Scan(&id); err != nil {
+	if err := d.QueryRowContext(context.WithoutCancel(tb.Context()), database.Rebind(d.Dialect(), query+" RETURNING id"),
+		args...).
+		Scan(&id); err != nil {
 		tb.Fatalf("%s: %v", query, err)
 	}
 
@@ -187,7 +187,7 @@ func MustFind(tb testing.TB, app *vukemtest.App, query string, args ...any) stri
 	d := DB(tb, app)
 
 	var v sql.NullString
-	if err := d.QueryRowContext(context.WithoutCancel(tb.Context()), sqlbind.Rebind(d.Dialect(), query), args...).
+	if err := d.QueryRowContext(context.WithoutCancel(tb.Context()), database.Rebind(d.Dialect(), query), args...).
 		Scan(&v); err != nil {
 		tb.Fatalf("%s: %v", query, err)
 	}

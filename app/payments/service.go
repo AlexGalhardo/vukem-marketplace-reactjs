@@ -193,7 +193,7 @@ func scanSellerOrder(r dbx.RowScanner) (SellerOrder, error) {
 func (s *Service) sellerOrders(ctx context.Context, ex database.Executor, orderID int64) ([]SellerOrder, error) {
 	rows, err := ex.QueryContext(
 		ctx,
-		dbx.Rebind(ex.Dialect(), sellerOrderSelect+` WHERE so.order_id = ? ORDER BY so.id`),
+		database.Rebind(ex.Dialect(), sellerOrderSelect+` WHERE so.order_id = ? ORDER BY so.id`),
 		orderID,
 	)
 	if err != nil {
@@ -226,7 +226,7 @@ type OrderItem struct {
 }
 
 func (s *Service) orderItems(ctx context.Context, ex database.Executor, orderID int64) ([]OrderItem, error) {
-	rows, err := ex.QueryContext(ctx, dbx.Rebind(ex.Dialect(),
+	rows, err := ex.QueryContext(ctx, database.Rebind(ex.Dialect(),
 		`SELECT oi.id, oi.seller_order_id, oi.product_id, oi.title, oi.price_cents, oi.quantity
 		FROM order_items oi JOIN seller_orders so ON so.id = oi.seller_order_id
 		WHERE so.order_id = ? ORDER BY oi.id`), orderID)

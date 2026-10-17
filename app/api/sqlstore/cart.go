@@ -7,7 +7,6 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/sqlbind"
 )
 
 // Items implements api.Cart. Every line is re-priced from products;
@@ -58,7 +57,7 @@ type buyable struct {
 func findBuyable(ctx context.Context, ex database.Executor, userID int64, slug string) (buyable, error) {
 	var b buyable
 
-	err := ex.QueryRowContext(ctx, sqlbind.Rebind(ex.Dialect(), `SELECT p.id, s.owner_id, p.stock, p.slug,
+	err := ex.QueryRowContext(ctx, database.Rebind(ex.Dialect(), `SELECT p.id, s.owner_id, p.stock, p.slug,
 		p.title, s.slug, p.price_cents FROM products p JOIN shops s ON s.id = p.shop_id
 		WHERE p.slug = ? AND `+visible), slug).
 		Scan(&b.id, &b.ownerID, &b.stock, &b.item.Product, &b.item.Title, &b.item.ShopSlug, &b.item.PriceCents)
@@ -93,7 +92,7 @@ func (s *Store) Add(ctx context.Context, userID int64, product string, quantity 
 		now := s.now().UTC()
 
 		// One statement, so concurrent adds cannot push a line past the cap.
-		res, err := tx.ExecContext(ctx, sqlbind.Rebind(tx.Dialect(), `INSERT INTO cart_items
+		res, err := tx.ExecContext(ctx, database.Rebind(tx.Dialect(), `INSERT INTO cart_items
 			(user_id, product_id, quantity, created_at, updated_at) VALUES (?, ?, ?, ?, ?)
 			ON CONFLICT (user_id, product_id) DO UPDATE
 			SET quantity = cart_items.quantity + excluded.quantity, updated_at = excluded.updated_at
@@ -129,7 +128,7 @@ func (s *Store) Update(ctx context.Context, userID int64, product string, quanti
 			return err
 		}
 
-		res, err := tx.ExecContext(ctx, sqlbind.Rebind(tx.Dialect(), `UPDATE cart_items SET quantity = ?,
+		res, err := tx.ExecContext(ctx, database.Rebind(tx.Dialect(), `UPDATE cart_items SET quantity = ?,
 			updated_at = ? WHERE user_id = ? AND product_id = ?`), quantity, s.now().UTC(), userID, b.id)
 		if err != nil {
 			return fmt.Errorf("update cart item: %w", err)
@@ -152,7 +151,7 @@ func (s *Store) Update(ctx context.Context, userID int64, product string, quanti
 func lineAfterWrite(ctx context.Context, tx *database.Tx, userID int64, b buyable) (api.CartItem, error) {
 	item := b.item
 
-	if err := tx.QueryRowContext(ctx, sqlbind.Rebind(tx.Dialect(),
+	if err := tx.QueryRowContext(ctx, database.Rebind(tx.Dialect(),
 		`SELECT quantity FROM cart_items WHERE user_id = ? AND product_id = ?`), userID, b.id).
 		Scan(&item.Quantity); err != nil {
 		return api.CartItem{}, fmt.Errorf("read cart item: %w", err)

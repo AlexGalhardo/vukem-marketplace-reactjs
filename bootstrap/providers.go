@@ -7,7 +7,6 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/alerts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/telemetry"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/webhooks"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/workers"
 )
 
 // Providers lists the application providers in registration order;
@@ -20,9 +19,6 @@ func Providers() []vukem.Provider {
 		// Before the routes too: its 5xx alert middleware must sit outside
 		// vukem's Recover. Off unless TELEGRAM_BOT_TOKEN/CHAT_ID are set.
 		alerts.Provider{},
-		// In-process queue worker and scheduler for "serve"
-		// (QUEUE_WORKER_IN_PROCESS, default on; the scheduler uses vukem SCHEDULE_IN_SERVE).
-		workers.Provider{},
 		// Registers the seller webhook delivery job (at Boot).
 		webhooks.Provider{},
 	}

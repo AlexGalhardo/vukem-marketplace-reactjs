@@ -14,8 +14,6 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
-
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/sqlbind"
 )
 
 // API keys look like mkt_<prefix>_<secret>. The prefix is the public
@@ -137,7 +135,7 @@ func (k *Keys) Create(ctx context.Context, userID int64, in NewKey) (Key, string
 			return ErrTooManyKeys
 		}
 
-		return tx.QueryRowContext(ctx, sqlbind.Rebind(tx.Dialect(),
+		return tx.QueryRowContext(ctx, database.Rebind(tx.Dialect(),
 			`INSERT INTO api_keys (user_id, name, prefix, secret_hash, scopes, expires_at, created_at, updated_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`),
 			userID, name, prefix, key.secretHash, strings.Join(scopes, " "), nullTime(in.ExpiresAt), now, now,
@@ -156,7 +154,7 @@ func (k *Keys) List(ctx context.Context, userID int64) ([]Key, error) {
 }
 
 func (k *Keys) list(ctx context.Context, ex database.Executor, userID int64) ([]Key, error) {
-	rows, err := ex.QueryContext(ctx, sqlbind.Rebind(ex.Dialect(),
+	rows, err := ex.QueryContext(ctx, database.Rebind(ex.Dialect(),
 		`SELECT `+keyColumns+` FROM api_keys WHERE user_id = ? ORDER BY id DESC`), userID)
 	if err != nil {
 		return nil, fmt.Errorf("list api keys of user %d: %w", userID, err)
@@ -182,7 +180,7 @@ func (k *Keys) list(ctx context.Context, ex database.Executor, userID int64) ([]
 func (k *Keys) Revoke(ctx context.Context, userID, id int64) error {
 	var revoked sql.NullTime
 
-	err := k.db.QueryRowContext(ctx, sqlbind.Rebind(k.db.Dialect(),
+	err := k.db.QueryRowContext(ctx, database.Rebind(k.db.Dialect(),
 		`SELECT revoked_at FROM api_keys WHERE id = ? AND user_id = ?`), id, userID).Scan(&revoked)
 	if errors.Is(err, sql.ErrNoRows) {
 		return ErrKeyNotFound
@@ -198,7 +196,7 @@ func (k *Keys) Revoke(ctx context.Context, userID, id int64) error {
 
 	now := k.now().UTC()
 
-	_, err = k.db.ExecContext(ctx, sqlbind.Rebind(k.db.Dialect(),
+	_, err = k.db.ExecContext(ctx, database.Rebind(k.db.Dialect(),
 		`UPDATE api_keys SET revoked_at = ?, updated_at = ? WHERE id = ? AND user_id = ? AND revoked_at IS NULL`),
 		now, now, id, userID)
 	if err != nil {
@@ -220,7 +218,7 @@ func (k *Keys) Authenticate(ctx context.Context, token string) (Key, error) {
 		return Key{}, ErrInvalidKey
 	}
 
-	row := k.db.QueryRowContext(ctx, sqlbind.Rebind(k.db.Dialect(),
+	row := k.db.QueryRowContext(ctx, database.Rebind(k.db.Dialect(),
 		`SELECT `+keyColumns+` FROM api_keys WHERE prefix = ?`), prefix)
 
 	key, err := scanKey(row)
@@ -248,7 +246,7 @@ func (k *Keys) Touch(ctx context.Context, key Key) error {
 		return nil
 	}
 
-	_, err := k.db.ExecContext(ctx, sqlbind.Rebind(k.db.Dialect(),
+	_, err := k.db.ExecContext(ctx, database.Rebind(k.db.Dialect(),
 		`UPDATE api_keys SET last_used_at = ? WHERE id = ?`), now, key.ID)
 	if err != nil {
 		return fmt.Errorf("touch api key %d: %w", key.ID, err)

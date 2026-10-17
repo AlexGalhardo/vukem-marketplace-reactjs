@@ -5,16 +5,16 @@ go 1.27.2
 require (
 	connectrpc.com/connect v1.21.1
 	connectrpc.com/grpchealth v1.5.0
-	github.com/AlexGalhardo/vukem v0.24.0
-	github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0
-	github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0
+	github.com/AlexGalhardo/vukem v0.25.0
+	github.com/AlexGalhardo/vukem/contrib/graphql v0.2.0
+	github.com/AlexGalhardo/vukem/contrib/grpc v0.2.0
 	github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0
-	github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0
+	github.com/AlexGalhardo/vukem/contrib/stripe v0.2.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.2.0
-	github.com/AlexGalhardo/vukem/drivers/otel v0.1.0
+	github.com/AlexGalhardo/vukem/drivers/otel v0.2.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
-	github.com/AlexGalhardo/vukem/drivers/redis v0.2.0
-	github.com/AlexGalhardo/vukem/drivers/s3 v0.2.0
+	github.com/AlexGalhardo/vukem/drivers/redis v0.3.0
+	github.com/AlexGalhardo/vukem/drivers/s3 v0.3.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	go.mongodb.org/mongo-driver/v2 v2.9.2
@@ -47,10 +47,12 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp v1.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.47.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.47.0 // indirect
 	go.opentelemetry.io/otel/log v1.47.0 // indirect
 	go.opentelemetry.io/otel/metric v1.47.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.47.0 // indirect
 	go.uber.org/atomic v1.12.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/image v0.47.0 // indirect

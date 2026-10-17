@@ -31,7 +31,7 @@ services:
       LOG_FORMAT: json
       # The worker and scheduler services below do this work, so serve
       # does not run them in process (the single-service default).
-      QUEUE_WORKER_IN_PROCESS: "false"
+      QUEUE_IN_SERVE: "false"
       SCHEDULE_IN_SERVE: "false"
     command: ["sh", "-c", "/app/app migrate && /app/app reference:sync && exec /app/app"]
     ports:

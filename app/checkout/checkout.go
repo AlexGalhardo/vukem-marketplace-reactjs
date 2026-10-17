@@ -163,7 +163,7 @@ func (s Service) cardReady(ctx context.Context, shops map[int64]*Group) (map[int
 	q := `SELECT id FROM shops WHERE stripe_ready = ? AND stripe_account_id IS NOT NULL AND id IN (?` +
 		strings.Repeat(", ?", len(ids)-1) + `)`
 
-	rows, err := s.DB.QueryContext(ctx, dbx.Rebind(s.DB.Dialect(), q), append([]any{true}, ids...)...)
+	rows, err := s.DB.QueryContext(ctx, database.Rebind(s.DB.Dialect(), q), append([]any{true}, ids...)...)
 	if err != nil {
 		return nil, fmt.Errorf("card-ready shops: %w", err)
 	}
@@ -244,7 +244,7 @@ func (s Service) Place(ctx context.Context, in Input) (payments.Order, error) {
 
 	now := s.now()
 	o := payments.Order{
-		PublicID: payments.NewPublicID(now), BuyerID: in.BuyerID, Status: payments.OrderPending, Method: in.Method,
+		PublicID: payments.NewPublicID(), BuyerID: in.BuyerID, Status: payments.OrderPending, Method: in.Method,
 		SubtotalCents: q.SubtotalCents, ShippingCents: q.ShippingCents, FeeCents: q.feeCents, TotalCents: q.TotalCents,
 	}
 

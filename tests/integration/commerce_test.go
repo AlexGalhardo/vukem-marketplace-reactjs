@@ -159,7 +159,7 @@ func TestStripeTestModeAPI(t *testing.T) {
 		t.Fatalf("account link = %q, %v", link, err)
 	}
 
-	pub := payments.NewPublicID(time.Now())
+	pub := payments.NewPublicID()
 
 	sess, err := c.CreateCheckoutSession(ctx, payments.CheckoutSessionParams{
 		OrderPublicID: pub, CustomerEmail: "buyer@example.com", Currency: payments.Currency,
@@ -187,7 +187,7 @@ func TestAbacatePayDevModeAPI(t *testing.T) {
 	}
 
 	ch, err := c.CreatePixCharge(t.Context(), payments.PixChargeParams{
-		AmountCents: 100, ExternalID: payments.NewPublicID(time.Now()), Description: "Integration test",
+		AmountCents: 100, ExternalID: payments.NewPublicID(), Description: "Integration test",
 		ExpiresIn: 10 * time.Minute,
 	})
 	if err != nil {

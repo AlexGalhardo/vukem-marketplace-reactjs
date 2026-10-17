@@ -32,7 +32,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		vukem.WithDatabaseDrivers(postgres.Driver()),
 		vukem.WithProviders(append(Providers(), platform.MongoProvider{Deps: deps})...),
 		vukem.WithMigrations(migrations.All()),
-		vukem.WithSeeders(seeders.All()...),
+		vukem.WithAppSeeders(seeders.All()...),
 		vukem.WithListeners(listeners.All()...),
 		vukem.WithJobs(jobs.All(jobBinding)...),
 		vukem.WithSchedule(routes.Schedule),

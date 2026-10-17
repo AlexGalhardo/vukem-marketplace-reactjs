@@ -18,7 +18,6 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/sqlbind"
 )
 
 // Store implements api.Catalog, api.Cart, api.Orders, api.Shops and
@@ -44,7 +43,7 @@ const productColumns = `p.slug, p.title, p.price_cents, p.stock, p.status, COALE
 
 const productFrom = ` FROM products p JOIN shops s ON s.id = p.shop_id LEFT JOIN categories c ON c.id = p.category_id`
 
-func (s *Store) q(query string) string { return sqlbind.Rebind(s.db.Dialect(), query) }
+func (s *Store) q(query string) string { return database.Rebind(s.db.Dialect(), query) }
 
 // ListProducts implements api.Catalog.
 func (s *Store) ListProducts(ctx context.Context, in api.ProductQuery) ([]api.Product, int64, error) {

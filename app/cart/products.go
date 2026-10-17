@@ -92,7 +92,7 @@ func (s SQLProducts) ProductsByID(ctx context.Context, ids []int64) (map[int64]P
 
 	q := productSelect + ` WHERE p.id IN (?` + strings.Repeat(", ?", len(ids)-1) + `)`
 
-	rows, err := s.DB.QueryContext(ctx, dbx.Rebind(s.DB.Dialect(), q), args...)
+	rows, err := s.DB.QueryContext(ctx, database.Rebind(s.DB.Dialect(), q), args...)
 	if err != nil {
 		return nil, fmt.Errorf("products by id: %w", err)
 	}

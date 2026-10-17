@@ -1,9 +1,30 @@
 // Package seeders fills the database with demo data: vukem db:seed.
 package seeders
 
-import vukem "github.com/AlexGalhardo/vukem"
+import (
+	"context"
+
+	vukem "github.com/AlexGalhardo/vukem"
+)
 
 // All lists the seeders run by vukem db:seed, in order; make:seeder appends here.
-func All() []vukem.Seeder {
-	return []vukem.Seeder{Users{}, Categories{}, DemoShop{}, FreightRates{}}
+func All() []vukem.AppSeeder {
+	return []vukem.AppSeeder{
+		Users{},
+		db("Categories", Categories{}),
+		DemoShop{},
+		db("FreightRates", FreightRates{}),
+	}
+}
+
+// db runs a database-only seeder in the ordered AppSeeder list.
+func db(name string, s vukem.Seeder) vukem.AppSeeder {
+	return vukem.NamedAppSeeder(name, func(ctx context.Context, app *vukem.App) error {
+		d, err := app.DB()
+		if err != nil {
+			return err
+		}
+
+		return s.Seed(ctx, d)
+	})
 }

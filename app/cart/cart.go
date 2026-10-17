@@ -116,7 +116,7 @@ type item struct {
 }
 
 func (s Service) items(ctx context.Context, ex database.Executor, userID int64) ([]item, error) {
-	rows, err := ex.QueryContext(ctx, dbx.Rebind(ex.Dialect(),
+	rows, err := ex.QueryContext(ctx, database.Rebind(ex.Dialect(),
 		`SELECT id, product_id, quantity FROM cart_items WHERE user_id = ? ORDER BY id`), userID)
 	if err != nil {
 		return nil, fmt.Errorf("cart items: %w", err)

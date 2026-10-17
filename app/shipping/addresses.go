@@ -120,7 +120,7 @@ func scanAddress(s dbx.RowScanner) (Address, error) {
 
 // List returns the user's addresses, the default first.
 func (a Addresses) List(ctx context.Context, userID int64) ([]Address, error) {
-	rows, err := a.DB.QueryContext(ctx, dbx.Rebind(a.DB.Dialect(),
+	rows, err := a.DB.QueryContext(ctx, database.Rebind(a.DB.Dialect(),
 		`SELECT `+addressColumns+` FROM addresses WHERE user_id = ? ORDER BY is_default DESC, id DESC`), userID)
 	if err != nil {
 		return nil, fmt.Errorf("list addresses: %w", err)

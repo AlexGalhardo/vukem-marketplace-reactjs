@@ -321,7 +321,7 @@ type owed struct{ soID, shopID, cents int64 }
 
 // oversold lists the oversell.refund entries of an order.
 func (s *Service) oversold(ctx context.Context, orderID int64) ([]owed, error) {
-	rows, err := s.DB.QueryContext(ctx, dbx.Rebind(s.DB.Dialect(),
+	rows, err := s.DB.QueryContext(ctx, database.Rebind(s.DB.Dialect(),
 		`SELECT seller_order_id, shop_id, amount_cents FROM ledger_entries WHERE order_id = ? AND type = ?`),
 		orderID, EntryOversellRefund)
 	if err != nil {
