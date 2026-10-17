@@ -1,5 +1,15 @@
+connectrpc.com/connect v1.21.1 h1:h2kacdlzXpZU2OQFSv98xkjYXNUSr/ptxmGVbS/+CRM=
+connectrpc.com/connect v1.21.1/go.mod h1:fhMcVJ5w6r/yTYhnkEbW6+sIF7OZ5Ay7KYgmfebh2ek=
+connectrpc.com/grpchealth v1.5.0 h1:nHEVTwz9WYKxW2JTYUFD337q76oAZMvot9jX0WjVCQo=
+connectrpc.com/grpchealth v1.5.0/go.mod h1:fC9WGwKmDruKCNh8wj2rThiaxxoiXxvsCVIu2Ex2voA=
+connectrpc.com/grpcreflect v1.3.1 h1:iU8385WX2RYriTwOIN8mf2qKl0qTxgY9yRPXTVhr+ao=
+connectrpc.com/grpcreflect v1.3.1/go.mod h1:zUUo5SriuSMQRhF9vAOibHC9P6PZDSW+UlOz1W9w5PU=
 github.com/AlexGalhardo/vukem v0.23.0 h1:ST9bQpOY+PuuQSq0gMh/hxYn/mTIqgG0BlDMs2seN4Y=
 github.com/AlexGalhardo/vukem v0.23.0/go.mod h1:I1SNhde10HmdHxvnDHCRf7GOQ4POIM36pFYUGPkLlFI=
+github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0 h1:jE24TDcmNKR2psddOcQTB+eqwopc1vqc6hZNnWV5FmM=
+github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0/go.mod h1:zio073OiT6KDNGuiZLN01BjNH4ldSnEWMas+hyyXQU4=
+github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0 h1:wbf2QNvqiRniXT/yUsBlxyN65eTQnpA6Tl+bgcl6qg0=
+github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0/go.mod h1:Lyv95eyisA2pvtBL4nQLUL8GjGVKS70kJVcdHSSErG8=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0 h1:yzvnesRSb9PRhfyq8zqWDVXQFN1LaXfVS12XItSAJ3I=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0/go.mod h1:eODVAbEprXjx9GGoHvD4YIPEUfwvO5xN1v2Ef5twGpM=
 github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0 h1:1LZo9IMbfLUrV5f2vn5KzDxMJBJudQrwRE5txAmNkmY=
@@ -115,6 +125,10 @@ golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated/go.mod h1:RVAQXBGN
 golang.org/x/vuln v1.9.0 h1:12VaqnI9kJfqwRoPptxoqsUhQtdfrSbdksT7X/KY/sc=
 golang.org/x/vuln v1.9.0/go.mod h1:E/Frwm0xp49fTyBW+6CQHdkvobknbwUM49yEpMGUauw=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 h1:QG6hS4zFplRZvOQedzei4t2pT/zkQc3VR1u+S9/rcAw=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941/go.mod h1:OaIUM3+LpYcK2GXM4FTmhWoIq371Owdr+Cc7/BsYHHc=
+google.golang.org/protobuf v1.36.12 h1:pJOKDDOyeXErUroCihFAd5LQuwXBSpVnKGrj5o/fwxc=
+google.golang.org/protobuf v1.36.12/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 modernc.org/cc/v4 v4.29.7 h1:q+NXGJ0bK3b4TXFYQQVr9pYETGnmwFWkrUzJnMya/Tg=
