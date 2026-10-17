@@ -71,7 +71,7 @@ export default function ProductForm({ product, categories, maxImages }: Props): 
 				)}
 			</div>
 			<div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-				<form onSubmit={submit} className="space-y-4 rounded-md bg-card p-5 shadow-sm">
+				<form onSubmit={submit} className="space-y-4 rounded-md bg-card p-5 shadow-card">
 					<Field
 						label={t("seller.form.title")}
 						required
@@ -147,7 +147,7 @@ export default function ProductForm({ product, categories, maxImages }: Props): 
 					<button
 						type="submit"
 						disabled={form.processing}
-						className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
+						className="rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600 disabled:opacity-50"
 					>
 						{product ? t("seller.form.save") : t("seller.form.create")}
 					</button>
@@ -181,7 +181,7 @@ function StatusActions({ product }: { product: SellerProduct }): JSX.Element {
 	}
 
 	return (
-		<section aria-labelledby="visibility-title" className="space-y-2 rounded-md bg-card p-4 shadow-sm">
+		<section aria-labelledby="visibility-title" className="space-y-2 rounded-md bg-card p-4 shadow-card">
 			<h2 id="visibility-title" className="font-medium text-ink">
 				{t("seller.form.visibility")}
 			</h2>
@@ -251,7 +251,7 @@ function Images({ product, maxImages }: { product: SellerProduct; maxImages: num
 	};
 
 	return (
-		<section aria-labelledby="images-title" className="rounded-md bg-card p-4 shadow-sm">
+		<section aria-labelledby="images-title" className="rounded-md bg-card p-4 shadow-card">
 			<h2 id="images-title" className="font-medium text-ink">
 				{t("seller.images.title", { count: product.images.length, max: maxImages })}
 			</h2>

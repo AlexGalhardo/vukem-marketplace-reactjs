@@ -19,7 +19,7 @@ export default function LocaleMenu(): JSX.Element {
 		<Menu.Root>
 			<Menu.Trigger
 				data-testid="locale-menu"
-				className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-medium text-brand-900 hover:bg-black/10 dark:text-ink dark:hover:bg-white/10"
+				className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-medium text-on-header hover:bg-header-hover"
 			>
 				{/* The accessible name keeps the visible code (WCAG 2.5.3). */}
 				<span className="sr-only">{t("locale.label")}: </span>

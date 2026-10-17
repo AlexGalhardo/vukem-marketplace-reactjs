@@ -65,7 +65,7 @@ export default function CheckoutPix({ order, brCode, qr, canSimulate }: Props): 
 				<p className="mt-1 text-3xl font-bold tabular-nums">{formatMoney(order.totalCents, locale)}</p>
 
 				{status === "pending" && (
-					<div className="mt-6 flex flex-col items-center gap-5 rounded-md bg-card p-6">
+					<div className="mt-6 flex flex-col items-center gap-5 rounded-md bg-card p-6 shadow-card">
 						<p className="text-center text-sm text-muted">{t("checkout.pix.instructions")}</p>
 						{qr ? (
 							<img
@@ -119,7 +119,7 @@ export default function CheckoutPix({ order, brCode, qr, canSimulate }: Props): 
 				)}
 
 				{status !== "pending" && (
-					<div role="status" className="mt-6 rounded-md bg-card p-6">
+					<div role="status" className="mt-6 rounded-md bg-card p-6 shadow-card">
 						<p
 							className={
 								status === "paid" ? "font-semibold text-success-600" : "font-semibold text-danger-600"

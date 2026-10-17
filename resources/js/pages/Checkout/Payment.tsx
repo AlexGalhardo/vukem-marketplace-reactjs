@@ -58,7 +58,7 @@ export default function CheckoutPayment({ quote, methods }: Props): JSX.Element 
 			<h1 className="mb-4 text-2xl font-semibold">{t("checkout.payment.title")}</h1>
 			<div className="grid gap-6 lg:grid-cols-[1fr_22rem] lg:items-start">
 				<div className="flex flex-col gap-4">
-					<section className="rounded-md bg-card p-4">
+					<section className="rounded-md bg-card p-5 shadow-card">
 						<div className="flex items-baseline justify-between gap-4">
 							<h2 className="text-sm text-muted">{t("checkout.payment.deliver_to")}</h2>
 							<Link href="/checkout/address" className="text-sm text-action-600 hover:underline">
@@ -72,7 +72,7 @@ export default function CheckoutPayment({ quote, methods }: Props): JSX.Element 
 						</p>
 					</section>
 					{quote.groups.map((g) => (
-						<section key={g.shopId} className="rounded-md bg-card p-4">
+						<section key={g.shopId} className="rounded-md bg-card p-5 shadow-card">
 							<h2 className="mb-2 text-sm text-muted">
 								{t("checkout.payment.from", { shop: g.shopName })}
 							</h2>
@@ -103,7 +103,7 @@ export default function CheckoutPayment({ quote, methods }: Props): JSX.Element 
 							methods.card ? t("checkout.payment.card_seller") : t("checkout.payment.card_off"),
 						)}
 					</fieldset>
-					<dl className="grid grid-cols-[1fr_auto] gap-y-1 rounded-md bg-card p-4 text-sm">
+					<dl className="grid grid-cols-[1fr_auto] gap-y-1 rounded-md bg-card p-5 shadow-card text-sm">
 						<dt className="text-muted">{t("checkout.payment.products")}</dt>
 						<dd className="text-right tabular-nums">{money(quote.subtotalCents)}</dd>
 						<dt className="text-muted">{t("checkout.payment.shipping")}</dt>

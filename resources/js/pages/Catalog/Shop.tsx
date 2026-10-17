@@ -18,7 +18,7 @@ export default function Shop({ shop, results }: Props): JSX.Element {
 	return (
 		<>
 			<Head title={shop.name} />
-			<header className="overflow-hidden rounded-md bg-card shadow-sm">
+			<header className="overflow-hidden rounded-md bg-card shadow-card">
 				<div className="h-20 bg-brand-300 dark:bg-brand-900" />
 				<div className="flex flex-col gap-3 px-5 pb-5 sm:flex-row sm:items-end">
 					<div className="-mt-10 size-20 shrink-0 overflow-hidden rounded-full border-4 border-card bg-white">

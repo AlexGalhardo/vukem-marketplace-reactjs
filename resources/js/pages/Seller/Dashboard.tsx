@@ -21,7 +21,7 @@ export default function Dashboard({ shop, products }: { shop: ShopView; products
 				</div>
 				<Link
 					href="/seller/products/new"
-					className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700"
+					className="rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600"
 				>
 					{t("seller.products.new")}
 				</Link>
@@ -31,7 +31,7 @@ export default function Dashboard({ shop, products }: { shop: ShopView; products
 					{t("seller.dashboard.suspended")}
 				</p>
 			)}
-			<section aria-labelledby="recent-products" className="mt-6 rounded-md bg-card shadow-sm">
+			<section aria-labelledby="recent-products" className="mt-6 rounded-md bg-card shadow-card">
 				<h2 id="recent-products" className="border-b border-line px-4 py-3 font-medium text-ink">
 					{t("seller.dashboard.recent")}
 				</h2>

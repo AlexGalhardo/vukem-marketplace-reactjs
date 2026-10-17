@@ -4,9 +4,9 @@ import { useT } from "../../lib/i18n";
 import { formatBRL, priceParts } from "../../lib/money";
 
 const sizes = {
-	sm: { whole: "text-xl", fraction: "text-[0.6rem]" },
-	md: { whole: "text-2xl", fraction: "text-xs" },
-	lg: { whole: "text-4xl", fraction: "text-base" },
+	sm: { whole: "text-2xl", fraction: "text-xs mt-0.5" },
+	md: { whole: "text-[1.75rem]", fraction: "text-sm mt-0.5" },
+	lg: { whole: "text-4xl", fraction: "text-lg mt-1" },
 } as const;
 
 // Price shows BRL the way marketplace shoppers scan it: the whole amount
@@ -18,7 +18,7 @@ export default function Price({ cents, size = "md" }: { cents: number; size?: ke
 	const s = sizes[size];
 
 	return (
-		<p className="flex items-start font-light tracking-tight text-ink tabular-nums">
+		<p className="relative flex items-start font-normal tracking-tight text-ink tabular-nums">
 			<span className="sr-only">{formatBRL(cents, locale)}</span>
 			<span aria-hidden="true" className={`${s.whole} mr-1 leading-none`}>
 				{p.symbol}

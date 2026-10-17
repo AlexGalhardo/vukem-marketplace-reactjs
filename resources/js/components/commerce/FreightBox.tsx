@@ -1,5 +1,6 @@
-import { type FormEvent, type JSX, useId, useState } from "react";
+import { type FormEvent, type JSX, useEffect, useId, useState } from "react";
 
+import { formatCep, saveCep, useSavedCep } from "../../lib/cep";
 import { useT } from "../../lib/i18n";
 import { formatMoney } from "../../lib/money";
 
@@ -26,6 +27,10 @@ export default function FreightBox({ slug }: Props): JSX.Element {
 	const id = useId();
 	const [cep, setCep] = useState("");
 	const [state, setState] = useState<State>({ kind: "idle" });
+	const saved = useSavedCep();
+	useEffect(() => {
+		if (saved) setCep((c) => c || formatCep(saved));
+	}, [saved]);
 
 	const submit = async (e: FormEvent) => {
 		e.preventDefault();
@@ -45,18 +50,15 @@ export default function FreightBox({ slug }: Props): JSX.Element {
 			}
 			if (!res.ok) throw new Error(String(res.status));
 			setState({ kind: "done", quote: (await res.json()) as Quote });
+			saveCep(digits);
 		} catch {
 			setState({ kind: "error", key: "error" });
 		}
 	};
 
 	return (
-		<form
-			onSubmit={submit}
-			aria-labelledby={`${id}-title`}
-			className="flex flex-col gap-2 rounded-md border border-line p-4"
-		>
-			<h2 id={`${id}-title`} className="text-sm font-medium text-ink">
+		<form onSubmit={submit} aria-labelledby={`${id}-title`} className="flex flex-col gap-2">
+			<h2 id={`${id}-title`} className="text-sm font-semibold text-ink">
 				{t("cart.freight.title")}
 			</h2>
 			<label htmlFor={id} className="text-sm text-muted">
@@ -72,12 +74,12 @@ export default function FreightBox({ slug }: Props): JSX.Element {
 					value={cep}
 					onChange={(e) => setCep(e.target.value)}
 					aria-describedby={`${id}-result`}
-					className="h-10 w-32 rounded-md border border-line bg-card px-3 text-sm text-ink"
+					className="h-10 w-32 min-w-0 flex-1 rounded-md border border-line bg-card px-3 text-sm text-ink focus:border-action-500 focus:outline-none"
 				/>
 				<button
 					type="submit"
 					disabled={state.kind === "loading"}
-					className="h-10 rounded-md border border-action-500 px-4 text-sm font-medium text-action-600 hover:bg-action-500/10 disabled:opacity-50"
+					className="h-10 rounded-md bg-action-soft px-4 text-sm font-semibold text-action-600 hover:bg-action-soft-hover disabled:opacity-50"
 				>
 					{t("cart.freight.calculate")}
 				</button>

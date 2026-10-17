@@ -650,5 +650,114 @@
 			"events": "Choose at least one event.",
 			"limit": "You can have at most {max} endpoints."
 		}
+	},
+	"storefront": {
+		"header": {
+			"skip": "Skip to content",
+			"deliver_to": "Deliver to",
+			"enter_cep": "Enter your CEP",
+			"nav_label": "Store shortcuts",
+			"new": "Newest",
+			"help": "Help",
+			"cart_count": "{count} items"
+		},
+		"price": {
+			"installments": "in up to {count}x {part}"
+		},
+		"banner": {
+			"label": "Highlights",
+			"carousel": "carousel",
+			"slide": "slide",
+			"position": "Slide {n} of {total}",
+			"previous": "Previous slide",
+			"next": "Next slide",
+			"pause": "Pause slides",
+			"play": "Play slides",
+			"deals_title": "Lower prices, every day",
+			"deals_body": "The catalog sorted from the cheapest product up.",
+			"deals_cta": "See lowest prices",
+			"sell_title": "Your shop, open in minutes",
+			"sell_body": "List products, get paid by PIX or card and track every order."
+		},
+		"shortcuts": {
+			"login_title": "Sign in for the best experience",
+			"login_body": "Track orders and save addresses.",
+			"login_cta": "Sign in",
+			"account_title": "Your purchases",
+			"account_body": "Orders, addresses and security in one place.",
+			"account_cta": "Open dashboard",
+			"cep_title": "Your delivery CEP",
+			"cep_body": "Check shipping price and time before buying.",
+			"cep_cta": "Manage addresses",
+			"pay_title": "PIX or card",
+			"pay_body": "Pay instantly by PIX or with a credit card.",
+			"pay_cta": "Browse products",
+			"budget_title": "Under R$ 100",
+			"budget_body": "Good finds that fit the budget.",
+			"budget_cta": "See products",
+			"sell_title": "Sell with us",
+			"sell_body": "Open a shop and reach buyers across Brazil.",
+			"sell_cta": "Start selling"
+		},
+		"shelf": {
+			"previous": "Scroll {title} back",
+			"next": "Scroll {title} forward"
+		},
+		"search": {
+			"applied": "Applied filters",
+			"remove_filter": "Remove filter {filter}",
+			"all_categories": "All categories",
+			"up_to": "Up to {max}",
+			"between": "{min} to {max}",
+			"over": "Over {min}",
+			"view": "Results view",
+			"view_list": "List view",
+			"view_grid": "Grid view"
+		},
+		"product": {
+			"all": "All products",
+			"in_category": "Listed in",
+			"buy_box": "Purchase options",
+			"stock_available": "Stock available",
+			"buy_now": "Buy now",
+			"reviews": "Product reviews",
+			"no_reviews": "No reviews yet.",
+			"questions": "Questions and answers",
+			"questions_soon": "Questions to the seller are not available in this demo yet."
+		},
+		"cart": {
+			"summary": "Purchase summary",
+			"shipping_later": "At checkout",
+			"decrease": "Decrease quantity",
+			"increase": "Increase quantity",
+			"available": "{count} available"
+		},
+		"perks": {
+			"pay_title": "PIX or card",
+			"pay_body": "Pay instantly by PIX or with a credit card at checkout.",
+			"ship_title": "Shipping by CEP",
+			"ship_body": "Price and delivery time calculated by region before you buy.",
+			"safe_title": "Protected account",
+			"safe_body": "Secure sessions, two-factor sign-in and scoped API keys."
+		},
+		"footer": {
+			"label": "Site links",
+			"buy": "Buy",
+			"all_products": "All products",
+			"deals": "Lowest prices",
+			"newest": "Newest",
+			"cart": "Cart",
+			"sell": "Sell",
+			"open_shop": "Open your shop",
+			"seller_area": "Seller area",
+			"payouts": "Payouts",
+			"help": "Help",
+			"purchases": "Purchases",
+			"addresses": "Addresses",
+			"contact": "Contact us",
+			"project": "Project",
+			"framework": "Built with vukem",
+			"disclaimer": "Open-source demo project, not affiliated with Mercado Livre."
+		}
 	}
 }

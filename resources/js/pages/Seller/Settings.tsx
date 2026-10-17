@@ -38,18 +38,18 @@ export default function Settings({ shop, ufs }: { shop: ShopView; ufs: string[] 
 			<Head title={t("seller.settings.title")} />
 			<SellerNav current="/seller/settings" shopSlug={shop.slug} />
 			<div className="grid gap-6 md:grid-cols-[1fr_16rem]">
-				<form onSubmit={submit} className="space-y-4 rounded-md bg-card p-5 shadow-sm">
+				<form onSubmit={submit} className="space-y-4 rounded-md bg-card p-5 shadow-card">
 					<h1 className="text-xl font-semibold text-ink">{t("seller.settings.title")}</h1>
 					<ShopFields data={form.data} errors={form.errors} ufs={ufs} set={(k, v) => form.setData(k, v)} />
 					<button
 						type="submit"
 						disabled={form.processing}
-						className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
+						className="rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600 disabled:opacity-50"
 					>
 						{t("seller.settings.save")}
 					</button>
 				</form>
-				<section aria-labelledby="logo-title" className="rounded-md bg-card p-5 shadow-sm">
+				<section aria-labelledby="logo-title" className="rounded-md bg-card p-5 shadow-card">
 					<h2 id="logo-title" className="font-medium text-ink">
 						{t("seller.settings.logo")}
 					</h2>

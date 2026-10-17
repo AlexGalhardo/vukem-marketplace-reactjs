@@ -106,7 +106,7 @@ export default function AdminPayouts({ pending, paid }: Props): JSX.Element {
 			{pending.length === 0 ? (
 				<p className="text-muted">{t("checkout.admin_payouts.none")}</p>
 			) : (
-				<ul className="divide-y divide-line rounded-md bg-card">
+				<ul className="divide-y divide-line rounded-md bg-card shadow-card">
 					{pending.map((p) => (
 						<PendingRow key={p.id} payout={p} />
 					))}

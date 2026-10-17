@@ -19,7 +19,7 @@ export default function CheckoutSuccess({ order }: { order: OrderSummary }): JSX
 	return (
 		<>
 			<Head title={t("checkout.success.title")} />
-			<div className="mx-auto max-w-xl rounded-md bg-card p-6">
+			<div className="mx-auto max-w-xl rounded-md bg-card p-6 shadow-card">
 				<h1 className="text-2xl font-semibold">{t("checkout.success.title")}</h1>
 				<p role="status" className="mt-2">
 					{message}

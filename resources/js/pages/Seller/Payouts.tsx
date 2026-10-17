@@ -42,7 +42,7 @@ export default function SellerPayouts({ shop, summary, payouts, stripe, minPayou
 			<p className="mb-6 text-muted">{shop.name}</p>
 
 			<div className="grid gap-6 lg:grid-cols-2">
-				<section className="rounded-md bg-card p-5">
+				<section className="rounded-md bg-card p-5 shadow-card">
 					<h2 className="text-sm text-muted">{t("checkout.payouts.balance")}</h2>
 					<p className="mt-1 text-3xl font-bold tabular-nums">{money(summary.balanceCents)}</p>
 					<dl className="mt-3 grid grid-cols-[1fr_auto] gap-y-1 text-sm">
@@ -74,7 +74,7 @@ export default function SellerPayouts({ shop, summary, payouts, stripe, minPayou
 					</form>
 				</section>
 
-				<section className="rounded-md bg-card p-5">
+				<section className="rounded-md bg-card p-5 shadow-card">
 					<h2 className="font-semibold">{t("checkout.payouts.card_title")}</h2>
 					<p className="mt-2 text-sm text-muted">
 						{!stripe.enabled
@@ -107,7 +107,7 @@ export default function SellerPayouts({ shop, summary, payouts, stripe, minPayou
 				{payouts.length === 0 ? (
 					<p className="text-muted">{t("checkout.payouts.none")}</p>
 				) : (
-					<ul className="divide-y divide-line rounded-md bg-card">
+					<ul className="divide-y divide-line rounded-md bg-card shadow-card">
 						{payouts.map((p) => (
 							<li
 								key={p.id}

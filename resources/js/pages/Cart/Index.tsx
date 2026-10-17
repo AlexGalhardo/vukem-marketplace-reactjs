@@ -1,6 +1,7 @@
 import { Head, Link, router, usePage } from "@inertiajs/react";
 import type { JSX } from "react";
-
+import ProductImage from "../../components/catalog/ProductImage";
+import { CartIcon, StoreIcon } from "../../components/icons";
 import { useT } from "../../lib/i18n";
 import { serverMessage } from "../../lib/messages";
 import { formatMoney } from "../../lib/money";
@@ -26,11 +27,16 @@ function LineRow({ line }: { line: CartLine }): JSX.Element {
 
 	const setQuantity = (quantity: number) =>
 		router.patch(`/cart/items/${line.id}`, { quantity }, { preserveScroll: true });
+	const step =
+		"flex size-8 items-center justify-center text-lg text-action-600 disabled:text-muted disabled:opacity-50";
 
 	return (
-		<li className="flex flex-wrap items-center gap-4 py-4">
-			<div className="min-w-0 flex-1">
-				<Link href={`/p/${line.slug}`} className="font-medium text-ink hover:text-action-600">
+		<li className="grid grid-cols-[4rem_1fr] gap-x-4 gap-y-3 py-5 sm:grid-cols-[4rem_1fr_auto_7.5rem] sm:items-center">
+			<div className="size-16 overflow-hidden rounded-md border border-line">
+				<ProductImage src="" alt="" />
+			</div>
+			<div className="min-w-0">
+				<Link href={`/p/${line.slug}`} className="line-clamp-2 break-words text-ink hover:text-action-600">
 					{line.title}
 				</Link>
 				<p className="text-sm text-muted">{t("cart.each", { price: formatMoney(line.priceCents, locale) })}</p>
@@ -39,29 +45,58 @@ function LineRow({ line }: { line: CartLine }): JSX.Element {
 						{t(`cart.issue.${line.issue}`, { stock: line.stock })}
 					</p>
 				)}
-			</div>
-			<label className="flex items-center gap-2 text-sm text-muted">
-				{t("cart.quantity")}
-				<select
-					value={line.quantity}
-					onChange={(e) => setQuantity(Number(e.target.value))}
-					className="h-9 rounded-md border border-line bg-card px-2 text-ink"
+				<button
+					type="button"
+					onClick={() => router.delete(`/cart/items/${line.id}`, { preserveScroll: true })}
+					className="mt-1 text-sm font-medium text-action-600 hover:underline"
 				>
-					{Array.from({ length: Math.max(max, line.quantity) }, (_, i) => i + 1).map((n) => (
-						<option key={n} value={n}>
-							{n}
-						</option>
-					))}
-				</select>
-			</label>
-			<p className="w-28 text-right font-semibold tabular-nums">{formatMoney(line.lineTotalCents, locale)}</p>
-			<button
-				type="button"
-				onClick={() => router.delete(`/cart/items/${line.id}`, { preserveScroll: true })}
-				className="text-sm text-action-600 hover:underline"
-			>
-				{t("cart.remove")}
-			</button>
+					{t("cart.remove")}
+				</button>
+			</div>
+			<div className="col-start-2 flex flex-col items-start gap-1 sm:col-start-auto sm:items-center">
+				<fieldset className="flex items-center rounded-md border border-line">
+					<legend className="sr-only">{t("cart.quantity")}</legend>
+					<button
+						type="button"
+						disabled={line.quantity <= 1}
+						onClick={() => setQuantity(line.quantity - 1)}
+						aria-label={t("storefront.cart.decrease")}
+						className={step}
+					>
+						−
+					</button>
+					<label className="sr-only" htmlFor={`qty-${line.id}`}>
+						{t("cart.quantity")}
+					</label>
+					<select
+						id={`qty-${line.id}`}
+						value={line.quantity}
+						onChange={(e) => setQuantity(Number(e.target.value))}
+						className="h-8 appearance-none bg-transparent px-1 text-center text-sm text-ink tabular-nums focus:outline-none"
+					>
+						{Array.from({ length: Math.max(max, line.quantity) }, (_, i) => i + 1).map((n) => (
+							<option key={n} value={n}>
+								{n}
+							</option>
+						))}
+					</select>
+					<button
+						type="button"
+						disabled={line.quantity >= max}
+						onClick={() => setQuantity(line.quantity + 1)}
+						aria-label={t("storefront.cart.increase")}
+						className={step}
+					>
+						+
+					</button>
+				</fieldset>
+				{line.stock > 0 && (
+					<p className="text-xs text-muted">{t("storefront.cart.available", { count: line.stock })}</p>
+				)}
+			</div>
+			<p className="col-start-2 text-lg font-normal text-ink tabular-nums sm:col-start-auto sm:text-right">
+				{formatMoney(line.lineTotalCents, locale)}
+			</p>
 		</li>
 	);
 }
@@ -70,34 +105,45 @@ export default function CartIndex({ cart }: Props): JSX.Element {
 	const { t, locale } = useT();
 	const errors = usePage<SharedProps>().props.errors ?? {};
 	const error = serverMessage(locale, errors.quantity ?? errors.product);
+	const cta = "mt-5 flex h-12 items-center justify-center rounded-md bg-action-500 px-4 font-semibold text-on-action";
 
 	return (
 		<>
 			<Head title={t("cart.title")} />
-			<h1 className="mb-4 text-2xl font-semibold">{t("cart.title")}</h1>
+			<h1 className="mb-4 text-2xl font-semibold text-ink">{t("cart.title")}</h1>
 			{error && (
 				<p role="alert" className="mb-4 text-sm text-danger-600">
 					{error}
 				</p>
 			)}
 			{cart.lines.length === 0 ? (
-				<div className="rounded-md bg-card p-8 text-center">
-					<p className="mb-4 text-muted">{t("cart.empty")}</p>
-					<Link href="/" className="font-medium text-action-600 hover:underline">
+				<div className="flex flex-col items-center gap-3 rounded-md bg-card px-6 py-12 text-center shadow-card">
+					<span className="flex size-16 items-center justify-center rounded-full bg-action-soft text-action-600">
+						<CartIcon className="size-8" />
+					</span>
+					<p className="text-lg font-semibold text-ink">{t("cart.empty")}</p>
+					<Link
+						href="/"
+						className="inline-flex h-10 items-center rounded-md bg-action-500 px-5 text-sm font-semibold text-on-action hover:bg-action-600"
+					>
 						{t("cart.empty_cta")}
 					</Link>
 				</div>
 			) : (
-				<div className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+				<div className="grid gap-4 lg:grid-cols-[1fr_20rem] lg:items-start">
 					<div className="flex flex-col gap-4">
 						{cart.hasIssues && (
-							<p role="status" className="rounded-md bg-danger-600/10 px-4 py-3 text-sm text-ink">
+							<p
+								role="status"
+								className="rounded-md bg-card px-4 py-3 text-sm text-danger-600 shadow-card"
+							>
 								{t("cart.has_issues")}
 							</p>
 						)}
 						{groupByShop(cart.lines).map((g) => (
-							<section key={g.shopSlug} className="rounded-md bg-card px-4">
-								<h2 className="border-b border-line py-3 text-sm text-muted">
+							<section key={g.shopSlug} className="rounded-md bg-card px-4 shadow-card sm:px-6">
+								<h2 className="flex items-center gap-2 border-b border-line py-4 text-sm font-semibold text-ink">
+									<StoreIcon className="size-5 text-muted" />
 									{t("cart.sold_by", { shop: g.shopName })}
 								</h2>
 								<ul className="divide-y divide-line">
@@ -108,24 +154,30 @@ export default function CartIndex({ cart }: Props): JSX.Element {
 							</section>
 						))}
 					</div>
-					<aside className="rounded-md bg-card p-4 lg:sticky lg:top-4">
-						<dl className="flex justify-between text-sm">
-							<dt className="text-muted">{t("cart.subtotal", { count: cart.itemCount })}</dt>
-							<dd className="font-semibold tabular-nums">{formatMoney(cart.subtotalCents, locale)}</dd>
+					<aside
+						aria-labelledby="summary-title"
+						className="rounded-md bg-card p-5 shadow-card lg:sticky lg:top-4"
+					>
+						<h2 id="summary-title" className="mb-4 border-b border-line pb-4 font-semibold text-ink">
+							{t("storefront.cart.summary")}
+						</h2>
+						<dl className="grid grid-cols-[1fr_auto] gap-y-2 text-sm">
+							<dt className="text-ink">{t("cart.subtotal", { count: cart.itemCount })}</dt>
+							<dd className="text-right tabular-nums">{formatMoney(cart.subtotalCents, locale)}</dd>
+							<dt className="text-ink">{t("checkout.payment.shipping")}</dt>
+							<dd className="text-right text-muted">{t("storefront.cart.shipping_later")}</dd>
+							<dt className="pt-3 text-base font-semibold">{t("checkout.payment.total")}</dt>
+							<dd className="pt-3 text-right text-base font-semibold tabular-nums">
+								{formatMoney(cart.subtotalCents, locale)}
+							</dd>
 						</dl>
-						<p className="mt-2 text-xs text-muted">{t("cart.shipping_note")}</p>
+						<p className="mt-3 text-xs text-muted">{t("cart.shipping_note")}</p>
 						{cart.hasIssues || cart.itemCount === 0 ? (
-							<span
-								aria-disabled="true"
-								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-on-action opacity-50"
-							>
+							<span aria-disabled="true" className={`${cta} opacity-50`}>
 								{t("cart.checkout")}
 							</span>
 						) : (
-							<Link
-								href="/checkout"
-								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-on-action hover:bg-action-600"
-							>
+							<Link href="/checkout" className={`${cta} hover:bg-action-600`}>
 								{t("cart.checkout")}
 							</Link>
 						)}

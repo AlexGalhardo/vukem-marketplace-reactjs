@@ -58,7 +58,7 @@ function AddressForm({ editing, onDone }: { editing: Address | null; onDone: () 
 	};
 
 	return (
-		<form onSubmit={submit} className="grid gap-4 rounded-md bg-card p-4 sm:grid-cols-6">
+		<form onSubmit={submit} className="grid gap-4 rounded-md bg-card p-5 shadow-card sm:grid-cols-6">
 			<div className="sm:col-span-6">
 				<Field
 					label={t("checkout.addresses.recipient")}
@@ -223,7 +223,7 @@ export default function Addresses({ addresses, max }: Props): JSX.Element {
 				{addresses.map((a) => (
 					<li
 						key={a.id}
-						className={`rounded-md bg-card p-4 ${a.isDefault ? "ring-2 ring-action-500" : "border border-line"}`}
+						className={`rounded-md bg-card p-4 shadow-card ${a.isDefault ? "ring-2 ring-action-500" : "border border-line"}`}
 					>
 						<p className="font-medium">
 							{a.recipient}

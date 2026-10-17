@@ -66,7 +66,7 @@ export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: 
 
 				{created && <CreatedKey name={created.name} token={created.token} />}
 
-				<section aria-labelledby="create-key" className="rounded-lg border border-line bg-card p-6">
+				<section aria-labelledby="create-key" className="rounded-md bg-card p-6 shadow-card">
 					<h2 id="create-key" className="mb-4 text-lg font-semibold text-ink">
 						{t("api.keys.create_title")}
 					</h2>
@@ -140,7 +140,7 @@ export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: 
 					{keys.length === 0 ? (
 						<p className="text-muted">{t("api.keys.empty")}</p>
 					) : (
-						<ul className="divide-y divide-line rounded-lg border border-line bg-card">
+						<ul className="divide-y divide-line rounded-md bg-card shadow-card">
 							{keys.map((key) => (
 								<li key={key.id} className="flex flex-wrap items-start justify-between gap-3 p-4">
 									<div className="min-w-0 space-y-1">
@@ -210,7 +210,7 @@ function CreatedKey({ name, token }: { name: string; token: string }) {
 	return (
 		<section
 			role="status"
-			className="space-y-3 rounded-lg border-2 border-brand-500 bg-brand-50 p-6 text-brand-900"
+			className="space-y-3 rounded-md border-2 border-brand-500 bg-brand-50 p-6 text-brand-900"
 		>
 			<h2 className="text-lg font-semibold">{t("api.keys.created_title")}</h2>
 			<p className="max-w-prose text-sm">{t("api.keys.created_body", { name })}</p>

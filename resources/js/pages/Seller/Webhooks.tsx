@@ -33,7 +33,7 @@ function SecretPanel({ secret }: { secret: string }): JSX.Element | null {
 	return (
 		<section
 			aria-labelledby="secret-title"
-			className="mb-6 rounded-lg border-2 border-brand-400 bg-brand-50 px-5 py-4 text-brand-900 dark:bg-card dark:text-ink"
+			className="mb-6 rounded-md border-2 border-brand-400 bg-brand-50 px-5 py-4 text-brand-900 dark:bg-card dark:text-ink"
 		>
 			<h2 id="secret-title" className="font-semibold">
 				{t("webhooks.secret_title")}
@@ -47,7 +47,7 @@ function SecretPanel({ secret }: { secret: string }): JSX.Element | null {
 					type="button"
 					onClick={copy}
 					aria-live="polite"
-					className="rounded-md bg-action-600 px-3 py-2 text-sm font-medium text-on-action hover:bg-action-700"
+					className="rounded-md bg-action-500 px-3 py-2 text-sm font-medium text-on-action hover:bg-action-600"
 				>
 					{copied ? t("webhooks.copied") : t("webhooks.copy")}
 				</button>
@@ -90,12 +90,12 @@ export default function Webhooks({ hasShop, endpoints, events, maxCount, secret 
 			<p className="mt-1 max-w-prose text-muted">{t("webhooks.intro")}</p>
 
 			{!hasShop ? (
-				<p className="mt-6 rounded-lg bg-card px-5 py-4 text-ink shadow-sm">{t("webhooks.no_shop")}</p>
+				<p className="mt-6 rounded-md bg-card px-5 py-4 text-ink shadow-card">{t("webhooks.no_shop")}</p>
 			) : (
 				<div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
 					<div>
 						{secret && <SecretPanel secret={secret} />}
-						<form onSubmit={submit} className="space-y-4 rounded-lg bg-card px-5 py-5 shadow-sm">
+						<form onSubmit={submit} className="space-y-4 rounded-md bg-card px-5 py-5 shadow-card">
 							<h2 className="font-semibold text-ink">{t("webhooks.new")}</h2>
 							<Field
 								label={t("webhooks.url")}
@@ -133,7 +133,7 @@ export default function Webhooks({ hasShop, endpoints, events, maxCount, secret 
 								<button
 									type="submit"
 									disabled={form.processing || endpoints.length >= maxCount}
-									className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
+									className="rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600 disabled:opacity-50"
 								>
 									{form.processing ? t("webhooks.adding") : t("webhooks.add")}
 								</button>
@@ -144,7 +144,7 @@ export default function Webhooks({ hasShop, endpoints, events, maxCount, secret 
 						</form>
 					</div>
 
-					<section aria-labelledby="endpoints-title" className="rounded-lg bg-card px-5 py-5 shadow-sm">
+					<section aria-labelledby="endpoints-title" className="rounded-md bg-card px-5 py-5 shadow-card">
 						<h2 id="endpoints-title" className="font-semibold text-ink">
 							{t("webhooks.list_title")}
 						</h2>
