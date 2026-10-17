@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 
+	vukem "github.com/AlexGalhardo/vukem"
+	"github.com/AlexGalhardo/vukem/logging/telegram"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
@@ -54,17 +56,18 @@ func telegramInbox(t *testing.T) (*httptest.Server, func() []string) {
 func contactApp(t *testing.T, telegramURL string) *vukemtest.App {
 	t.Helper()
 
-	env := map[string]string{}
-	if telegramURL != "" {
-		env = map[string]string{
-			"TELEGRAM_BOT_TOKEN": telegramToken,
-			"TELEGRAM_CHAT_ID":   "-1",
-			"TELEGRAM_API_URL":   telegramURL,
-			"TELEGRAM_MIN_LEVEL": "ERROR+8",
-		}
+	if telegramURL == "" {
+		return vukemtest.New(t, bootstrap.New)
 	}
 
-	return vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: env})
+	return vukemtest.New(t, bootstrap.New, vukemtest.Options{
+		Env: map[string]string{
+			"TELEGRAM_BOT_TOKEN": telegramToken,
+			"TELEGRAM_CHAT_ID":   "-1",
+			"TELEGRAM_LOG":       "false",
+		},
+		AppOptions: []vukem.Option{vukem.WithTelegram(func(c *telegram.Config) { c.BaseURL = telegramURL })},
+	})
 }
 
 func validContact() map[string]any {
