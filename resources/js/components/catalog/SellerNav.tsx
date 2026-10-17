@@ -6,6 +6,7 @@ import { type MessageKey, useT } from "../../lib/i18n";
 const tabs: { href: string; label: MessageKey }[] = [
 	{ href: "/seller", label: "seller.nav.overview" },
 	{ href: "/seller/products", label: "seller.nav.products" },
+	{ href: "/seller/questions", label: "qna.seller.nav" },
 	{ href: "/seller/settings", label: "seller.nav.settings" },
 ];
 
