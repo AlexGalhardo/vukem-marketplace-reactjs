@@ -195,7 +195,6 @@
 			"other_sessions_ended": "Your other sessions were logged out."
 		},
 		"errors": {
-			"credentials": "These credentials do not match our records.",
 			"reset_invalid": "This password reset link is invalid or has expired.",
 			"password_incorrect": "The password is incorrect.",
 			"password_mismatch": "The password confirmation does not match.",
@@ -207,11 +206,8 @@
 			"two_factor_enabled": "Two-factor authentication is already enabled.",
 			"two_factor_off": "Two-factor authentication is not enabled.",
 			"verify_other_account": "This verification link belongs to another account.",
-			"unverified": "Your email address is not verified.",
 			"social_no_email": "The sign-in provider did not share an email address.",
-			"social_email_taken": "An account with this email already exists. Log in with your password first.",
-			"social_state": "The sign-in attempt expired or is invalid. Please try again.",
-			"social_denied": "Sign-in was cancelled."
+			"social_email_taken": "An account with this email already exists. Log in with your password first."
 		},
 		"mail": {
 			"hello": "Hello {name},",

@@ -11,31 +11,9 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 )
 
-// vukemKey maps an English message produced inside vukem (guards, ORM
-// rules, social sign-in) to its catalog key.
-//
-// workaround(vukem): auth, orm.Unique and social errors are fixed English
-// strings, not i18n keys, so they are matched here by text.
-func vukemKey(msg string) (string, bool) {
-	switch msg {
-	case "These credentials do not match our records.":
-		return "account.errors.credentials", true
-	case "The email has already been taken.":
-		return "account.errors.email_taken", true
-	case "The sign-in attempt expired or is invalid. Please try again.":
-		return "account.errors.social_state", true
-	case "Sign-in was cancelled.":
-		return "account.errors.social_denied", true
-	case "Your email address is not verified.":
-		return "account.errors.unverified", true
-	}
-
-	return "", false
-}
-
-// Localized translates the errors fn returns: messages that are catalog
-// keys ("account.*") and the known vukem messages become text in the
-// request locale. Handlers and the accounts package use keys only.
+// Localized translates the errors fn returns whose messages are our
+// catalog keys ("account.*") into the request locale. vukem's own auth,
+// social and validation errors are keyed and translated by vukem.
 func Localized(fn func(*web.Ctx) error) func(*web.Ctx) error {
 	return func(c *web.Ctx) error { return localize(c.Context(), fn(c)) }
 }
@@ -68,10 +46,6 @@ func localize(ctx context.Context, err error) error {
 }
 
 func translate(ctx context.Context, msg string) string {
-	if key, ok := vukemKey(msg); ok {
-		msg = key
-	}
-
 	if strings.HasPrefix(msg, "account.") {
 		return i18n.T(ctx, msg)
 	}

@@ -195,7 +195,6 @@
 			"other_sessions_ended": "Suas outras sessões foram encerradas."
 		},
 		"errors": {
-			"credentials": "Essas credenciais não correspondem aos nossos registros.",
 			"reset_invalid": "Este link de redefinição de senha é inválido ou expirou.",
 			"password_incorrect": "A senha está incorreta.",
 			"password_mismatch": "A confirmação da senha não confere.",
@@ -207,11 +206,8 @@
 			"two_factor_enabled": "A autenticação em dois fatores já está ativa.",
 			"two_factor_off": "A autenticação em dois fatores não está ativa.",
 			"verify_other_account": "Este link de confirmação pertence a outra conta.",
-			"unverified": "Seu e-mail não foi confirmado.",
 			"social_no_email": "O provedor de login não compartilhou um endereço de e-mail.",
-			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro.",
-			"social_state": "A tentativa de login expirou ou é inválida. Tente novamente.",
-			"social_denied": "O login foi cancelado."
+			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro."
 		},
 		"mail": {
 			"hello": "Olá {name},",
