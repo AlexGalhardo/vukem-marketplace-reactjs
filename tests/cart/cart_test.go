@@ -284,3 +284,19 @@ func TestCEPLookup(t *testing.T) {
 	c.GetJSON("/cep/99999999").AssertNotFound()
 	c.GetJSON("/cep/123").AssertStatus(http.StatusUnprocessableEntity)
 }
+
+func TestFreightSeederIsIdempotent(t *testing.T) {
+	t.Parallel()
+
+	e := commercetest.New(t, commercetest.Options{})
+
+	for range 2 {
+		if err := e.Seed(t.Context()); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if n := e.Int64(t, `SELECT COUNT(*) FROM freight_rates`); n != 30 {
+		t.Errorf("freight rates = %d, want 30 (6 bands × 5 regions)", n)
+	}
+}
