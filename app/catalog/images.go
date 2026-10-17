@@ -117,6 +117,10 @@ func (s *Service) ThumbnailRegistration() queue.Registration {
 // dispatch queues the variants of a new upload. A failed dispatch only
 // leaves the original showing, so it is logged, not returned.
 func (s *Service) dispatch(ctx context.Context, job ThumbnailJob) {
+	// The upload is stored: a client that hangs up now must not abort the
+	// dispatch (or, with the sync queue, the thumbnails).
+	ctx = context.WithoutCancel(ctx)
+
 	var err error
 	if s.queue == nil {
 		err = s.ProcessThumbnails(ctx, job)
@@ -253,6 +257,9 @@ func (s *Service) logoThumbnail(ctx context.Context, job ThumbnailJob) error {
 // deleteObject removes one object; failures only leave an orphan behind,
 // so they are logged, not returned.
 func (s *Service) deleteObject(ctx context.Context, p string) {
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
+
 	if err := s.disk.Delete(ctx, p); err != nil && !errors.Is(err, storage.ErrNotFound) {
 		s.log.WarnContext(ctx, "catalog: delete image object", "path", p, "error", err)
 	}

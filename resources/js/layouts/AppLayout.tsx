@@ -80,6 +80,12 @@ export default function AppLayout({ children }: { children: ReactNode }): JSX.El
 								</Link>
 							</>
 						)}
+						<Link
+							href={page.props.auth?.user ? "/seller" : "/sell"}
+							className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+						>
+							{t("nav.sell")}
+						</Link>
 						<LocaleMenu />
 						<ThemeToggle />
 					</nav>

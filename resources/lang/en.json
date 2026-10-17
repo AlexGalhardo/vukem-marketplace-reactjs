@@ -43,5 +43,147 @@
 	"admin": {
 		"title": "Admin",
 		"intro": "Moderation, payouts and the ledger arrive in the admin phase."
+	},
+	"catalog": {
+		"card": {
+			"last_units": "Only {count} left",
+			"ships_from": "Ships from {uf}"
+		},
+		"home": {
+			"deals": "Lowest prices",
+			"latest": "New arrivals",
+			"recent": "Recently viewed",
+			"see_all": "See all",
+			"empty": "No products yet. Open a shop and list the first one."
+		},
+		"pagination": {
+			"label": "Pages",
+			"previous": "Previous",
+			"next": "Next",
+			"status": "Page {page} of {last}"
+		},
+		"product": {
+			"breadcrumb": "Category",
+			"description": "Description",
+			"freight_title": "Shipping",
+			"freight_placeholder": "Ships from {uf}. Enter your ZIP code at checkout to see the price and delivery time.",
+			"in_stock": "In stock: {count} available",
+			"out_of_stock": "Out of stock",
+			"more_from": "More from {shop}",
+			"no_description": "The seller has not written a description.",
+			"photos": "Photos",
+			"rating": "{avg} out of 5 ({count} reviews)",
+			"seller_since": "Selling since {year}",
+			"show_photo": "Show photo {n}",
+			"sold_by": "Sold by"
+		},
+		"search": {
+			"all_products": "All products",
+			"any_state": "Any state",
+			"apply": "Apply price",
+			"count": "Results: {count}",
+			"empty_title": "No products match your search",
+			"empty_body": "Check the spelling, use fewer words or remove a filter.",
+			"filters": "Filters",
+			"max": "Max R$",
+			"min": "Min R$",
+			"price": "Price",
+			"results_for": "Results for “{q}”",
+			"ships_from": "Ships from",
+			"sort": "Sort by",
+			"sort_relevance": "Best match",
+			"sort_price_asc": "Lowest price",
+			"sort_price_desc": "Highest price",
+			"sort_newest": "Newest"
+		}
+	},
+	"shop": {
+		"empty": "This shop has no products for sale right now.",
+		"meta": "Selling since {since}. Ships from {uf}. Products: {count}",
+		"products": "Products"
+	},
+	"seller": {
+		"dashboard": {
+			"recent": "Latest products",
+			"summary": "Products in your shop: {total}",
+			"suspended": "Your shop is suspended: its products are hidden from buyers. Contact support to appeal."
+		},
+		"flash": {
+			"images_added": "Photos uploaded.",
+			"product_created": "Draft saved. Add photos, then publish it.",
+			"saved": "Changes saved.",
+			"shop_opened": "Your shop is open. List your first product."
+		},
+		"form": {
+			"archive": "Archive",
+			"category": "Category",
+			"create": "Save draft",
+			"description": "Description",
+			"draft_hint": "New products start as drafts. You can add photos and publish on the next page.",
+			"edit_title": "Edit product",
+			"new_title": "New product",
+			"no_category": "No category",
+			"price": "Price (R$)",
+			"publish": "Publish",
+			"save": "Save changes",
+			"stock": "Stock",
+			"suspended": "Moderation suspended this product. It stays hidden until the review is closed.",
+			"title": "Title",
+			"unpublish": "Move to drafts",
+			"view_public": "View product page",
+			"visibility": "Visibility",
+			"weight": "Weight (g)"
+		},
+		"images": {
+			"add": "Add photos ({free} left)",
+			"full": "This product has the maximum number of photos.",
+			"hint": "JPEG, PNG, GIF or WebP, up to 5 MB and 16 megapixels each.",
+			"move_left": "Move photo {n} earlier",
+			"move_right": "Move photo {n} later",
+			"photo": "Photo {n}",
+			"processing": "Resizing…",
+			"remove": "Remove photo {n}",
+			"remove_short": "Remove",
+			"title": "Photos ({count} of {max})",
+			"uploading": "Uploading…"
+		},
+		"nav": {
+			"label": "Seller area",
+			"overview": "Overview",
+			"products": "Products",
+			"settings": "Shop settings",
+			"storefront": "View storefront"
+		},
+		"open": {
+			"body": "Name your shop and tell buyers where you ship from. You can change both later.",
+			"submit": "Open shop",
+			"title": "Open your shop"
+		},
+		"products": {
+			"empty": "You have no products yet.",
+			"new": "New product",
+			"price": "Price",
+			"product": "Product",
+			"status": "Status",
+			"stock": "Stock",
+			"title": "Your products"
+		},
+		"settings": {
+			"logo": "Logo",
+			"logo_upload": "Upload logo",
+			"save": "Save changes",
+			"title": "Shop settings"
+		},
+		"shop": {
+			"description": "Description",
+			"name": "Shop name",
+			"ship_from": "Ships from (state)"
+		},
+		"status": {
+			"archived": "Archived",
+			"draft": "Draft",
+			"published": "Published",
+			"suspended": "Suspended"
+		}
 	}
 }

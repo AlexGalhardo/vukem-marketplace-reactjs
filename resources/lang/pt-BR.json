@@ -43,5 +43,147 @@
 	"admin": {
 		"title": "Administração",
 		"intro": "Moderação, repasses e o livro-razão chegam na fase de administração."
+	},
+	"catalog": {
+		"card": {
+			"last_units": "Só restam {count}",
+			"ships_from": "Enviado de {uf}"
+		},
+		"home": {
+			"deals": "Menores preços",
+			"latest": "Novidades",
+			"recent": "Vistos recentemente",
+			"see_all": "Ver todos",
+			"empty": "Ainda não há produtos. Abra uma loja e anuncie o primeiro."
+		},
+		"pagination": {
+			"label": "Páginas",
+			"previous": "Anterior",
+			"next": "Próxima",
+			"status": "Página {page} de {last}"
+		},
+		"product": {
+			"breadcrumb": "Categoria",
+			"description": "Descrição",
+			"freight_title": "Frete",
+			"freight_placeholder": "Enviado de {uf}. Informe seu CEP no checkout para ver o preço e o prazo.",
+			"in_stock": "Em estoque: {count} disponíveis",
+			"out_of_stock": "Sem estoque",
+			"more_from": "Mais de {shop}",
+			"no_description": "O vendedor não escreveu uma descrição.",
+			"photos": "Fotos",
+			"rating": "{avg} de 5 ({count} avaliações)",
+			"seller_since": "Vendendo desde {year}",
+			"show_photo": "Mostrar foto {n}",
+			"sold_by": "Vendido por"
+		},
+		"search": {
+			"all_products": "Todos os produtos",
+			"any_state": "Qualquer estado",
+			"apply": "Aplicar preço",
+			"count": "Resultados: {count}",
+			"empty_title": "Nenhum produto corresponde à sua busca",
+			"empty_body": "Confira a ortografia, use menos palavras ou remova um filtro.",
+			"filters": "Filtros",
+			"max": "Máx. R$",
+			"min": "Mín. R$",
+			"price": "Preço",
+			"results_for": "Resultados para “{q}”",
+			"ships_from": "Enviado de",
+			"sort": "Ordenar por",
+			"sort_relevance": "Mais relevantes",
+			"sort_price_asc": "Menor preço",
+			"sort_price_desc": "Maior preço",
+			"sort_newest": "Mais recentes"
+		}
+	},
+	"shop": {
+		"empty": "Esta loja não tem produtos à venda agora.",
+		"meta": "Vendendo desde {since}. Envia de {uf}. Produtos: {count}",
+		"products": "Produtos"
+	},
+	"seller": {
+		"dashboard": {
+			"recent": "Últimos produtos",
+			"summary": "Produtos na sua loja: {total}",
+			"suspended": "Sua loja está suspensa: os produtos ficam ocultos para compradores. Fale com o suporte para recorrer."
+		},
+		"flash": {
+			"images_added": "Fotos enviadas.",
+			"product_created": "Rascunho salvo. Adicione fotos e depois publique.",
+			"saved": "Alterações salvas.",
+			"shop_opened": "Sua loja está aberta. Anuncie seu primeiro produto."
+		},
+		"form": {
+			"archive": "Arquivar",
+			"category": "Categoria",
+			"create": "Salvar rascunho",
+			"description": "Descrição",
+			"draft_hint": "Produtos novos começam como rascunho. Você adiciona fotos e publica na próxima página.",
+			"edit_title": "Editar produto",
+			"new_title": "Novo produto",
+			"no_category": "Sem categoria",
+			"price": "Preço (R$)",
+			"publish": "Publicar",
+			"save": "Salvar alterações",
+			"stock": "Estoque",
+			"suspended": "A moderação suspendeu este produto. Ele fica oculto até a revisão terminar.",
+			"title": "Título",
+			"unpublish": "Voltar para rascunho",
+			"view_public": "Ver página do produto",
+			"visibility": "Visibilidade",
+			"weight": "Peso (g)"
+		},
+		"images": {
+			"add": "Adicionar fotos (restam {free})",
+			"full": "Este produto já tem o número máximo de fotos.",
+			"hint": "JPEG, PNG, GIF ou WebP, até 5 MB e 16 megapixels cada.",
+			"move_left": "Mover foto {n} para antes",
+			"move_right": "Mover foto {n} para depois",
+			"photo": "Foto {n}",
+			"processing": "Redimensionando…",
+			"remove": "Remover foto {n}",
+			"remove_short": "Remover",
+			"title": "Fotos ({count} de {max})",
+			"uploading": "Enviando…"
+		},
+		"nav": {
+			"label": "Área do vendedor",
+			"overview": "Resumo",
+			"products": "Produtos",
+			"settings": "Configurações da loja",
+			"storefront": "Ver vitrine"
+		},
+		"open": {
+			"body": "Dê um nome à sua loja e diga de onde você envia. Dá para mudar os dois depois.",
+			"submit": "Abrir loja",
+			"title": "Abra sua loja"
+		},
+		"products": {
+			"empty": "Você ainda não tem produtos.",
+			"new": "Novo produto",
+			"price": "Preço",
+			"product": "Produto",
+			"status": "Status",
+			"stock": "Estoque",
+			"title": "Seus produtos"
+		},
+		"settings": {
+			"logo": "Logo",
+			"logo_upload": "Enviar logo",
+			"save": "Salvar alterações",
+			"title": "Configurações da loja"
+		},
+		"shop": {
+			"description": "Descrição",
+			"name": "Nome da loja",
+			"ship_from": "Envia de (estado)"
+		},
+		"status": {
+			"archived": "Arquivado",
+			"draft": "Rascunho",
+			"published": "Publicado",
+			"suspended": "Suspenso"
+		}
 	}
 }

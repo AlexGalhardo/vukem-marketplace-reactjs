@@ -1,30 +1,85 @@
-import { Head } from "@inertiajs/react";
-import type { JSX } from "react";
+import { Head, Link } from "@inertiajs/react";
+import type { JSX, ReactNode } from "react";
 
-import { type MessageKey, useT } from "../lib/i18n";
+import CategoryRail from "../components/catalog/CategoryRail";
+import ProductGrid from "../components/catalog/ProductGrid";
+import { useT } from "../lib/i18n";
+import type { CategoryRef, ProductCard } from "../types";
 
-const benefits: MessageKey[] = ["home.benefits.pix", "home.benefits.shipping", "home.benefits.protection"];
+interface Props {
+	categories: CategoryRef[];
+	latest: ProductCard[];
+	deals: ProductCard[];
+	recent: ProductCard[];
+}
 
-export default function Home(): JSX.Element {
+function Section({
+	id,
+	title,
+	action,
+	children,
+}: {
+	id: string;
+	title: string;
+	action?: ReactNode;
+	children: ReactNode;
+}) {
+	return (
+		<section aria-labelledby={id} className="mt-8">
+			<div className="mb-3 flex items-baseline justify-between gap-4">
+				<h2 id={id} className="text-xl font-semibold text-ink">
+					{title}
+				</h2>
+				{action}
+			</div>
+			{children}
+		</section>
+	);
+}
+
+export default function Home({ categories, latest, deals, recent }: Props): JSX.Element {
 	const { t } = useT();
+	const seeAll = (href: string) => (
+		<Link href={href} className="text-sm text-action-600 hover:underline">
+			{t("catalog.home.see_all")}
+		</Link>
+	);
 
 	return (
 		<>
 			<Head title={t("app.name")} />
-			<section className="rounded-lg bg-card px-6 py-12 text-center shadow-sm">
-				<h1 className="text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{t("home.hero_title")}</h1>
-				<p className="mx-auto mt-3 max-w-xl text-muted">{t("home.hero_body")}</p>
-				<p className="mt-6 inline-block rounded-md bg-action-600 px-5 py-2.5 font-medium text-white">
-					{t("home.coming_soon")}
-				</p>
+			<section className="flex flex-col gap-4 rounded-md bg-card px-5 py-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<h1 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+						{t("home.hero_title")}
+					</h1>
+					<p className="mt-1 max-w-xl text-muted">{t("home.hero_body")}</p>
+				</div>
+				<Link
+					href="/sell"
+					className="shrink-0 self-start rounded-md bg-action-600 px-5 py-2.5 font-medium text-white hover:bg-action-700 sm:self-auto"
+				>
+					{t("home.cta_sell")}
+				</Link>
 			</section>
-			<ul className="mt-6 grid gap-4 sm:grid-cols-3">
-				{benefits.map((key) => (
-					<li key={key} className="rounded-lg bg-card px-4 py-5 text-sm font-medium text-ink shadow-sm">
-						{t(key)}
-					</li>
-				))}
-			</ul>
+
+			<div className="mt-6">
+				<CategoryRail categories={categories} label={t("nav.categories")} />
+			</div>
+
+			{recent.length > 0 && (
+				<Section id="recent" title={t("catalog.home.recent")}>
+					<ProductGrid products={recent.slice(0, 4)} />
+				</Section>
+			)}
+
+			<Section id="deals" title={t("catalog.home.deals")} action={seeAll("/search?sort=price_asc")}>
+				<ProductGrid products={deals} empty={<p className="text-muted">{t("catalog.home.empty")}</p>} />
+			</Section>
+
+			<Section id="latest" title={t("catalog.home.latest")} action={seeAll("/search?sort=newest")}>
+				<ProductGrid products={latest} empty={<p className="text-muted">{t("catalog.home.empty")}</p>} />
+			</Section>
 		</>
 	);
 }
