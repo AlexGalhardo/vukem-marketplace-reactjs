@@ -25,17 +25,7 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api/sqlstore"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/apikeys"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
 )
-
-// API registers the public APIs (PLAN 3.8): REST /api/v1 with its OpenAPI
-// document and Scalar reference at /docs/api, GraphQL /graphql, gRPC on
-// GRPC_PORT, and the account page that manages API keys.
-func API(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
-	return func(r *router.Router, app *vukem.App) error {
-		return apiRoutes(r, app, deps)
-	}
-}
 
 // Rate limits per minute; API_RATE_LIMIT tunes the per-caller one.
 const (
@@ -43,13 +33,22 @@ const (
 	apiIPRateLimit      = 300
 )
 
-func apiRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
+// API registers the public APIs (PLAN 3.8): REST /api/v1 with its OpenAPI
+// document and Scalar reference at /docs/api, GraphQL /graphql, gRPC on
+// GRPC_PORT, and the account page that manages API keys.
+func API(r *router.Router, app *vukem.App) error {
 	acc, err := accounts.New(app)
 	if err != nil {
 		return err
 	}
 
 	cache, err := app.Cache()
+	if err != nil {
+		return err
+	}
+
+	// RATE_LIMIT_STORE=cache shares the buckets across instances (Redis).
+	limiters, err := app.RateLimiters()
 	if err != nil {
 		return err
 	}
@@ -72,8 +71,8 @@ func apiRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 
 	// The IP limit runs before authentication so key guessing is throttled
 	// too; the per-caller limit runs after it (per key, user or IP).
-	ipLimit := ratelimit.Middleware(deps.Limiter("api-ip", apiIPRateLimit, time.Minute), ratelimit.ByIP)
-	callerLimit := ratelimit.Middleware(deps.Limiter("api", perCaller, time.Minute), api.RateKey)
+	ipLimit := ratelimit.Middleware(limiters("api-ip", apiIPRateLimit, time.Minute), ratelimit.ByIP)
+	callerLimit := ratelimit.Middleware(limiters("api", perCaller, time.Minute), api.RateKey)
 	idempotency := vapi.Idempotency(cache.Store(), vapi.IdempotencyOptions{Scope: api.IdempotencyScope})
 
 	rest := &api.REST{Svc: svc, Idempotency: idempotency}
@@ -116,7 +115,7 @@ func apiRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 
 	pages := &apikeys.Handlers{Keys: keys, Now: app.Now}
 	required := auth.Required(acc.Web)
-	writes := ratelimit.Middleware(deps.Limiter("api-keys-page", 20, time.Minute), apiKeysPageKey)
+	writes := ratelimit.Middleware(limiters("api-keys-page", 20, time.Minute), apiKeysPageKey)
 
 	r.Get(apikeys.Path, pages.Show).Name("account.api-keys").Use(required)
 	r.Post(apikeys.Path, pages.Store).Name("account.api-keys.store").Use(required, writes)
