@@ -1,15 +1,11 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { testPassword as password, totp, uniqueEmail } from "./support";
+import { testPassword as password, register as signUp, totp, uniqueEmail } from "./support";
 
+// register signs up; the landing page depends on the email_verification
+// flag (off by default: the dashboard), which e2e/flags.spec.ts toggles.
 async function register(page: Page, name: string, email: string): Promise<void> {
-	await page.goto("/register");
-	await page.getByLabel("Name").fill(name);
-	await page.getByLabel("Email").fill(email);
-	await page.getByLabel(/^Password/).fill(password);
-	await page.getByLabel("Confirm password").fill(password);
-	await page.getByRole("button", { name: /register|create/i }).click();
-	await expect(page).toHaveURL(/\/email\/verify$/);
+	await signUp(page, name, email, password);
 }
 
 async function logIn(page: Page, email: string): Promise<void> {
@@ -67,6 +63,8 @@ test("account pages: profile, password change, 2FA and the login challenge", asy
 	await expect(page.getByText("Store these recovery codes somewhere safe.")).toBeVisible();
 
 	await page.getByRole("button", { name: "Log out" }).click();
+	// Wait for the logout to land before visiting /login (a guest-only page).
+	await expect(page.getByRole("link", { name: "Log in" })).toBeVisible();
 
 	// The password alone stops at the challenge; the next time step logs in
 	// (each step works once, and confirming used the current one).

@@ -13,7 +13,9 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api/sqlstore"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 func gql(c *vukemtest.Client, query string, vars map[string]any) *vukemtest.Response {
@@ -249,4 +251,17 @@ func TestGraphQLIntrospectionPolicy(t *testing.T) {
 	if body := rec.Body.String(); !strings.Contains(body, `"errors"`) || strings.Contains(body, `"queryType"`) {
 		t.Errorf("introspection with the production policy answered: %s", body)
 	}
+}
+
+func TestGraphQLFlag(t *testing.T) {
+	t.Parallel()
+
+	app := apifixture.NewApp(t, nil)
+	apifixture.SeedCatalog(t, app)
+
+	gql(app.Client(t), `{ categories { slug } }`, nil).AssertOK()
+
+	flagtest.Set(t, app, flags.GraphQLAPI, false)
+	gql(app.Client(t), `{ categories { slug } }`, nil).AssertNotFound()
+	app.Client(t).Get("/graphql").AssertNotFound()
 }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 var linkRe = regexp.MustCompile(`https?://[^\s)"]+`)
@@ -37,19 +38,25 @@ func link(t *testing.T, app *vukemtest.App, email string) string {
 	return parsed.RequestURI()
 }
 
+// register signs up email and lands logged in: on the dashboard, or on the
+// verification notice while the email_verification flag is on.
 func register(t *testing.T, c *vukemtest.Client, email string) {
 	t.Helper()
 
-	c.PostJSON("/register", map[string]any{
+	r := c.PostJSON("/register", map[string]any{
 		"name": "Ana Silva", "email": email,
 		"password": "correct horse battery", "password_confirmation": "correct horse battery",
-	}).AssertRedirect("/email/verify")
+	})
+	if loc := r.Header("Location"); loc != "/dashboard" && loc != "/email/verify" {
+		t.Fatalf("register %s: status %d, redirect %q", email, r.Status(), loc)
+	}
 }
 
 func TestRegisterAndVerifyEmail(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
+	flagtest.RequireEmailVerification(t, app)
 	c := app.Client(t).Inertia("")
 
 	c.Get("/dashboard").AssertRedirect("/login")

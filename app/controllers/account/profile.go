@@ -7,6 +7,7 @@ import (
 	"github.com/AlexGalhardo/vukem/inertia"
 	"github.com/AlexGalhardo/vukem/web"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
 )
@@ -68,8 +69,9 @@ func (h *Handlers) ShowSecurity(c *web.Ctx) error {
 	}
 
 	return inertia.Render(c, "Account/Security", inertia.Props{
-		"twoFactorEnabled":  tf.Enabled(),
-		"recoveryCodesLeft": len(tf.TwoFactorRecoveryCodes.V),
+		"twoFactorAvailable": u.IsAdmin() || h.a.Flags.Enabled(c.Context(), flags.TwoFactor),
+		"twoFactorEnabled":   tf.Enabled(),
+		"recoveryCodesLeft":  len(tf.TwoFactorRecoveryCodes.V),
 	})
 }
 

@@ -12,16 +12,13 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 // queuedApp boots the app with a fake queue: jobs are recorded instead of
 // running inline, so a test sees what left the request path. extra adds
 // test-only routes.
-func queuedApp(
-	t *testing.T,
-	env map[string]string,
-	extra ...func(*router.Router, *vukem.App) error,
-) (*vukemtest.App, *queue.Fake) {
+func queuedApp(t *testing.T, extra ...func(*router.Router, *vukem.App) error) (*vukemtest.App, *queue.Fake) {
 	t.Helper()
 
 	fake := queue.NewFake()
@@ -31,7 +28,7 @@ func queuedApp(
 		opts = append(opts, vukem.WithRoutes(fn))
 	}
 
-	return vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: env, AppOptions: opts}), fake
+	return vukemtest.New(t, bootstrap.New, vukemtest.Options{AppOptions: opts}), fake
 }
 
 // queuedMailJobs counts the queued (not yet sent) mail jobs. Since vukem
@@ -110,7 +107,8 @@ func verifiedOnly(r *router.Router, app *vukem.App) error {
 func TestVerifiedMiddleware(t *testing.T) {
 	t.Parallel()
 
-	app, fake := queuedApp(t, nil, verifiedOnly)
+	app, fake := queuedApp(t, verifiedOnly)
+	flagtest.RequireEmailVerification(t, app)
 
 	app.Client(t).Get("/test/verified").AssertRedirect("/login")
 

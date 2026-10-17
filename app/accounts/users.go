@@ -16,8 +16,8 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
 )
 
-// Register creates a user (unique email, hashed password) and sends the
-// verification email.
+// Register creates a user (unique email, hashed password) and, while the
+// email_verification flag is on, sends the verification email.
 func (a *Accounts) Register(ctx context.Context, in requests.Register) (models.User, error) {
 	email := strings.ToLower(in.Email)
 
@@ -33,6 +33,10 @@ func (a *Accounts) Register(ctx context.Context, in requests.Register) (models.U
 	u := models.User{Name: in.Name, Email: email, Password: h, Role: models.RoleUser}
 	if err := orm.Create(ctx, a.DB, &u); err != nil {
 		return models.User{}, err
+	}
+
+	if !a.VerificationRequired(ctx) {
+		return u, nil
 	}
 
 	return u, a.SendVerification(ctx, u)

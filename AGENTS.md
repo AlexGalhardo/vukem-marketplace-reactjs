@@ -15,6 +15,8 @@ Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framewor
 - Web: `bun run lint`, `bun run typecheck`, `bun run build`, `bun run test:e2e` (stack on :3200 with `app` and `worker` up and `db:seed` run; includes the axe accessibility scans in `e2e/a11y.spec.ts`, which fail on serious/critical violations; new pages must be added there)
 - Stack: `docker compose up -d --build`; probes `curl localhost:3200/health` and `/ready`; demo data `docker compose exec -T app /app/app db:seed` (Git Bash: prefix `MSYS_NO_PATHCONV=1`); reference data only: `reference:sync`
 - Tests that need a logged-in user: `internal/testing/authtest.ActingAs` / `SessionCookies` (sessions carry a password stamp; `vukemtest` `ActingAs` alone is logged out)
+- Feature flags (`app/flags`, admin page `/admin/flags`): typed keys with defaults, cached 30 s, defaults on any read error. `email_verification` is off by default (sign-up lands on the dashboard); tests that need it call `internal/testing/flagtest.RequireEmailVerification` (or `flagtest.Set`). New on/off features get a flag there, gated server-side and covered by a test
+- E2E against a local binary: `E2E_DOCKER=0 E2E_APP_BIN=<path to the app binary>` (run Playwright with the app's env so `users:make-admin` reaches the same database); `E2E_GOOGLE=1` when the stack has `SOCIAL_GOOGLE_CLIENT_ID` set (any value)
 
 ## Rules
 

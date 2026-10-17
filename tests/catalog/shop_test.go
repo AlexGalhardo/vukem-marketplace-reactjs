@@ -10,6 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 func TestShopOpenRequiresVerifiedEmail(t *testing.T) {
@@ -18,6 +19,11 @@ func TestShopOpenRequiresVerifiedEmail(t *testing.T) {
 	app := newApp(t)
 
 	app.Client(t).Inertia("").Get("/sell").AssertRedirect("/login")
+
+	// With email verification off (the default) any signed-in user may open a shop.
+	as(t, app, newUser(t, app, "unverified0@example.com", false)).Get("/sell").AssertOK()
+
+	flagtest.RequireEmailVerification(t, app)
 	as(t, app, newUser(t, app, "unverified@example.com", false)).Get("/sell").AssertRedirect("/email/verify")
 	asJSON(t, app, newUser(t, app, "unverified2@example.com", false)).
 		PostJSON("/sell", map[string]any{"name": "Loja", "ship_from_uf": "SP"}).AssertForbidden()

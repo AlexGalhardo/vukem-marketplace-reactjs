@@ -15,6 +15,7 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/cart"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/checkout"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
@@ -43,13 +44,14 @@ func (h *Handlers) user(c *web.Ctx) (models.User, error) {
 }
 
 // RequireVerified sends users with an unverified email to the verification
-// notice (checkout and payouts need a verified account).
+// notice (checkout and payouts need a verified account while the
+// email_verification flag is on).
 func (h *Handlers) RequireVerified(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		c := web.NewCtx(w, r, web.ServicesFrom(r.Context()))
 
 		u, err := h.Accounts.Web.User(c)
-		if err == nil && !u.EmailVerified() {
+		if err == nil && !u.EmailVerified() && h.Accounts.VerificationRequired(r.Context()) {
 			_ = c.Redirect("/email/verify")
 			return
 		}
@@ -85,8 +87,14 @@ func (h *Handlers) ShareCartCount(next http.Handler) http.Handler {
 }
 
 // paymentMethods tells pages which providers are configured.
-func (h *Handlers) paymentMethods() map[string]bool {
-	return map[string]bool{"card": h.Payments.Config.CardEnabled(), "pix": h.Payments.Config.PixEnabled()}
+// paymentMethods reports which methods checkout offers: configured and
+// switched on (card_checkout, pix_checkout).
+func (h *Handlers) paymentMethods(ctx context.Context) (card, pix bool) {
+	on := h.Accounts.Flags.All(ctx)
+	card = on[flags.CardCheckout] && h.Payments.Config.CardEnabled() && h.Payments.Stripe != nil
+	pix = on[flags.PixCheckout] && h.Payments.Config.PixEnabled() && h.Payments.Pix != nil
+
+	return card, pix
 }
 
 func paramID(c *web.Ctx) (int64, error) {

@@ -11,6 +11,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
 )
 
@@ -50,6 +51,7 @@ func TestPayoutRequestAndBalanceFromLedger(t *testing.T) {
 
 	// Users without a shop: not found.
 	e.Client(t, e.User(t, true)).Get("/seller/payouts").AssertNotFound()
+	flagtest.RequireEmailVerification(t, e.App)
 	e.Client(t, e.User(t, false)).Get("/seller/payouts").AssertRedirect("/email/verify")
 
 	tests := []struct {

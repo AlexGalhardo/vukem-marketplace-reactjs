@@ -6,6 +6,7 @@ import (
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 const oldPassword = "correct horse battery"
@@ -29,6 +30,7 @@ func TestAccountProfile(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
+	flagtest.RequireEmailVerification(t, app)
 	register(t, app.Client(t).Inertia(""), "taken@example.com")
 
 	c := app.Client(t).Inertia("")

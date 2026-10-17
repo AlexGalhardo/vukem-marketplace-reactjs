@@ -30,7 +30,8 @@ func (a *Accounts) CheckPassword(u models.User, password string) bool {
 }
 
 // UpdateProfile saves the name and email of u. A new email needs the
-// current password, is unverified again and gets a verification mail.
+// current password, is unverified again and gets a verification mail
+// while the email_verification flag is on.
 func (a *Accounts) UpdateProfile(
 	ctx context.Context,
 	u models.User,
@@ -68,11 +69,11 @@ func (a *Accounts) UpdateProfile(
 
 	u.Name = in.Name
 
-	if changed {
+	if changed && a.VerificationRequired(ctx) {
 		return u, true, a.SendVerification(ctx, u)
 	}
 
-	return u, false, nil
+	return u, changed, nil
 }
 
 // ChangePassword checks the current password, stores the new one and

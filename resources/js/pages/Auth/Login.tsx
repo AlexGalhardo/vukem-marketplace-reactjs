@@ -2,10 +2,12 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import SocialButtons from "../../components/SocialButtons";
 import { button, card, heading, link } from "../../components/ui";
 import { useT } from "../../lib/i18n";
+import type { AuthPageProps } from "../../types";
 
-export default function Login(): JSX.Element {
+export default function Login({ socialProviders = [] }: AuthPageProps): JSX.Element {
 	const { t } = useT();
 	const form = useForm({ email: "", password: "", remember: false });
 
@@ -49,6 +51,7 @@ export default function Login(): JSX.Element {
 					{t("account.login.submit")}
 				</button>
 			</form>
+			<SocialButtons providers={socialProviders} />
 			<p className="mt-6 flex flex-wrap gap-4 text-sm">
 				<Link href="/forgot-password" className={link}>
 					{t("account.login.forgot")}

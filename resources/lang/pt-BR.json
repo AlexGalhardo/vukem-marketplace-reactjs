@@ -42,7 +42,54 @@
 	},
 	"admin": {
 		"title": "Administração",
-		"intro": "Moderação, repasses e o livro-razão chegam na fase de administração."
+		"intro": "Moderação, repasses e o livro-razão chegam na fase de administração.",
+		"flags_link": "Funcionalidades",
+		"flags": {
+			"title": "Funcionalidades",
+			"intro": "Ative ou desative funcionalidades para todos. As mudanças valem em segundos e cada uma fica registrada abaixo.",
+			"on": "Ativado",
+			"off": "Desativado",
+			"default": "Padrão: {value}",
+			"locked": "Bloqueado",
+			"locked_error": "Esta funcionalidade está bloqueada e não pode ser alterada.",
+			"saved": "A funcionalidade foi atualizada.",
+			"history": "Histórico de mudanças",
+			"history_empty": "Nenhuma mudança ainda.",
+			"col_when": "Quando",
+			"col_flag": "Funcionalidade",
+			"col_change": "Mudança",
+			"col_by": "Por",
+			"items": {
+				"email_verification": {
+					"label": "Confirmação de e-mail",
+					"description": "Novas contas precisam confirmar o e-mail antes de comprar, vender e usar a administração, e recebem um e-mail de confirmação. Desativado: o cadastro já entra logado e nenhum e-mail é enviado. Administradores com e-mail não confirmado precisam confirmá-lo para continuar usando esta página."
+				},
+				"two_factor": {
+					"label": "Autenticação em dois fatores para usuários",
+					"description": "Usuários podem ativar um app autenticador. Desativado: ninguém novo pode ativar (exceto administradores); quem já usa continua usando."
+				},
+				"admin_two_factor": {
+					"label": "Autenticação em dois fatores para administradores",
+					"description": "A administração sempre exige autenticação em dois fatores. Ela protege toda ação administrativa, por isso não pode ser desativada aqui."
+				},
+				"google_login": {
+					"label": "Continuar com o Google",
+					"description": "Mostra o botão do Google nas páginas de login e cadastro (quando as credenciais do Google estão configuradas) e atende as rotas de login."
+				},
+				"card_checkout": {
+					"label": "Pagamento com cartão",
+					"description": "Oferece pagamento com cartão (Stripe) no checkout quando o Stripe está configurado. Pagamentos já iniciados continuam."
+				},
+				"pix_checkout": {
+					"label": "Pagamento com PIX",
+					"description": "Oferece pagamento com PIX (AbacatePay) no checkout quando o AbacatePay está configurado. Pagamentos já iniciados continuam."
+				},
+				"graphql_api": {
+					"label": "API GraphQL",
+					"description": "Atende /graphql para quem tem chave de API. Desativado: o endpoint responde 404; REST e gRPC não mudam."
+				}
+			}
+		}
 	},
 	"api": {
 		"keys": {
@@ -97,7 +144,8 @@
 			"confirm_password": "Confirme a senha",
 			"name": "Nome",
 			"save": "Salvar",
-			"back_dashboard": "Voltar ao painel"
+			"back_dashboard": "Voltar ao painel",
+			"name_hint": "De 4 a 24 caracteres."
 		},
 		"login": {
 			"title": "Entrar",
@@ -141,7 +189,8 @@
 			"code": "Código",
 			"confirm": "Confirmar",
 			"intro": "Adicione uma segunda etapa ao login: um código de um app autenticador no seu celular.",
-			"enable": "Ativar a autenticação em dois fatores"
+			"enable": "Ativar a autenticação em dois fatores",
+			"unavailable": "A autenticação em dois fatores está desativada por enquanto. Se você já a usa, ela continua ativa."
 		},
 		"challenge": {
 			"title": "Autenticação em dois fatores",
@@ -207,7 +256,9 @@
 			"two_factor_off": "A autenticação em dois fatores não está ativa.",
 			"verify_other_account": "Este link de confirmação pertence a outra conta.",
 			"social_no_email": "O provedor de login não compartilhou um endereço de e-mail.",
-			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro."
+			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro.",
+			"name_length": "Seu nome deve ter de 4 a 24 caracteres.",
+			"two_factor_unavailable": "A autenticação em dois fatores não está disponível no momento."
 		},
 		"mail": {
 			"hello": "Olá {name},",
@@ -219,6 +270,10 @@
 			"reset_body": "Alguém pediu para redefinir sua senha. Se foi você:",
 			"reset_action": "Redefinir senha",
 			"reset_expiry": "O link expira em uma hora e funciona uma única vez. Se não foi você, ignore este e-mail."
+		},
+		"social": {
+			"or": "ou",
+			"continue_google": "Continuar com o Google"
 		}
 	},
 	"validation": {

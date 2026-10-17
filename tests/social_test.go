@@ -53,3 +53,24 @@ func TestSocialDoesNotTakeOverUnverifiedEmails(t *testing.T) {
 	signIn(t, app.Client(t)).AssertStatus(409)
 	vukemtest.AssertDatabaseCount(t, app, "social_accounts", 0)
 }
+
+func TestSocialNameFollowsNameRules(t *testing.T) {
+	t.Parallel()
+
+	user := social.User{
+		ID:            "g-name",
+		Email:         "duda@example.com",
+		EmailVerified: true,
+		Name:          "  maria   eduarda da silva oliveira ",
+	}
+	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: vukemtest.FakeSocial(user)})
+
+	signIn(t, app.Client(t)).AssertRedirect("/dashboard")
+	// Normalized, cut to 24 runes (trailing space dropped), capitalized.
+	vukemtest.AssertDatabaseHas(
+		t,
+		app,
+		"users",
+		map[string]any{"email": "duda@example.com", "name": "Maria eduarda da silva"},
+	)
+}

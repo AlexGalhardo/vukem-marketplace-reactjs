@@ -22,6 +22,8 @@ export interface SharedProps {
 
 // Account/Security page props (controllers/account.ShowSecurity).
 export interface SecurityProps {
+	// False while the two_factor flag is off (admins can always enrol).
+	twoFactorAvailable: boolean;
 	twoFactorEnabled: boolean;
 	recoveryCodesLeft: number;
 }
@@ -231,4 +233,26 @@ export interface WebhookDelivery {
 	last_error: string | null;
 	next_attempt_at: string | null;
 	updated_at: string;
+}
+
+// Auth/Login and Auth/Register props (controllers/account.authPage):
+// configured sign-in providers whose feature flag is on.
+export interface AuthPageProps {
+	socialProviders: string[];
+}
+
+// Admin/Flags props (controllers/admin.Flags).
+export interface FeatureFlag {
+	key: string;
+	default: boolean;
+	locked: boolean;
+	enabled: boolean;
+}
+
+export interface FeatureFlagChange {
+	flag: string;
+	old: boolean;
+	new: boolean;
+	user_email: string;
+	at: string;
 }

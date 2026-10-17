@@ -18,6 +18,7 @@ import (
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/signed"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 )
 
@@ -31,6 +32,9 @@ type Accounts struct {
 	Tokens *auth.Tokens
 	Hasher hash.Hasher
 	Signer *signed.Signer
+	// Flags are the admin-managed feature flags (email verification, 2FA
+	// enrolment, Google sign-in).
+	Flags *flags.Flags
 	// URL is the public base URL used in emails (APP_URL).
 	URL string
 	// ResetTTL is how long password reset links work.
@@ -68,6 +72,11 @@ func New(app *vukem.App) (*Accounts, error) {
 		return nil, err
 	}
 
+	ff, err := flags.New(app)
+	if err != nil {
+		return nil, err
+	}
+
 	hasher := hash.Default()
 	if app.Kind == vukem.KindTest {
 		hasher = hash.Fake() // fast hashing keeps tests quick
@@ -82,6 +91,7 @@ func New(app *vukem.App) (*Accounts, error) {
 	return &Accounts{
 		DB: db, Mailer: mailer, Users: users, Web: web, Tokens: tokens, Hasher: hasher,
 		API:       auth.NewTokenGuard("api", users, tokens),
+		Flags:     ff,
 		Signer:    signed.New(app.Key.Derive("signed.urls", 32)),
 		URL:       strings.TrimSuffix(app.Config.URL, "/"),
 		ResetTTL:  time.Hour,
@@ -96,7 +106,23 @@ func New(app *vukem.App) (*Accounts, error) {
 // RequireVerified lets signed-in users with a verified email through.
 // Guests go to the login page; unverified browsers (Inertia visits
 // included) are redirected to the verification notice, JSON clients get
-// 403. Checkout, selling and the admin area use it.
+// 403. Checkout, selling and the admin area use it. While the
+// email_verification flag is off, any signed-in user passes.
 func (a *Accounts) RequireVerified(next http.Handler) http.Handler {
-	return auth.Required(a.Web)(auth.Verified(a.Web)(next))
+	verified := auth.Required(a.Web)(auth.Verified(a.Web)(next))
+	signedIn := auth.Required(a.Web)(next)
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if a.VerificationRequired(r.Context()) {
+			verified.ServeHTTP(w, r)
+			return
+		}
+
+		signedIn.ServeHTTP(w, r)
+	})
+}
+
+// VerificationRequired reports whether the email_verification flag is on.
+func (a *Accounts) VerificationRequired(ctx context.Context) bool {
+	return a.Flags.Enabled(ctx, flags.EmailVerification)
 }

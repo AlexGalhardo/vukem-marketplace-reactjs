@@ -3,12 +3,15 @@ package tests
 import (
 	"strings"
 	"testing"
+
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 func TestAccountMessagesFollowTheLocale(t *testing.T) {
 	t.Parallel()
 
-	app, fake := queuedApp(t, nil)
+	app, fake := queuedApp(t)
+	flagtest.RequireEmailVerification(t, app)
 	register(t, app.Client(t).Inertia(""), "tom@example.com")
 
 	cases := []struct {
@@ -23,7 +26,7 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 		{
 			name: "built-in rule", page: "/register", path: "/register", component: "Auth/Register", field: "password",
 			body: map[string]any{
-				"name": "Tom", "email": "tom2@example.com", "password": "short", "password_confirmation": "short",
+				"name": "Tomas", "email": "tom2@example.com", "password": "short", "password_confirmation": "short",
 			},
 			want: "O campo senha deve ter pelo menos 12 caracteres.",
 		},
@@ -31,7 +34,7 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 			name: "refine message", page: "/register", path: "/register", component: "Auth/Register",
 			field: "password_confirmation",
 			body: map[string]any{
-				"name":                  "Tom",
+				"name":                  "Tomas",
 				"email":                 "tom3@example.com",
 				"password":              "long enough password",
 				"password_confirmation": "x",
