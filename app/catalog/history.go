@@ -44,16 +44,14 @@ type ViewEvent struct {
 // collections. Documents are typed structs, never request maps, so no
 // client value can become a query operator.
 //
-// The client is read on each call: MongoDB connects in a provider's Boot,
-// after routes (and so this recorder) are built. Until it is connected,
-// or when MONGO_URL is unset, events are dropped.
+// Without a client (MONGO_URL unset) events are dropped.
 type MongoRecorder struct {
-	client  func() *mongo.Client
+	client  *mongo.Client
 	indexed atomic.Bool
 }
 
-// NewMongoRecorder returns a recorder over the client client returns.
-func NewMongoRecorder(client func() *mongo.Client) *MongoRecorder {
+// NewMongoRecorder returns a recorder over client (nil drops events).
+func NewMongoRecorder(client *mongo.Client) *MongoRecorder {
 	return &MongoRecorder{client: client}
 }
 
@@ -82,7 +80,7 @@ func EnsureIndexes(ctx context.Context, mc *mongo.Client) error {
 // ready returns the client once connected, creating the indexes on first
 // use (retried on the next event if that fails).
 func (m *MongoRecorder) ready(ctx context.Context) (*mongo.Client, error) {
-	mc := m.client()
+	mc := m.client
 	if mc == nil {
 		return nil, nil
 	}

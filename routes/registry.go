@@ -16,8 +16,15 @@ func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 		TwoFactor(deps),
 		Admin,
 		API,
-		Catalog(deps),
 		Commerce(deps),
 		Ops(deps),
+	}
+}
+
+// AfterBoot lists the route files that need clients opened in a
+// provider's Boot (vukem.WithRoutesAfterBoot).
+func AfterBoot(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
+	return []func(r *router.Router, app *vukem.App) error{
+		Catalog(deps),
 	}
 }

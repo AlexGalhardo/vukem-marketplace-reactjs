@@ -3,7 +3,6 @@ package routes
 import (
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth"
-	"github.com/AlexGalhardo/vukem/drivers/mongo"
 	"github.com/AlexGalhardo/vukem/router"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
@@ -16,11 +15,11 @@ import (
 
 // Catalog registers the storefront (home, search, category, product, shop,
 // images) and the seller area (open a shop, dashboard, products). Selling
-// needs a verified email.
+// needs a verified email. Registered with WithRoutesAfterBoot, so the
+// MongoDB client the platform provider opens in Boot exists.
 func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 	return func(r *router.Router, app *vukem.App) error {
-		// deps.Mongo is connected at boot, after the routes are built.
-		svc, err := catalog.FromApp(app, func() *mongo.Client { return deps.Mongo })
+		svc, err := catalog.FromApp(app, deps.Mongo)
 		if err != nil {
 			return err
 		}

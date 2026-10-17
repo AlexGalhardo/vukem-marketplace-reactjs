@@ -47,6 +47,10 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		base = append(base, vukem.WithRoutes(fn))
 	}
 
+	for _, fn := range routes.AfterBoot(deps) {
+		base = append(base, vukem.WithRoutesAfterBoot(fn))
+	}
+
 	app, err := vukem.New(append(base, opts...)...)
 	if err != nil {
 		if deps.Redis != nil {

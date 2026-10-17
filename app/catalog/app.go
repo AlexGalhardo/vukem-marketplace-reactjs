@@ -65,10 +65,9 @@ func OpenDisk(src config.Lookuper, env config.Env, test bool) (storage.Disk, err
 
 // FromApp builds the service from the app: its database, cache (Redis when
 // configured), the configured image disk and, when mongoClient is not nil,
-// MongoDB history (pass func() *mongo.Client { return deps.Mongo }: the
-// client connects at boot). Other modules (cart, checkout, APIs) call it too; the service is
-// stateless apart from the memory disk used in tests.
-func FromApp(app *vukem.App, mongoClient func() *mongo.Client) (*Service, error) {
+// MongoDB history. Other modules (cart, checkout, APIs) call it too; the
+// service is stateless apart from the memory disk used in tests.
+func FromApp(app *vukem.App, mongoClient *mongo.Client) (*Service, error) {
 	db, err := app.DB()
 	if err != nil {
 		return nil, err
