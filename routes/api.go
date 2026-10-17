@@ -23,6 +23,7 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api/sqlstore"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/apikeys"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 )
 
@@ -73,7 +74,8 @@ func API(r *router.Router, app *vukem.App) error {
 		app.Source.Get("GRAPHQL_INSECURE_INTROSPECTION"),
 	)
 	r.Handle("/graphql", api.GraphQLHandler(schema, introspection)).
-		Use(st.ipLimit, st.authn.Middleware, st.callerLimit).Name("graphql").Doc(openapi.Skip{})
+		Use(st.acc.Flags.Require(flags.GraphQLAPI), st.ipLimit, st.authn.Middleware, st.callerLimit).
+		Name("graphql").Doc(openapi.Skip{})
 
 	rpc, err := st.rpc().Handler(app)
 	if err != nil {

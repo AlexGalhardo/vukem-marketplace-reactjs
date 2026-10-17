@@ -12,6 +12,7 @@ import (
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/mailtrap"
 )
 
@@ -34,6 +35,7 @@ func TestVerificationEmailThroughMailtrap(t *testing.T) {
 		"SMTP_USERNAME": os.Getenv("SMTP_USERNAME"),
 		"SMTP_PASSWORD": os.Getenv("SMTP_PASSWORD"),
 	}})
+	flagtest.RequireEmailVerification(t, app)
 
 	email := fmt.Sprintf("verify-%d@example.com", time.Now().UnixNano())
 

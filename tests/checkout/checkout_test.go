@@ -11,8 +11,10 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
 )
 
@@ -175,6 +177,7 @@ func TestCheckoutNeedsVerifiedEmailAndAvailableCart(t *testing.T) {
 	e := m.e
 
 	unverified := e.User(t, false)
+	flagtest.RequireEmailVerification(t, e.App)
 	e.Client(t, unverified).Get("/checkout/address").AssertRedirect("/email/verify")
 	e.App.Client(t).Get("/checkout/address").AssertRedirect("/login")
 
@@ -621,4 +624,36 @@ func TestProvidersOffByDefault(t *testing.T) {
 	res.AssertRedirect("/cart")
 	c.Get("/checkout/payment").AssertInertia("Checkout/Payment").
 		PropEquals("methods.card", false).PropEquals("methods.pix", false).HasProp("errors.method")
+}
+
+func TestCheckoutMethodFlags(t *testing.T) {
+	t.Parallel()
+
+	m := newMarket(t, commercetest.Options{Pix: true, Card: true})
+	e := m.e
+
+	flagtest.Set(t, e.App, flags.PixCheckout, false)
+	flagtest.Set(t, e.App, flags.CardCheckout, false)
+
+	// Configured but switched off: neither is offered nor accepted, and no
+	// charge reaches a provider.
+	for _, method := range []string{"pix", "card"} {
+		c, res := e.Checkout(t, m.buyer, m.address, method, m.items())
+		res.AssertRedirect("/cart")
+		c.Get("/checkout/payment").AssertInertia("Checkout/Payment").
+			PropEquals("methods.card", false).PropEquals("methods.pix", false).HasProp("errors.method")
+	}
+
+	if ch := e.Pix.Charges(); len(ch) != 0 {
+		t.Fatalf("PIX charges with pix_checkout off = %+v", ch)
+	}
+
+	vukemtest.AssertDatabaseCount(t, e.App, "orders", 0)
+
+	flagtest.Set(t, e.App, flags.PixCheckout, true)
+
+	_, res := e.Checkout(t, m.buyer, m.address, "pix", nil)
+	if loc := res.Header("Location"); !strings.HasPrefix(loc, "/checkout/pix/") {
+		t.Fatalf("pix with the flag back on → %d %q", res.Status(), loc)
+	}
 }

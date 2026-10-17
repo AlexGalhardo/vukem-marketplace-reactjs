@@ -42,7 +42,54 @@
 	},
 	"admin": {
 		"title": "Admin",
-		"intro": "Moderation, payouts and the ledger arrive in the admin phase."
+		"intro": "Moderation, payouts and the ledger arrive in the admin phase.",
+		"flags_link": "Feature flags",
+		"flags": {
+			"title": "Feature flags",
+			"intro": "Turn features on or off for everyone. Changes apply within seconds and every change is logged below.",
+			"on": "On",
+			"off": "Off",
+			"default": "Default: {value}",
+			"locked": "Locked",
+			"locked_error": "This flag is locked and cannot be changed.",
+			"saved": "The flag was updated.",
+			"history": "Change log",
+			"history_empty": "No changes yet.",
+			"col_when": "When",
+			"col_flag": "Flag",
+			"col_change": "Change",
+			"col_by": "By",
+			"items": {
+				"email_verification": {
+					"label": "Email verification",
+					"description": "New accounts must confirm their email before checkout, selling and the admin area, and get a verification email. Off: sign-up lands logged in with no email. Admins with an unverified email must verify it to keep using this page."
+				},
+				"two_factor": {
+					"label": "Two-factor authentication for users",
+					"description": "Users may turn on an authenticator app. Off: no new enrolments (admins excepted); people who already use it keep it."
+				},
+				"admin_two_factor": {
+					"label": "Two-factor authentication for admins",
+					"description": "The admin area always requires two-factor authentication. It protects every admin action, so it cannot be turned off here."
+				},
+				"google_login": {
+					"label": "Continue with Google",
+					"description": "Shows the Google button on the login and sign-up pages (when Google credentials are configured) and serves its sign-in routes."
+				},
+				"card_checkout": {
+					"label": "Card payments",
+					"description": "Offers card payments (Stripe) at checkout when Stripe is configured. Payments already started still complete."
+				},
+				"pix_checkout": {
+					"label": "PIX payments",
+					"description": "Offers PIX payments (AbacatePay) at checkout when AbacatePay is configured. Payments already started still complete."
+				},
+				"graphql_api": {
+					"label": "GraphQL API",
+					"description": "Serves /graphql for API key holders. Off: the endpoint answers 404; REST and gRPC are unaffected."
+				}
+			}
+		}
 	},
 	"api": {
 		"keys": {
@@ -141,7 +188,8 @@
 			"code": "Code",
 			"confirm": "Confirm",
 			"intro": "Add a second step to your login: a code from an authenticator app on your phone.",
-			"enable": "Enable two-factor authentication"
+			"enable": "Enable two-factor authentication",
+			"unavailable": "Two-factor authentication is turned off for now. If you already use it, it stays on."
 		},
 		"challenge": {
 			"title": "Two-factor authentication",
@@ -207,7 +255,9 @@
 			"two_factor_off": "Two-factor authentication is not enabled.",
 			"verify_other_account": "This verification link belongs to another account.",
 			"social_no_email": "The sign-in provider did not share an email address.",
-			"social_email_taken": "An account with this email already exists. Log in with your password first."
+			"social_email_taken": "An account with this email already exists. Log in with your password first.",
+			"name_length": "Your name must have 4 to 24 characters.",
+			"two_factor_unavailable": "Two-factor authentication is not available right now."
 		},
 		"mail": {
 			"hello": "Hello {name},",

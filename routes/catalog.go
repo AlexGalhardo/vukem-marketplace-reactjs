@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/AlexGalhardo/vukem"
-	"github.com/AlexGalhardo/vukem/auth"
 	"github.com/AlexGalhardo/vukem/router"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
@@ -47,7 +46,7 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		r.Get("/media/{kind}/{id}/{file}", pub.Media).Name("catalog.media")
 
 		h := seller.New(svc, acc)
-		verified := []router.Middleware{auth.Required(acc.Web), auth.Verified(acc.Web)}
+		verified := []router.Middleware{acc.RequireVerified}
 
 		r.Get("/sell", h.ShowOpen).Name("shop.create").Use(verified...)
 		r.Post("/sell", h.Open).Name("shop.store").Use(verified...)

@@ -15,6 +15,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 const newPassword = "a brand new password"
@@ -51,7 +52,8 @@ func rejectedReset(t *testing.T, app *vukemtest.App, form map[string]any) {
 func TestResetResponseDoesNotRevealAccounts(t *testing.T) {
 	t.Parallel()
 
-	app, fake := queuedApp(t, nil)
+	app, fake := queuedApp(t)
+	flagtest.RequireEmailVerification(t, app)
 	register(t, app.Client(t).Inertia(""), "known@example.com")
 	runQueued(t, app, fake) // the verification mail
 

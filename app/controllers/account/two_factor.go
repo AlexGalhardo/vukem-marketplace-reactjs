@@ -10,6 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
 )
@@ -27,6 +28,7 @@ func (h *TwoFactorHandlers) Show(c *web.Ctx) error {
 	}
 
 	props := inertia.Props{
+		"available":         h.enrolmentOpen(c, u),
 		"enabled":           tf.Enabled(),
 		"pending":           tf.Pending(),
 		"recoveryCodes":     flashedCodes(c),
@@ -50,11 +52,24 @@ func (h *TwoFactorHandlers) Show(c *web.Ctx) error {
 	return inertia.Render(c, "Auth/TwoFactor", props)
 }
 
+// enrolmentOpen reports whether u may turn two-factor authentication on:
+// admins always (the admin area requires it), others while the
+// two_factor flag is on.
+func (h *TwoFactorHandlers) enrolmentOpen(c *web.Ctx, u models.User) bool {
+	return u.IsAdmin() || h.a.Flags.Enabled(c.Context(), flags.TwoFactor)
+}
+
+var errTwoFactorUnavailable = errs.New(403, "account.errors.two_factor_unavailable")
+
 // Enable creates a secret to scan; it is active once confirmed.
 func (h *TwoFactorHandlers) Enable(c *web.Ctx) error {
 	u, err := auth.User[models.User](c, "web")
 	if err != nil {
 		return err
+	}
+
+	if !h.enrolmentOpen(c, u) {
+		return errTwoFactorUnavailable
 	}
 
 	if err := h.a.EnableTwoFactor(c.Context(), u.ID); err != nil {
@@ -70,6 +85,10 @@ func (h *TwoFactorHandlers) Confirm(c *web.Ctx) error {
 	u, err := auth.User[models.User](c, "web")
 	if err != nil {
 		return err
+	}
+
+	if !h.enrolmentOpen(c, u) {
+		return errTwoFactorUnavailable
 	}
 
 	in, err := web.Parse(c, requests.TwoFactorCodeSchema)

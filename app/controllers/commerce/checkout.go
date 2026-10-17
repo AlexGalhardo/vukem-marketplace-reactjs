@@ -130,9 +130,11 @@ func (h *Handlers) ShowPaymentStep(c *web.Ctx) error {
 		return err
 	}
 
+	card, pix := h.paymentMethods(c.Context())
+
 	return inertia.Render(c, "Checkout/Payment", inertia.Props{
 		"quote":   q,
-		"methods": h.paymentMethods(),
+		"methods": map[string]bool{"card": card, "pix": pix},
 	})
 }
 
@@ -154,10 +156,12 @@ func (h *Handlers) Place(c *web.Ctx) error {
 		return c.Redirect("/checkout/address")
 	}
 
+	card, pix := h.paymentMethods(c.Context())
+
 	o, err := h.Checkout.Place(c.Context(), checkout.Input{
 		BuyerID: u.ID, AddressID: addressID, Method: in.Method,
-		CardEnabled: h.Payments.Config.CardEnabled() && h.Payments.Stripe != nil,
-		PixEnabled:  h.Payments.Config.PixEnabled() && h.Payments.Pix != nil,
+		CardEnabled: card,
+		PixEnabled:  pix,
 	})
 	if err != nil {
 		return err

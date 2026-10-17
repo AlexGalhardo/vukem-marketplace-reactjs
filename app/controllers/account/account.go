@@ -21,10 +21,18 @@ import (
 // Handlers serves the account pages.
 type Handlers struct {
 	a *accounts.Accounts
+	// social lists the configured sign-in providers (buttons on the login
+	// and register pages).
+	social []string
 }
 
-// New returns the handlers.
-func New(a *accounts.Accounts) *Handlers { return &Handlers{a: a} }
+// New returns the handlers; social names the configured sign-in providers.
+func New(a *accounts.Accounts, social ...string) *Handlers { return &Handlers{a: a, social: social} }
+
+// authPage renders a guest page with the sign-in provider buttons.
+func (h *Handlers) authPage(c *web.Ctx, component string) error {
+	return inertia.Render(c, component, inertia.Props{"socialProviders": EnabledProviders(c, h.a, h.social)})
+}
 
 // LoginThrottleKey limits login attempts per email and IP.
 func LoginThrottleKey(r *http.Request) string {
@@ -69,7 +77,7 @@ func loginEmail(r *http.Request) string {
 }
 
 // ShowLogin renders the login page.
-func (*Handlers) ShowLogin(c *web.Ctx) error { return inertia.Render(c, "Auth/Login", nil) }
+func (h *Handlers) ShowLogin(c *web.Ctx) error { return h.authPage(c, "Auth/Login") }
 
 // Login signs the user in and goes to the page they wanted.
 func (h *Handlers) Login(c *web.Ctx) error {
@@ -100,9 +108,11 @@ func (h *Handlers) Login(c *web.Ctx) error {
 }
 
 // ShowRegister renders the registration page.
-func (*Handlers) ShowRegister(c *web.Ctx) error { return inertia.Render(c, "Auth/Register", nil) }
+func (h *Handlers) ShowRegister(c *web.Ctx) error { return h.authPage(c, "Auth/Register") }
 
-// Register creates the account, logs in and asks for email verification.
+// Register creates the account and logs in; while the email_verification
+// flag is on it then asks for the verification, otherwise it goes to the
+// dashboard.
 func (h *Handlers) Register(c *web.Ctx) error {
 	in, err := web.Parse(c, requests.RegisterSchema)
 	if err != nil {
@@ -118,7 +128,11 @@ func (h *Handlers) Register(c *web.Ctx) error {
 		return err
 	}
 
-	return c.Redirect("/email/verify")
+	if h.a.VerificationRequired(c.Context()) {
+		return c.Redirect("/email/verify")
+	}
+
+	return c.Redirect("/dashboard")
 }
 
 // Logout signs the user out and rotates the history encryption key.

@@ -9,6 +9,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 func makeAdmin(t *testing.T, app *vukemtest.App, email string) {
@@ -48,7 +49,7 @@ func TestRegisteredUsersAreNotAdmins(t *testing.T) {
 	c.PostJSON("/register", map[string]any{
 		"name": "Eve", "email": "eve@example.com", "role": "admin",
 		"password": "correct horse battery", "password_confirmation": "correct horse battery",
-	}).AssertRedirect("/email/verify")
+	}).AssertRedirect("/dashboard")
 
 	vukemtest.AssertDatabaseHas(t, app, "users", map[string]any{"email": "eve@example.com", "role": "user"})
 	c.Get("/admin").AssertNotFound()
@@ -58,6 +59,7 @@ func TestAdminAreaRequiresAdminAndTwoFactor(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
+	flagtest.RequireEmailVerification(t, app)
 
 	app.Client(t).Get("/admin").AssertNotFound()
 

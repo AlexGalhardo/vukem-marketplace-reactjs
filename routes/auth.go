@@ -32,8 +32,13 @@ func authRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 		return err
 	}
 
+	s, err := accounts.NewSocial(app, "google")
+	if err != nil {
+		return err
+	}
+
 	L := account.Localized
-	h := account.New(acc)
+	h := account.New(acc, s.Names()...)
 	guest := auth.Guest(acc.Web)
 	required := auth.Required(acc.Web)
 	throttle := ratelimit.Middleware(deps.Limiter("login", 5, time.Minute), account.LoginThrottleKey)
@@ -42,13 +47,16 @@ func authRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 		account.LoginAccountThrottleKey,
 	)
 	mails := ratelimit.Middleware(deps.Limiter("auth-mail", 3, time.Minute), ratelimit.ByIP)
+	// Sign-up tells a taken email apart (it cannot log the visitor in), so
+	// probing addresses is throttled per IP.
+	signups := ratelimit.Middleware(deps.Limiter("register", 20, time.Minute), ratelimit.ByIP)
 
 	r.Use(shareAuth(acc))
 
 	r.Get("/login", L(h.ShowLogin)).Name("login").Use(guest)
 	r.Post("/login", L(h.Login)).Use(guest, throttle, perAccount)
 	r.Get("/register", L(h.ShowRegister)).Name("register").Use(guest)
-	r.Post("/register", L(h.Register)).Use(guest)
+	r.Post("/register", L(h.Register)).Use(guest, signups)
 	r.Post("/logout", L(h.Logout)).Name("logout").Use(required)
 
 	r.Get("/forgot-password", L(h.ShowForgot)).Name("password.request").Use(guest)

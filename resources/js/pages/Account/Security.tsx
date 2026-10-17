@@ -6,7 +6,11 @@ import { button, heading, link, muted, panel, secondaryButton, subheading } from
 import { useT } from "../../lib/i18n";
 import type { SecurityProps } from "../../types";
 
-export default function Security({ twoFactorEnabled, recoveryCodesLeft }: SecurityProps): JSX.Element {
+export default function Security({
+	twoFactorAvailable,
+	twoFactorEnabled,
+	recoveryCodesLeft,
+}: SecurityProps): JSX.Element {
 	const { t } = useT();
 	const password = useForm({ current_password: "", password: "", password_confirmation: "" });
 	const sessions = useForm({ password: "" });
@@ -72,11 +76,15 @@ export default function Security({ twoFactorEnabled, recoveryCodesLeft }: Securi
 				<p className="mb-4">
 					{twoFactorEnabled
 						? t("account.security.two_factor_on", { count: recoveryCodesLeft })
-						: t("account.security.two_factor_off")}
+						: twoFactorAvailable
+							? t("account.security.two_factor_off")
+							: t("account.two_factor.unavailable")}
 				</p>
-				<Link href="/user/two-factor" className={secondaryButton}>
-					{t("account.security.two_factor_manage")}
-				</Link>
+				{(twoFactorEnabled || twoFactorAvailable) && (
+					<Link href="/user/two-factor" className={secondaryButton}>
+						{t("account.security.two_factor_manage")}
+					</Link>
+				)}
 			</section>
 
 			<section className={panel} aria-labelledby="sessions-title">

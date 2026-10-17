@@ -3,12 +3,15 @@ package tests
 import (
 	"strings"
 	"testing"
+
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
 )
 
 func TestAccountMessagesFollowTheLocale(t *testing.T) {
 	t.Parallel()
 
-	app, fake := queuedApp(t, nil)
+	app, fake := queuedApp(t)
+	flagtest.RequireEmailVerification(t, app)
 	register(t, app.Client(t).Inertia(""), "tom@example.com")
 
 	cases := []struct {

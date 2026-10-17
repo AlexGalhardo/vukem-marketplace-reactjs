@@ -6,6 +6,8 @@ import { button, card, dangerButton, heading, link, secondaryButton, subheading 
 import { useT } from "../../lib/i18n";
 
 interface Props {
+	// False while the two_factor flag is off (admins can always enrol).
+	available: boolean;
 	enabled: boolean;
 	pending: boolean;
 	secret: string | null;
@@ -15,6 +17,7 @@ interface Props {
 }
 
 export default function TwoFactor({
+	available,
 	enabled,
 	pending,
 	secret,
@@ -105,13 +108,15 @@ export default function TwoFactor({
 						</button>
 					</form>
 				</div>
-			) : (
+			) : available ? (
 				<div className="space-y-4">
 					<p>{t("account.two_factor.intro")}</p>
 					<Link href="/user/two-factor" method="post" as="button" className={button}>
 						{t("account.two_factor.enable")}
 					</Link>
 				</div>
+			) : (
+				<p>{t("account.two_factor.unavailable")}</p>
 			)}
 			<p className="mt-6 text-sm">
 				<Link href="/account/security" className={link}>
