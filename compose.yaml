@@ -75,7 +75,7 @@ services:
       retries: 20
 
   mongo:
-    image: mongo:8.3.13
+    image: mongo:9.0.2
     ports:
       - "${MKT_MONGO_PORT:-27027}:27017"
     volumes:
