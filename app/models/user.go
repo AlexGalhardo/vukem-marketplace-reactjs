@@ -15,6 +15,9 @@ type User struct {
 	Password        string       `json:"-"`
 	EmailVerifiedAt orm.NullTime `json:"email_verified_at"`
 	Role            string       `json:"role"`
+	// SessionVersion ends every browser session when it changes
+	// (auth.SessionVersioner).
+	SessionVersion int64 `json:"-"`
 }
 
 // Roles.
@@ -29,6 +32,9 @@ func (u User) IsAdmin() bool { return u.Role == RoleAdmin }
 
 // AuthID implements auth.Authenticatable.
 func (u User) AuthID() string { return strconv.FormatInt(u.ID, 10) }
+
+// AuthSessionVersion implements auth.SessionVersioner.
+func (u User) AuthSessionVersion() int64 { return u.SessionVersion }
 
 // AuthPassword implements auth.Authenticatable.
 func (u User) AuthPassword() string { return u.Password }

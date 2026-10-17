@@ -15,5 +15,6 @@ func All() []schema.Migration {
 		m20261017200000CreateCatalogTables(),
 		m20261017200100CreateCommerceTables(),
 		m20261017200200CreateAPITables(),
+		m20261017220000AddSessionVersionToUsers(),
 	}
 }

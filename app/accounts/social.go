@@ -207,7 +207,14 @@ func (a *Accounts) lockOutUnverifiedOwner(ctx context.Context, tx database.Execu
 
 	u.Password = h
 
-	return revokeCredentials(ctx, tx, *u)
+	if err := revokeCredentials(ctx, tx, *u); err != nil {
+		return err
+	}
+
+	// The owner logs in right after with u: record the bumped version.
+	u.SessionVersion++
+
+	return nil
 }
 
 // SocialStateTTL is how long a used sign-in state is remembered; it

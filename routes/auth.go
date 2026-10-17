@@ -43,7 +43,7 @@ func authRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 	)
 	mails := ratelimit.Middleware(deps.Limiter("auth-mail", 3, time.Minute), ratelimit.ByIP)
 
-	r.Use(acc.CheckSessionStamp, shareAuth(acc))
+	r.Use(shareAuth(acc))
 
 	r.Get("/login", L(h.ShowLogin)).Name("login").Use(guest)
 	r.Post("/login", L(h.Login)).Use(guest, throttle, perAccount)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/AlexGalhardo/vukem/auth"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/orm"
@@ -75,8 +76,8 @@ func (a *Accounts) UpdateProfile(
 }
 
 // ChangePassword checks the current password, stores the new one and
-// revokes remember-me and API tokens. Other sessions end with the old
-// password hash (session stamp); call RotateSession for the current one.
+// revokes remember-me and API tokens. Other sessions end with the bumped
+// session version; call RotateSession for the current one.
 func (a *Accounts) ChangePassword(ctx context.Context, u models.User, current, password string) (models.User, error) {
 	if !a.CheckPassword(u, current) {
 		return u, wrongPassword("current_password")
@@ -85,9 +86,9 @@ func (a *Accounts) ChangePassword(ctx context.Context, u models.User, current, p
 	return a.setPassword(ctx, u, password)
 }
 
-// LogoutOtherSessions ends every other session of u: the password is
-// hashed again (new salt, so a new session stamp) and remember-me and API
-// tokens are revoked. Call RotateSession for the current one.
+// LogoutOtherSessions ends every other session of u: the session version
+// is bumped and remember-me and API tokens are revoked. Call RotateSession
+// for the current one.
 func (a *Accounts) LogoutOtherSessions(ctx context.Context, u models.User, password string) (models.User, error) {
 	if !a.CheckPassword(u, password) {
 		return u, wrongPassword("password")
@@ -113,15 +114,17 @@ func (a *Accounts) setPassword(ctx context.Context, u models.User, password stri
 		return u, err
 	}
 
-	u.Password = h
-
-	return u, nil
+	// The stored row carries the bumped session version.
+	return orm.QueryOf[models.User](a.DB).Find(ctx, u.ID)
 }
 
 // RotateSession gives the current browser a new session id bound to u's
-// new password hash, so it survives the change that ended the others.
+// new session version, so it survives the change that ended the others.
 func (a *Accounts) RotateSession(c *web.Ctx, u models.User) {
 	s := c.Session()
 	s.Regenerate()
-	s.Put(stampSessionKey, a.stamp(u))
+
+	for k, v := range auth.SessionValues(a.Web.Name(), u) {
+		s.Put(k, v)
+	}
 }

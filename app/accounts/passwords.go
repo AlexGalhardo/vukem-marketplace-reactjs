@@ -131,8 +131,8 @@ func (a *Accounts) ResetPassword(ctx context.Context, email, token, password str
 			return errInvalidReset
 		}
 
-		// A new password ends every other way in: sessions (stamp),
-		// remembered sessions and API tokens issued with the old one.
+		// A new password ends every other way in: sessions (session
+		// version), remembered sessions and API tokens issued with the old one.
 		if err := revokeCredentials(ctx, tx, u); err != nil {
 			return err
 		}
@@ -148,12 +148,14 @@ func digest(token string) string {
 	return hex.EncodeToString(sum[:])
 }
 
-// revokeCredentials deletes u's remember-me and API tokens. Live sessions end through the session stamp once the
-// password hash changes.
+// revokeCredentials ends every session of u (bumps the session version,
+// which vukem's session guard checks on every request and every driver)
+// and deletes its remember-me and API tokens.
 func revokeCredentials(ctx context.Context, tx database.Executor, u models.User) error {
 	d := tx.Dialect()
 
 	for _, q := range []struct{ sql, arg string }{
+		{"UPDATE users SET session_version = session_version + 1 WHERE id = " + d.Placeholder(1), u.AuthID()},
 		{"DELETE FROM remember_tokens WHERE user_id = " + d.Placeholder(1), u.AuthID()},
 		{"DELETE FROM access_tokens WHERE user_id = " + d.Placeholder(1), u.AuthID()},
 	} {

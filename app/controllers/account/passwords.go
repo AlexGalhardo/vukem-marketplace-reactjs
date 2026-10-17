@@ -45,7 +45,7 @@ func (h *Handlers) Reset(c *web.Ctx) error {
 	}
 
 	// The new password hash ends every session of the account (session
-	// stamp); this browser gets a fresh session id as well.
+	// version); this browser gets a fresh session id as well.
 	c.Session().Regenerate()
 
 	flash(c, "account.flash.password_reset")

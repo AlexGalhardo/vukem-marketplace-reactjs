@@ -43,7 +43,6 @@ type Accounts struct {
 	mailLater func(ctx context.Context, m mail.Mailable, opts ...queue.Option) error
 	queue     *queue.Queue
 	cache     cache.Store
-	stampKey  []byte
 	now       func() time.Time
 }
 
@@ -90,7 +89,6 @@ func New(app *vukem.App) (*Accounts, error) {
 		mailLater: app.MailLater,
 		queue:     q,
 		cache:     c.Store(),
-		stampKey:  app.Key.Derive("session.stamp", 32),
 		now:       app.Now,
 	}, nil
 }
