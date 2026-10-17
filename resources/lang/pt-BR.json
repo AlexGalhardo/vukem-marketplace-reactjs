@@ -269,6 +269,10 @@
 			"reset_body": "Alguém pediu para redefinir sua senha. Se foi você:",
 			"reset_action": "Redefinir senha",
 			"reset_expiry": "O link expira em uma hora e funciona uma única vez. Se não foi você, ignore este e-mail."
+		},
+		"social": {
+			"or": "ou",
+			"continue_google": "Continuar com o Google"
 		}
 	},
 	"validation": {

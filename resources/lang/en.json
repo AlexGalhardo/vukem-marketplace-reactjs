@@ -269,6 +269,10 @@
 			"reset_body": "Someone asked to reset your password. If it was you:",
 			"reset_action": "Reset password",
 			"reset_expiry": "The link expires in one hour and works once. If you did not ask, ignore this email."
+		},
+		"social": {
+			"or": "or",
+			"continue_google": "Continue with Google"
 		}
 	},
 	"validation": {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/social"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
 )
 
@@ -205,10 +207,41 @@ func (a *Accounts) lockOutUnverifiedOwner(ctx context.Context, tx database.Execu
 		return err
 	}
 
+	if _, err := orm.QueryOf[models.TwoFactor](tx).Where("id", u.ID).Update(ctx, orm.Set{
+		"two_factor_secret":         nil,
+		"two_factor_recovery_codes": nil,
+		"two_factor_confirmed_at":   nil,
+		"two_factor_last_step":      0,
+	}); err != nil {
+		return err
+	}
+
 	u.Password = h
 
 	if err := revokeCredentials(ctx, tx, *u); err != nil {
 		return err
+	}
+
+	now := a.now().UTC()
+
+	for _, q := range []struct {
+		sql  string
+		args []any
+	}{
+		{"DELETE FROM password_resets WHERE email = ?", []any{u.Email}},
+		{"UPDATE api_keys SET revoked_at = ?, updated_at = ? WHERE user_id = ? AND revoked_at IS NULL", []any{now, now, u.ID}},
+		{
+			"UPDATE shops SET pix_key = NULL, stripe_account_id = NULL, stripe_ready = ?, updated_at = ? WHERE owner_id = ?",
+			[]any{false, now, u.ID},
+		},
+		{
+			"UPDATE webhook_endpoints SET active = ?, updated_at = ? WHERE shop_id IN (SELECT id FROM shops WHERE owner_id = ?)",
+			[]any{false, now, u.ID},
+		},
+	} {
+		if _, err := dbx.Exec(ctx, tx, q.sql, q.args...); err != nil {
+			return fmt.Errorf("lock out unverified owner: %w", err)
+		}
 	}
 
 	// The owner logs in right after with u: record the bumped version.

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
+	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/social"
 	"github.com/AlexGalhardo/vukem/vukemtest"
@@ -180,11 +181,40 @@ func TestGoogleVerifiedEmailEndsPreHijackedAccount(t *testing.T) {
 	user := social.User{ID: "g-3", Email: "ivy@example.com", EmailVerified: true, Name: "Ivy"}
 	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: vukemtest.FakeSocial(user)})
 
-	// The attacker registers the victim's address first and stays logged in.
+	// The attacker registers the victim's address first (no verification
+	// needed by default) and stays logged in. They also enrol their own
+	// authenticator, mint an API key, open a shop with their payout
+	// destinations and a webhook, and have a reset link pending.
 	attacker := app.Client(t).Inertia("")
-	register(t, attacker, "ivy@example.com")
+	enableTwoFactor(t, app, attacker, "ivy@example.com")
+	attacker.WithHeader("Referer", "/account/api-keys").
+		PostJSON("/account/api-keys", map[string]any{"name": "loot", "scopes": []string{"cart:read"}}).
+		AssertRedirect("/account/api-keys")
+	attacker.PostJSON("/sell", map[string]any{"name": "Loja Falsa", "ship_from_uf": "SP"}).
+		AssertStatus(http.StatusSeeOther)
 
-	// The owner signs in with Google, which proves the address.
+	db, err := app.DB()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	now := time.Now().UTC()
+	for _, q := range []struct {
+		sql  string
+		args []any
+	}{
+		{"UPDATE shops SET pix_key = ?, stripe_account_id = ?, stripe_ready = ?", []any{"sealed", "acct_attacker", true}},
+		{`INSERT INTO webhook_endpoints (shop_id, url, secret, events, active, created_at, updated_at)
+			SELECT id, 'https://attacker.example/hook', 'sealed', 'order.paid', ?, ?, ? FROM shops`, []any{true, now, now}},
+		{"INSERT INTO password_resets (email, hash, created_at) VALUES (?, ?, ?)", []any{"ivy@example.com", "digest", now}},
+	} {
+		if _, err := db.ExecContext(t.Context(), database.Rebind(db.Dialect(), q.sql), q.args...); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// The owner signs in with Google, which proves the address: no
+	// two-factor challenge from the attacker's authenticator.
 	owner := app.Client(t).Inertia("")
 	signIn(t, owner).AssertRedirect("/dashboard")
 	owner.Get("/dashboard").AssertInertia("Dashboard").HasProp("auth.user.email_verified_at")
@@ -193,6 +223,17 @@ func TestGoogleVerifiedEmailEndsPreHijackedAccount(t *testing.T) {
 	attacker.Get("/dashboard").AssertRedirect("/login")
 	passwordLogin(app.Client(t).Inertia("").WithHeader("Referer", "/login"),
 		"ivy@example.com", "correct horse battery").AssertRedirect("/login")
+
+	vukemtest.AssertDatabaseHas(t, app, "users",
+		map[string]any{"email": "ivy@example.com", "two_factor_secret": nil, "two_factor_confirmed_at": nil})
+	vukemtest.AssertDatabaseMissing(t, app, "api_keys", map[string]any{"revoked_at": nil})
+	vukemtest.AssertDatabaseCount(t, app, "password_resets", 0)
+	vukemtest.AssertDatabaseHas(t, app, "shops",
+		map[string]any{"pix_key": nil, "stripe_account_id": nil, "stripe_ready": false})
+	vukemtest.AssertDatabaseHas(t, app, "webhook_endpoints", map[string]any{"active": false})
+
+	// Signing in again (the link exists now) changes nothing more.
+	signIn(t, app.Client(t).Inertia("")).AssertRedirect("/dashboard")
 }
 
 func TestGoogleSignInStillAsksForTwoFactor(t *testing.T) {
@@ -202,6 +243,18 @@ func TestGoogleSignInStillAsksForTwoFactor(t *testing.T) {
 	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: vukemtest.FakeSocial(user)})
 
 	secret, _ := enableTwoFactor(t, app, app.Client(t).Inertia(""), "jon2fa@example.com")
+
+	// A verified account keeps its 2FA (an unverified one is reset, see
+	// TestGoogleVerifiedEmailEndsPreHijackedAccount).
+	db, err := app.DB()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := db.ExecContext(t.Context(), database.Rebind(db.Dialect(),
+		"UPDATE users SET email_verified_at = ? WHERE email = ?"), time.Now().UTC(), "jon2fa@example.com"); err != nil {
+		t.Fatal(err)
+	}
 
 	c := app.Client(t).Inertia("")
 	signIn(t, c).AssertRedirect("/two-factor-challenge")
