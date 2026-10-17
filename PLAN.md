@@ -14,7 +14,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 
 | # | Decision | Why |
 | --- | --- | --- |
-| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.24.0`), no `replace` | Battle-test the released framework, like any user |
+| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.25.0`), no `replace` | Battle-test the released framework, like any user |
 | D2 | Frontend Inertia **v3** (stable: `@inertiajs/react` 3.9.1 is `latest` on npm, 2026-10-17) + React 19 + TypeScript strict | Server-driven pages, no client router or API layer for pages |
 | D3 | Base UI (`@base-ui/react` 1.9.0, headless) styled with pure Tailwind v4; no shadcn | Accessible behaviour, our own look |
 | D4 | i18n EN + PT-BR from one set of JSON catalogs (`resources/lang`) read by vukem i18n and imported by React | No drift between server and client strings |
@@ -44,7 +44,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | Layer | Version |
 | --- | --- |
 | Go toolchain | 1.27.2 |
-| vukem | v0.24.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.2.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.2.0, `drivers/otel` v0.1.0, `contrib/graphql`, `contrib/grpc`, `contrib/stripe`, `contrib/imaging` v0.1.0) |
+| vukem | v0.25.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.3.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.3.0, `drivers/otel` v0.2.0, `contrib/graphql` v0.2.0, `contrib/grpc` v0.2.0, `contrib/stripe` v0.2.0, `contrib/imaging` v0.1.0) |
 | pgx / go-redis / mongo-driver | v5.11.0 / v9.23.0 / v2.9.2 |
 | stripe-go | v87.0.0 (`github.com/stripe/stripe-go/v87`, Payments phase) |
 | Bun | 1.4.3 |
@@ -334,7 +334,7 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - [x] B.1 Queue worker + scheduler processes (PIX expiry, cleanup of expired tokens/sessions, rating recalcs, transfer retries)
   → verify: `vukem schedule:list` shows tasks; job tests with fake clock
-- [ ] B.2 OpenTelemetry (traces done; metrics pending new dependencies) (`drivers/otel`) HTTP spans + manual DB/queue/client spans + metrics, OTLP to Railway
+- [x] B.2 OpenTelemetry (`drivers/otel`) HTTP spans + manual DB/queue/client spans + metrics, OTLP to Railway
   → verify: local OTLP collector receives spans in integration test
 - [x] B.3 Telegram: contact form + rate-limited 5xx alerts
   → verify: `go test ./app/alerts` with httptest Telegram
@@ -382,6 +382,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 - 2026-10-17 — Merged catalog (C.1–C.5), checkout (K.1–K.3, P.1–P.6) and ops (B.1, B.3, X.5; B.2 traces only, metrics need new OTel dependencies; O.2 infrastructure: `/events` + `useEventStream`, checkout does not publish yet). Product page mounts add-to-cart and the freight quote. The image runs `migrate` + `reference:sync` on start; the queue worker and scheduler run inside the web process unless disabled. Open: O.1, O.2 wiring (publish on order status), O.3, M.*, REST seller writes + `freight`, S.*, axe accessibility scans in e2e (owner approved `@axe-core/playwright`).
 
 - 2026-10-17 — vukem v0.24.0 adopted (scheduler in serve, shared `Social.States`, sealed queued mail, `App.Stdout`); Stripe connected accounts moved to Accounts v2 (merchant `card_payments` + recipient `stripe_transfers`, real test-mode API green in CI); axe accessibility scans in e2e (all pages, both themes, both locales, desktop + mobile, buyer/seller/admin) with the violations fixed. All stream worktrees merged and removed. Next: O.1–O.3, M.*, REST seller writes + `freight`, drop `platform.RedisOptions` for `WithCacheStoreFunc`, adopt `OpenLazy`/`ReadyHandler`, `TRUSTED_PROXIES` for Railway, S.*.
+
+- 2026-10-17 — vukem v0.25.0 adopted (see CHANGELOG): queue and scheduler in serve, lazy Redis/Mongo, `app.ReadyHandler`, routes after boot, app seeders, keyed errors, session versions, contrib/stripe v1 calls, gRPC own port, OTel metrics, Telegram `SendSync` (`TELEGRAM_LOG=false` set on Railway). Kept: `platform.RedisOptions` (lazy store funcs cannot fall back to cookie sessions / sync queue without Redis), Stripe Accounts v2 calls (typed helpers expected in v0.26.0). Next: active sessions list (`UserSessions`/`RevokeSession`), O.*, M.*, S.*.
 
 ## 9. Operations
 

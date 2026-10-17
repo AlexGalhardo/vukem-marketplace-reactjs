@@ -37,10 +37,12 @@ All notable changes to this project are documented here. The format follows [Kee
 - Outgoing seller webhooks at `/seller/webhooks` (vukem `webhook.Sender`, Standard Webhooks signatures, retries, delivery log).
 - `/events` server-sent events over Redis pub/sub and a `useEventStream` React hook.
 - Accessibility e2e suite (`e2e/a11y.spec.ts`, `@axe-core/playwright` 4.14.0): every page and UI state in light and dark, EN and PT-BR, desktop and mobile, logged out and as buyer, seller and admin; serious and critical WCAG 2.x A/AA violations fail CI.
+- OpenTelemetry metrics (HTTP, outbound HTTP, DB, queue) over OTLP, configured by `OTEL_*` env.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
 
+- vukem bumped to v0.25.0 (`drivers/otel` v0.2.0, `drivers/redis` v0.3.0, `drivers/s3` v0.3.0, `contrib/graphql` v0.2.0, `contrib/grpc` v0.2.0, `contrib/stripe` v0.2.0). Adopted: the queue worker in serve (`QUEUE_IN_SERVE`, `app/workers` removed), `database.Rebind`, `uuid.NewV7`, app seeders (`WithAppSeeders`), lazy Redis/MongoDB clients (`OpenLazy`) so the app boots while they are down, `/ready` from `app.ReadyHandler` (the database check is now `db`), catalog routes after boot (`WithRoutesAfterBoot`), keyed vukem errors (no English message matching), session versions (`users.session_version`) instead of the password stamp, Stripe v1 calls through `contrib/stripe`, GraphQL Go-name folding, the gRPC server on its own router and port, `ServeOpenAPIWith`, nonce-only CSP on `/docs/api`, `Disk.CreateBucket`, Telegram `SendSync` with `TELEGRAM_LOG=false` (replaces `TELEGRAM_MIN_LEVEL`, `TELEGRAM_API_URL` removed), and DB/queue/mail spans from `drivers/otel` (SQL text is no longer exported).
 - Accessibility fixes from the axe scans: text on blue, green and red backgrounds uses theme tokens with AA contrast in both themes (`on-action`, `on-status`, darker success/danger), text links use `action-600`, and the language menu's accessible name keeps its visible code.
 - vukem bumped to v0.24.0 (`drivers/s3` v0.2.0, `drivers/mongo` v0.2.0, `drivers/redis` v0.2.0): the scheduler runs inside serve through vukem (`SCHEDULE_IN_SERVE`, replaces `SCHEDULER_IN_PROCESS`), queued mail payloads are sealed with `APP_KEY`, Google sign-in states use vukem's shared `Social.States` store (Redis), and `users:make-admin` prints to stdout.
 - Stripe connected accounts use Accounts v2 (Express dashboard, recipient configuration with `stripe_transfers`); new Connect platforms cannot create v1 accounts.
@@ -51,6 +53,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Security
 
+- API authentication failures (401/403) are always problem+json, even for `Accept: text/html`; `HTTP_H2C` alone never opens the gRPC port in production.
 - Login, 2FA and auth-mail rate limits are stored in Redis, so they hold across instances.
 - The 2FA QR code is rendered as a `data:` image instead of raw HTML.
 - Users get 10 two-factor recovery codes (was 8).

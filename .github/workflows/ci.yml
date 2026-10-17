@@ -110,6 +110,8 @@ jobs:
       STRIPE_WEBHOOK_SECRETS: ${{ secrets.STRIPE_WEBHOOK_SECRETS }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      # Never forward test logs to the real chat.
+      TELEGRAM_LOG: "false"
     # The Mailtrap free plan has one sandbox shared with other apps: never
     # run two email suites at once.
     concurrency:
