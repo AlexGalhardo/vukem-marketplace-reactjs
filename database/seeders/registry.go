@@ -5,5 +5,5 @@ import vukem "github.com/AlexGalhardo/vukem"
 
 // All lists the seeders run by vukem db:seed, in order; make:seeder appends here.
 func All() []vukem.Seeder {
-	return []vukem.Seeder{}
+	return []vukem.Seeder{Categories{}, DemoShop{}}
 }

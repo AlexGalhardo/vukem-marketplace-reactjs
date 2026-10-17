@@ -1,3 +1,5 @@
+// Package controllers holds the HTTP handlers shared by every area (probes,
+// locale); feature pages live in sub-packages.
 package controllers
 
 import (

@@ -7,6 +7,7 @@ require (
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0
+	github.com/AlexGalhardo/vukem/drivers/s3 v0.1.0
 	github.com/google/go-cmp v0.7.0
 	go.mongodb.org/mongo-driver/v2 v2.9.2
 )
