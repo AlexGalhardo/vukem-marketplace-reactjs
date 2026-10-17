@@ -5,15 +5,15 @@ go 1.27.2
 require (
 	connectrpc.com/connect v1.21.1
 	connectrpc.com/grpchealth v1.5.0
-	github.com/AlexGalhardo/vukem v0.25.0
-	github.com/AlexGalhardo/vukem/contrib/graphql v0.2.0
-	github.com/AlexGalhardo/vukem/contrib/grpc v0.2.0
+	github.com/AlexGalhardo/vukem v0.26.0
+	github.com/AlexGalhardo/vukem/contrib/graphql v0.3.0
+	github.com/AlexGalhardo/vukem/contrib/grpc v0.3.0
 	github.com/AlexGalhardo/vukem/contrib/imaging v0.1.0
-	github.com/AlexGalhardo/vukem/contrib/stripe v0.2.0
+	github.com/AlexGalhardo/vukem/contrib/stripe v0.3.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.2.0
 	github.com/AlexGalhardo/vukem/drivers/otel v0.2.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
-	github.com/AlexGalhardo/vukem/drivers/redis v0.3.0
+	github.com/AlexGalhardo/vukem/drivers/redis v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/s3 v0.3.0
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0

@@ -4,20 +4,13 @@
 // Checkout Sessions, PaymentIntents, transfers, refunds and transfer
 // reversals, each POST with a caller-chosen idempotency key.
 //
-// v1 calls go through contrib/stripe v0.2.0 (Call with idempotency keys).
-//
-// workaround(vukem): contrib/stripe has no Accounts v2 helpers yet (typed
-// v2 helpers are planned for v0.26.0), so the v2 account and account-link
-// calls (JSON bodies) are made here.
+// Every call goes through contrib/stripe (v1 Call with idempotency keys,
+// typed Accounts v2 helpers).
 package stripe
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -38,7 +31,7 @@ type Client struct {
 	key  config.Secret
 	base string
 	http *http.Client
-	// v1 sends the v1 (form-encoded) calls through vukem's client.
+	// v1 is vukem's client (v1 and v2 endpoints).
 	v1 *vstripe.Client
 }
 
@@ -98,101 +91,8 @@ func (c *Client) call(ctx context.Context, method, path string, form url.Values,
 	return c.v1.Call(ctx, method, path, params, out, opts...)
 }
 
-// callJSON sends a v2 request: v2 endpoints take JSON bodies.
-func (c *Client) callJSON(ctx context.Context, method, path string, in any, idemKey string, out any) error {
-	var (
-		body        io.Reader = http.NoBody
-		contentType string
-	)
-
-	if in != nil {
-		b, err := json.Marshal(in)
-		if err != nil {
-			return fmt.Errorf("stripe: encode %s: %w", path, err)
-		}
-
-		body, contentType = bytes.NewReader(b), "application/json"
-	}
-
-	return c.send(ctx, method, c.base+path, path, body, contentType, idemKey, out)
-}
-
-func (c *Client) send(
-	ctx context.Context,
-	method, target, path string,
-	body io.Reader,
-	contentType, idemKey string,
-	out any,
-) error {
-	req, err := http.NewRequestWithContext(ctx, method, target, body)
-	if err != nil {
-		return fmt.Errorf("stripe: %s %s: %w", method, path, err)
-	}
-
-	req.Header.Set("Authorization", "Bearer "+c.key.Reveal())
-	req.Header.Set("Stripe-Version", vstripe.APIVersion)
-
-	if contentType != "" {
-		req.Header.Set("Content-Type", contentType)
-	}
-
-	if idemKey != "" {
-		req.Header.Set("Idempotency-Key", idemKey)
-	}
-
-	res, err := c.http.Do(req)
-	if err != nil {
-		return fmt.Errorf("stripe: %s %s: %w", method, path, err)
-	}
-	defer res.Body.Close()
-
-	b, err := io.ReadAll(io.LimitReader(res.Body, 4<<20))
-	if err != nil {
-		return fmt.Errorf("stripe: read %s: %w", path, err)
-	}
-
-	if res.StatusCode < 200 || res.StatusCode > 299 {
-		var env struct {
-			Error *vstripe.Error `json:"error"`
-		}
-
-		e := &vstripe.Error{Type: "api_error", Message: http.StatusText(res.StatusCode)}
-		if json.Unmarshal(b, &env) == nil && env.Error != nil {
-			e = env.Error
-		}
-
-		e.Status = res.StatusCode
-		e.RequestID = res.Header.Get("Request-Id")
-
-		return e
-	}
-
-	if err := json.Unmarshal(b, out); err != nil {
-		return fmt.Errorf("stripe: decode %s: %w", path, err)
-	}
-
-	return nil
-}
-
-// account is an Accounts v2 connected account with its recipient
-// configuration included. New Connect platforms cannot create v1 accounts.
-type account struct {
-	ID            string `json:"id"`
-	Configuration struct {
-		Recipient *struct {
-			Capabilities struct {
-				StripeBalance struct {
-					StripeTransfers struct {
-						Status string `json:"status"`
-					} `json:"stripe_transfers"`
-				} `json:"stripe_balance"`
-			} `json:"capabilities"`
-		} `json:"recipient"`
-	} `json:"configuration"`
-}
-
 // toAccount: a seller can sell once the account can receive transfers.
-func (a account) toAccount() payments.StripeAccount {
+func toAccount(a vstripe.AccountV2) payments.StripeAccount {
 	r := a.Configuration.Recipient
 
 	return payments.StripeAccount{
@@ -210,7 +110,7 @@ func (c *Client) CreateExpressAccount(
 	p payments.ExpressAccountParams,
 	idemKey string,
 ) (payments.StripeAccount, error) {
-	body := map[string]any{
+	params := vstripe.Params{
 		"dashboard": "express",
 		"identity":  map[string]any{"country": strings.ToLower(p.Country)},
 		"defaults": map[string]any{
@@ -235,33 +135,37 @@ func (c *Client) CreateExpressAccount(
 		"metadata": map[string]string{"shop_id": strconv.FormatInt(p.ShopID, 10)},
 	}
 	if p.Email != "" {
-		body["contact_email"] = p.Email
+		params["contact_email"] = p.Email
 	}
 
-	var a account
-	if err := c.callJSON(ctx, http.MethodPost, "/v2/core/accounts", body, idemKey, &a); err != nil {
+	var opts []vstripe.RequestOption
+	if idemKey != "" {
+		opts = append(opts, vstripe.IdempotencyKey(idemKey))
+	}
+
+	a, err := c.v1.CreateAccountV2(ctx, params, opts...)
+	if err != nil {
 		return payments.StripeAccount{}, err
 	}
 
-	return a.toAccount(), nil
+	return toAccount(a), nil
 }
 
 // GetAccount implements payments.StripeAPI.
 func (c *Client) GetAccount(ctx context.Context, id string) (payments.StripeAccount, error) {
-	var a account
-
-	path := "/v2/core/accounts/" + url.PathEscape(id) + "?include=configuration.recipient"
-	if err := c.callJSON(ctx, http.MethodGet, path, nil, "", &a); err != nil {
+	a, err := c.v1.GetAccountV2(ctx, id, []string{"configuration.recipient"})
+	if err != nil {
 		return payments.StripeAccount{}, err
 	}
 
-	return a.toAccount(), nil
+	return toAccount(a), nil
 }
 
 // CreateAccountLink implements payments.StripeAPI (v2 onboarding link for
 // the merchant and recipient configurations).
 func (c *Client) CreateAccountLink(ctx context.Context, accountID, refreshURL, returnURL string) (string, error) {
-	body := map[string]any{
+	// Account links are single-use and short-lived: a fresh one each time.
+	link, err := c.v1.CreateAccountLinkV2(ctx, vstripe.Params{
 		"account": accountID,
 		"use_case": map[string]any{
 			"type": "account_onboarding",
@@ -271,14 +175,8 @@ func (c *Client) CreateAccountLink(ctx context.Context, accountID, refreshURL, r
 				"return_url":     returnURL,
 			},
 		},
-	}
-
-	var link struct {
-		URL string `json:"url"`
-	}
-
-	// Account links are single-use and short-lived: a fresh one each time.
-	if err := c.callJSON(ctx, http.MethodPost, "/v2/core/account_links", body, "", &link); err != nil {
+	})
+	if err != nil {
 		return "", err
 	}
 

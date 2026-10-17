@@ -127,8 +127,13 @@ const payoutSelect = `SELECT p.id, p.shop_id, s.name, p.amount_cents, p.status, 
 	p.rejection_reason, p.created_at, p.paid_at FROM payouts p JOIN shops s ON s.id = p.shop_id`
 
 func (s *Service) payouts(ctx context.Context, where string, args ...any) ([]PayoutRequest, error) {
-	rows, err := s.DB.QueryContext(ctx, database.Rebind(s.DB.Dialect(), payoutSelect+` WHERE `+where+
-		` ORDER BY p.id DESC LIMIT 100`), args...)
+	// where is one of a few constant filters chosen by the callers.
+	q, err := database.RebindChecked(s.DB.Dialect(), payoutSelect+` WHERE `+where+` ORDER BY p.id DESC LIMIT 100`)
+	if err != nil {
+		return nil, fmt.Errorf("list payouts: %w", err)
+	}
+
+	rows, err := s.DB.QueryContext(ctx, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("list payouts: %w", err)
 	}

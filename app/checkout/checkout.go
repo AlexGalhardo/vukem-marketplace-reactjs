@@ -163,7 +163,12 @@ func (s Service) cardReady(ctx context.Context, shops map[int64]*Group) (map[int
 	q := `SELECT id FROM shops WHERE stripe_ready = ? AND stripe_account_id IS NOT NULL AND id IN (?` +
 		strings.Repeat(", ?", len(ids)-1) + `)`
 
-	rows, err := s.DB.QueryContext(ctx, database.Rebind(s.DB.Dialect(), q), append([]any{true}, ids...)...)
+	q, err := database.RebindChecked(s.DB.Dialect(), q)
+	if err != nil {
+		return nil, fmt.Errorf("card-ready shops: %w", err)
+	}
+
+	rows, err := s.DB.QueryContext(ctx, q, append([]any{true}, ids...)...)
 	if err != nil {
 		return nil, fmt.Errorf("card-ready shops: %w", err)
 	}
