@@ -46,7 +46,7 @@ function AskBox({ slug, qna }: { slug: string; qna: QnaMeta }): JSX.Element {
 		return (
 			<Notice>
 				{t("qna.own_product")}{" "}
-				<Link href="/seller/questions" className={link}>
+				<Link href="/seller/questions" className="text-action-600 underline">
 					{t("qna.own_product_link")}
 				</Link>
 			</Notice>
