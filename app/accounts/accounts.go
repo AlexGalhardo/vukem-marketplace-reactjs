@@ -12,6 +12,7 @@ import (
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth"
 	"github.com/AlexGalhardo/vukem/auth/hash"
+	"github.com/AlexGalhardo/vukem/cache"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/mail"
 	"github.com/AlexGalhardo/vukem/queue"
@@ -41,6 +42,7 @@ type Accounts struct {
 	// latency and failures stay off the request path.
 	mailLater func(ctx context.Context, m mail.Mailable, opts ...queue.Option) error
 	queue     *queue.Queue
+	cache     cache.Store
 	stampKey  []byte
 	now       func() time.Time
 }
@@ -58,6 +60,11 @@ func New(app *vukem.App) (*Accounts, error) {
 	}
 
 	q, err := app.Queue()
+	if err != nil {
+		return nil, err
+	}
+
+	c, err := app.Cache()
 	if err != nil {
 		return nil, err
 	}
@@ -82,6 +89,7 @@ func New(app *vukem.App) (*Accounts, error) {
 		VerifyTTL: time.Hour,
 		mailLater: app.MailLater,
 		queue:     q,
+		cache:     c.Store(),
 		stampKey:  app.Key.Derive("session.stamp", 32),
 		now:       app.Now,
 	}, nil

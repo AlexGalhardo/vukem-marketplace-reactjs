@@ -127,21 +127,9 @@ func (a *Accounts) ResetPassword(ctx context.Context, email, token, password str
 			return errInvalidReset
 		}
 
-		// A new password ends every other way in: remembered sessions and
-		// API tokens issued with the old one.
-		if _, err := tx.ExecContext(
-			ctx,
-			"DELETE FROM remember_tokens WHERE user_id = "+d.Placeholder(1),
-			u.AuthID(),
-		); err != nil {
-			return err
-		}
-
-		if _, err := tx.ExecContext(
-			ctx,
-			"DELETE FROM access_tokens WHERE user_id = "+d.Placeholder(1),
-			u.AuthID(),
-		); err != nil {
+		// A new password ends every other way in: sessions (stamp),
+		// remembered sessions and API tokens issued with the old one.
+		if err := revokeCredentials(ctx, tx, u); err != nil {
 			return err
 		}
 
@@ -154,4 +142,21 @@ func (a *Accounts) ResetPassword(ctx context.Context, email, token, password str
 func digest(token string) string {
 	sum := sha256.Sum256([]byte(token))
 	return hex.EncodeToString(sum[:])
+}
+
+// revokeCredentials deletes u's remember-me and API tokens. Live sessions end through the session stamp once the
+// password hash changes.
+func revokeCredentials(ctx context.Context, tx database.Executor, u models.User) error {
+	d := tx.Dialect()
+
+	for _, q := range []struct{ sql, arg string }{
+		{"DELETE FROM remember_tokens WHERE user_id = " + d.Placeholder(1), u.AuthID()},
+		{"DELETE FROM access_tokens WHERE user_id = " + d.Placeholder(1), u.AuthID()},
+	} {
+		if _, err := tx.ExecContext(ctx, q.sql, q.arg); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

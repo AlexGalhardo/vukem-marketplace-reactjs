@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/database"
@@ -22,6 +23,7 @@ import (
 func NewSocial(app *vukem.App, names ...string) *social.Social {
 	s := social.New(app.Key.Derive("social.state", 32))
 	s.InsecureCookies = !app.Config.IsProduction() && !strings.HasPrefix(app.Config.URL, "https://")
+	s.StateTTL = SocialStateTTL
 
 	base := strings.TrimSuffix(app.Config.URL, "/")
 
@@ -120,6 +122,16 @@ func (a *Accounts) FindOrCreateFromSocial(ctx context.Context, su social.User) (
 		switch {
 		case err == nil && su.EmailVerified:
 			u = existing
+
+			// Pre-hijacking: someone may have registered this address
+			// with a password before its owner ever signed in. The
+			// provider proved ownership, so that password and every
+			// session made with it stop working.
+			if !existing.EmailVerified() {
+				if err := a.lockOutUnverifiedOwner(ctx, tx, &u); err != nil {
+					return err
+				}
+			}
 		case err == nil:
 			// An unverified email must never take over an existing account.
 			return errs.New(409, "An account with this email already exists. Log in with your password first.")
@@ -174,3 +186,33 @@ func (a *Accounts) createSocialUser(
 
 	return u, nil
 }
+
+func (a *Accounts) lockOutUnverifiedOwner(ctx context.Context, tx database.Executor, u *models.User) error {
+	h, err := a.Hasher.Make(rand.Text() + rand.Text())
+	if err != nil {
+		return err
+	}
+
+	if _, err := orm.QueryOf[models.User](tx).Where("id", u.ID).Update(ctx, orm.Set{"password": h}); err != nil {
+		return err
+	}
+
+	u.Password = h
+
+	return revokeCredentials(ctx, tx, *u)
+}
+
+// ConsumeSocialState marks a sign-in state as used in the shared cache
+// (Redis in production) and reports whether it was fresh, so a replayed
+// callback fails on every instance. Call it after social.User accepted
+// the state, so only genuine states are stored.
+//
+// workaround(vukem): social.Social keeps used states in process memory,
+// which only stops replays on the instance that saw the first callback.
+func (a *Accounts) ConsumeSocialState(ctx context.Context, provider, state string) (bool, error) {
+	return a.cache.Add(ctx, "social-state:"+provider+":"+digest(state), []byte("1"), SocialStateTTL)
+}
+
+// SocialStateTTL is how long a used sign-in state is remembered; it
+// matches social.Social.StateTTL (after that the state cookie is expired).
+const SocialStateTTL = 10 * time.Minute
