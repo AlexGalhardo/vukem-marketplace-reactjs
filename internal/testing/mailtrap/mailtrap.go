@@ -113,7 +113,9 @@ func (c *Client) Text(ctx context.Context, id int64) (string, error) {
 	return c.getText(ctx, fmt.Sprintf("/messages/%d/body.txt", id))
 }
 
-// Clean deletes every message in the sandbox (run before a suite).
+// Clean deletes every message in the sandbox. The sandbox is shared with
+// other apps (Mailtrap free plan), so real suites must not call it: they
+// filter by a unique recipient with WaitFor instead.
 func (c *Client) Clean(ctx context.Context) error {
 	res, err := c.do(ctx, http.MethodPatch, "/clean")
 	if err != nil {
