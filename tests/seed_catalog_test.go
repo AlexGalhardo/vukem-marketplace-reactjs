@@ -3,6 +3,8 @@ package tests
 import (
 	"bytes"
 	"errors"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"testing"
@@ -276,5 +278,23 @@ func TestDBSeedRunsTheDemoCatalog(t *testing.T) {
 
 	if !slices.Contains(names, "DemoCatalog") {
 		t.Fatalf("db:seed seeders %v do not include DemoCatalog", names)
+	}
+}
+
+// The production image applies migrations and reference data on start but
+// never seeds; only the compose seed service does (development).
+func TestProductionImageNeverSeeds(t *testing.T) {
+	t.Parallel()
+
+	b, err := os.ReadFile(filepath.Join("..", "Dockerfile"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for line := range strings.Lines(string(b)) {
+		if strings.HasPrefix(line, "CMD") &&
+			(strings.Contains(line, "db:seed") || strings.Contains(line, "demo:catalog")) {
+			t.Fatalf("the production CMD seeds: %s", line)
+		}
 	}
 }

@@ -45,6 +45,21 @@ vukem serve                     # http://localhost:3000, Vite HMR
 | RustFS console | <http://localhost:9201> |
 | Postgres / Redis / Mongo | `localhost:5442` / `6389` / `27027` |
 
+## Contas de desenvolvimento
+
+`docker compose up -d --build` runs a one-shot `seed` service after `app` is healthy (`media:bucket` + `db:seed`); on the host run `vukem db:seed` after `vukem migrate`. Seeding is idempotent (re-runs create nothing new) and refuses `APP_ENV=production`, even with `--force`: known-password accounts never exist there.
+
+| Role | Email | Password (default) | Notes |
+| --- | --- | --- | --- |
+| Buyer | `buyer@example.com` | `marketplace-demo-password` | |
+| Seller | `seller@example.com` | `marketplace-demo-password` | owns "Loja Demo Vukem" (12 products) |
+| Admin | `admin@example.com` | `marketplace-demo-password` | 2FA (TOTP) is mandatory and already confirmed |
+
+- The password is `SEED_PASSWORD` from `.env` (at least 12 characters) when set.
+- Admin 2FA: the seeder logs the TOTP secret and the recovery codes once, when it creates the admin. Read them with `docker compose logs seed | grep totp_secret` (host: the `vukem db:seed` output), add the secret to an authenticator app, then sign in. Lost it? Run `vukem migrate:fresh --seed` (wipes the local database) to get a new one.
+- Demo catalog: 100 sellers (`*@vendedores.example.com`, random passwords nobody knows, not meant to log in) with one shop each across the 27 UFs and 2000 published products (10 to 30 per shop) with shared placeholder images; it takes a few seconds. `vukem demo:catalog --fresh` deletes and recreates it.
+- Production: the first admin is an existing account promoted with `users:make-admin <email>` (2FA is then required). The demo catalog is never seeded there unless explicitly requested with `demo:catalog --allow-production`; its sellers have random passwords.
+
 ## Checks
 
 ```sh
