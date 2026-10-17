@@ -192,7 +192,8 @@ func (a account) toAccount() payments.StripeAccount {
 
 // CreateExpressAccount implements payments.StripeAPI with Accounts v2: an
 // Express dashboard, the platform collecting fees and owning losses, and
-// the recipient configuration (separate charges and transfers).
+// the merchant and recipient configurations (separate charges and
+// transfers; readiness is the recipient's stripe_transfers capability).
 func (c *Client) CreateExpressAccount(
 	ctx context.Context,
 	p payments.ExpressAccountParams,
@@ -208,6 +209,11 @@ func (c *Client) CreateExpressAccount(
 			},
 		},
 		"configuration": map[string]any{
+			// Stripe requires card_payments on the merchant configuration
+			// before it grants stripe_transfers (seen on a BR platform).
+			"merchant": map[string]any{
+				"capabilities": map[string]any{"card_payments": map[string]any{"requested": true}},
+			},
 			"recipient": map[string]any{
 				"capabilities": map[string]any{
 					"stripe_balance": map[string]any{"stripe_transfers": map[string]any{"requested": true}},
@@ -242,14 +248,14 @@ func (c *Client) GetAccount(ctx context.Context, id string) (payments.StripeAcco
 }
 
 // CreateAccountLink implements payments.StripeAPI (v2 onboarding link for
-// the recipient configuration).
+// the merchant and recipient configurations).
 func (c *Client) CreateAccountLink(ctx context.Context, accountID, refreshURL, returnURL string) (string, error) {
 	body := map[string]any{
 		"account": accountID,
 		"use_case": map[string]any{
 			"type": "account_onboarding",
 			"account_onboarding": map[string]any{
-				"configurations": []string{"recipient"},
+				"configurations": []string{"merchant", "recipient"},
 				"refresh_url":    refreshURL,
 				"return_url":     returnURL,
 			},
