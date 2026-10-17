@@ -18,6 +18,7 @@ import (
 	catalogv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1/catalogv1connect"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/routes"
 )
 
 // TestAPIsAgainstPostgres runs the hand-written API SQL (upserts,
@@ -76,7 +77,12 @@ func TestAPIsAgainstPostgres(t *testing.T) {
 	plain.PostJSON("/graphql", map[string]any{"query": `{ me { email } orders { meta { total } } }`}).
 		AssertOK().AssertJSONPath("data.orders.meta.total", 1)
 
-	srv := grpctest.NewServer(t, api.GRPCListener(app.Handler()))
+	rpc, err := routes.RPCHandler(app.App)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	srv := grpctest.NewServer(t, rpc)
 	client := catalogv1connect.NewCatalogServiceClient(srv.Client, srv.URL)
 	req := connect.NewRequest(&catalogv1.ListProductsRequest{Q: "pen"})
 	req.Header().Set("Authorization", "Bearer "+tok)

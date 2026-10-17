@@ -19,14 +19,20 @@ import (
 	ordersv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1/ordersv1connect"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/routes"
 )
 
-// grpcServer serves the app like the GRPC_PORT listener does, on an
-// in-process HTTP/2 server (connect-go's equivalent of bufconn).
+// grpcServer serves the handler of the GRPC_PORT server on an in-process
+// HTTP/2 server (connect-go's equivalent of bufconn).
 func grpcServer(t *testing.T, app *vukemtest.App) *grpctest.Server {
 	t.Helper()
 
-	return grpctest.NewServer(t, api.GRPCListener(app.Handler()))
+	h, err := routes.RPCHandler(app.App)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return grpctest.NewServer(t, h)
 }
 
 func withKey[T any](msg *T, tok string) *connect.Request[T] {
@@ -165,7 +171,7 @@ func TestGRPCOrderServiceIsScopedToTheBuyer(t *testing.T) {
 	wantCode(t, err, connect.CodeNotFound)
 }
 
-func TestGRPCOnlyOnItsListener(t *testing.T) {
+func TestGRPCOnlyOnItsPort(t *testing.T) {
 	t.Parallel()
 
 	app := apifixture.NewApp(t, nil)
@@ -192,7 +198,7 @@ func TestGRPCOnlyOnItsListener(t *testing.T) {
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusNotFound {
-		t.Errorf("GET /api/v1/products on the gRPC listener = %d, want 404", res.StatusCode)
+		t.Errorf("GET /api/v1/products on the gRPC port = %d, want 404", res.StatusCode)
 	}
 }
 

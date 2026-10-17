@@ -54,8 +54,15 @@ func TestGraphQLCatalogQueries(t *testing.T) {
 		AssertJSONCount("data.products.data.0.shop.products", 2).
 		AssertJSONPath("data.products.meta.total", 2)
 
-	gql(c, `{ product(slug: "lamp") { title images { width } shop { slug } } categories { slug parentSlug } }`, nil).
-		AssertOK().AssertJSONPath("data.product.images.0.width", 1280).AssertJSONCount("data.categories", 2)
+	// Acronym fields (shipFromUf, nameEn, ratingAvgX100) resolve through the
+	// default resolver folding Go field names, with no per-field bindings.
+	gql(c, `{ product(slug: "lamp") { title ratingAvgX100 images { width } shop { slug shipFromUf } }
+		categories { slug nameEn namePt parentSlug } }`, nil).
+		AssertOK().AssertJSONPath("data.product.images.0.width", 1280).AssertJSONCount("data.categories", 2).
+		AssertJSONPath("data.product.shop.shipFromUf", "SP").
+		AssertJSONPath("data.product.ratingAvgX100", 0).
+		AssertJSONPath("data.categories.0.nameEn", "Home").
+		AssertJSONPath("data.categories.0.namePt", "Casa")
 
 	for _, hidden := range []string{f.Draft, f.Hidden} {
 		res := gql(c, `query($s: String!) { product(slug: $s) { title } }`, map[string]any{"s": hidden})
