@@ -1,9 +1,12 @@
 import { Head, Link, useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import { button, card, heading, link } from "../../components/ui";
+import { useT } from "../../lib/i18n";
 
-export default function Login() {
+export default function Login(): JSX.Element {
+	const { t } = useT();
 	const form = useForm({ email: "", password: "", remember: false });
 
 	const submit = (e: FormEvent) => {
@@ -12,12 +15,12 @@ export default function Login() {
 	};
 
 	return (
-		<>
-			<Head title="Log in" />
-			<h1 className="mb-4 text-2xl font-semibold">Log in</h1>
+		<section className={card}>
+			<Head title={t("account.login.title")} />
+			<h1 className={heading}>{t("account.login.title")}</h1>
 			<form onSubmit={submit} className="space-y-4">
 				<Field
-					label="Email"
+					label={t("account.common.email")}
 					type="email"
 					autoComplete="username"
 					required
@@ -26,7 +29,7 @@ export default function Login() {
 					error={form.errors.email}
 				/>
 				<Field
-					label="Password"
+					label={t("account.common.password")}
 					type="password"
 					autoComplete="current-password"
 					required
@@ -34,30 +37,26 @@ export default function Login() {
 					onChange={(e) => form.setData("password", e.target.value)}
 					error={form.errors.password}
 				/>
-				<label className="flex items-center gap-2">
+				<label className="flex items-center gap-2 text-sm">
 					<input
 						type="checkbox"
 						checked={form.data.remember}
 						onChange={(e) => form.setData("remember", e.target.checked)}
 					/>
-					Remember me
+					{t("account.login.remember")}
 				</label>
-				<button
-					type="submit"
-					disabled={form.processing}
-					className="rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-				>
-					Log in
+				<button type="submit" disabled={form.processing} className={button}>
+					{t("account.login.submit")}
 				</button>
 			</form>
-			<p className="mt-6 flex gap-4 text-sm">
-				<Link href="/forgot-password" className="text-indigo-600 hover:underline dark:text-indigo-400">
-					Forgot your password?
+			<p className="mt-6 flex flex-wrap gap-4 text-sm">
+				<Link href="/forgot-password" className={link}>
+					{t("account.login.forgot")}
 				</Link>
-				<Link href="/register" className="text-indigo-600 hover:underline dark:text-indigo-400">
-					Create an account
+				<Link href="/register" className={link}>
+					{t("account.login.register")}
 				</Link>
 			</p>
-		</>
+		</section>
 	);
 }

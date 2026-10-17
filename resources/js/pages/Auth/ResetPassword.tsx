@@ -1,9 +1,12 @@
 import { Head, useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import { button, card, heading } from "../../components/ui";
+import { useT } from "../../lib/i18n";
 
-export default function ResetPassword({ token, email }: { token: string; email: string }) {
+export default function ResetPassword({ token, email }: { token: string; email: string }): JSX.Element {
+	const { t } = useT();
 	const form = useForm({ token, email, password: "", password_confirmation: "" });
 
 	const submit = (e: FormEvent) => {
@@ -12,12 +15,12 @@ export default function ResetPassword({ token, email }: { token: string; email: 
 	};
 
 	return (
-		<>
-			<Head title="Choose a new password" />
-			<h1 className="mb-4 text-2xl font-semibold">Choose a new password</h1>
+		<section className={card}>
+			<Head title={t("account.reset.title")} />
+			<h1 className={heading}>{t("account.reset.title")}</h1>
 			<form onSubmit={submit} className="space-y-4">
 				<Field
-					label="Email"
+					label={t("account.common.email")}
 					type="email"
 					autoComplete="email"
 					required
@@ -26,7 +29,7 @@ export default function ResetPassword({ token, email }: { token: string; email: 
 					error={form.errors.email}
 				/>
 				<Field
-					label="New password (at least 12 characters)"
+					label={t("account.common.new_password")}
 					type="password"
 					autoComplete="new-password"
 					minLength={12}
@@ -36,7 +39,7 @@ export default function ResetPassword({ token, email }: { token: string; email: 
 					error={form.errors.password}
 				/>
 				<Field
-					label="Confirm password"
+					label={t("account.common.confirm_password")}
 					type="password"
 					autoComplete="new-password"
 					required
@@ -44,14 +47,10 @@ export default function ResetPassword({ token, email }: { token: string; email: 
 					onChange={(e) => form.setData("password_confirmation", e.target.value)}
 					error={form.errors.password_confirmation}
 				/>
-				<button
-					type="submit"
-					disabled={form.processing}
-					className="rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-				>
-					Reset password
+				<button type="submit" disabled={form.processing} className={button}>
+					{t("account.reset.submit")}
 				</button>
 			</form>
-		</>
+		</section>
 	);
 }

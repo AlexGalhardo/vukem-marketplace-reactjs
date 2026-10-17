@@ -1,28 +1,39 @@
 import { Head, Link, usePage } from "@inertiajs/react";
+import type { JSX } from "react";
 
+import { heading, link, panel } from "../components/ui";
+import { useT } from "../lib/i18n";
 import type { SharedProps } from "../types";
 
-export default function Dashboard() {
+export default function Dashboard(): JSX.Element {
+	const { t } = useT();
 	const user = usePage<SharedProps>().props.auth?.user;
 
 	return (
-		<>
-			<Head title="Dashboard" />
-			<h1 className="text-2xl font-semibold">Hello, {user?.name}</h1>
+		<section className={panel}>
+			<Head title={t("account.dashboard.title")} />
+			<h1 className={heading}>{t("account.dashboard.hello", { name: user?.name ?? "" })}</h1>
 			{user?.email_verified_at ? (
-				<p className="mt-2">Your email is verified.</p>
+				<p>{t("account.dashboard.verified")}</p>
 			) : (
-				<p className="mt-2">
-					<Link href="/email/verify" className="text-indigo-600 hover:underline dark:text-indigo-400">
-						Verify your email
+				<p>
+					<Link href="/email/verify" className={link}>
+						{t("account.dashboard.verify")}
 					</Link>
 				</p>
 			)}
-			<p className="mt-2">
-				<Link href="/user/two-factor" className="text-indigo-600 hover:underline dark:text-indigo-400">
-					Two-factor authentication
-				</Link>
-			</p>
-		</>
+			<ul className="mt-4 space-y-2">
+				<li>
+					<Link href="/account" className={link}>
+						{t("account.dashboard.settings")}
+					</Link>
+				</li>
+				<li>
+					<Link href="/user/two-factor" className={link}>
+						{t("account.two_factor.title")}
+					</Link>
+				</li>
+			</ul>
+		</section>
 	);
 }

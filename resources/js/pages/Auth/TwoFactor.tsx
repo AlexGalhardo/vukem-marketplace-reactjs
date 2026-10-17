@@ -1,7 +1,9 @@
 import { Head, Link, useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import { button, card, dangerButton, heading, link, secondaryButton, subheading } from "../../components/ui";
+import { useT } from "../../lib/i18n";
 
 interface Props {
 	enabled: boolean;
@@ -12,9 +14,15 @@ interface Props {
 	recoveryCodesLeft: number;
 }
 
-const button = "rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50";
-
-export default function TwoFactor({ enabled, pending, secret, qr, recoveryCodes, recoveryCodesLeft }: Props) {
+export default function TwoFactor({
+	enabled,
+	pending,
+	secret,
+	qr,
+	recoveryCodes,
+	recoveryCodesLeft,
+}: Props): JSX.Element {
+	const { t } = useT();
 	const confirm = useForm({ code: "" });
 	const disable = useForm({ password: "" });
 
@@ -29,17 +37,17 @@ export default function TwoFactor({ enabled, pending, secret, qr, recoveryCodes,
 	};
 
 	return (
-		<>
-			<Head title="Two-factor authentication" />
-			<h1 className="mb-4 text-2xl font-semibold">Two-factor authentication</h1>
+		<section className={card}>
+			<Head title={t("account.two_factor.title")} />
+			<h1 className={heading}>{t("account.two_factor.title")}</h1>
 			{enabled ? (
 				<div className="space-y-4">
-					<p>Two-factor authentication is on: logging in asks for a code from your authenticator app.</p>
+					<p>{t("account.two_factor.on")}</p>
 					{recoveryCodes ? (
 						<>
 							<p>
-								<strong>Store these recovery codes somewhere safe.</strong> Each one works once if you
-								lose your device; they are not shown again.
+								<strong>{t("account.two_factor.store_codes")}</strong>{" "}
+								{t("account.two_factor.store_codes_body")}
 							</p>
 							<ul className="grid grid-cols-2 gap-2 font-mono">
 								{recoveryCodes.map((code) => (
@@ -48,15 +56,15 @@ export default function TwoFactor({ enabled, pending, secret, qr, recoveryCodes,
 							</ul>
 						</>
 					) : (
-						<p>You have {recoveryCodesLeft} recovery codes left.</p>
+						<p>{t("account.two_factor.codes_left", { count: recoveryCodesLeft })}</p>
 					)}
-					<Link href="/user/two-factor/recovery-codes" method="post" as="button" className={button}>
-						Regenerate recovery codes
+					<Link href="/user/two-factor/recovery-codes" method="post" as="button" className={secondaryButton}>
+						{t("account.two_factor.regenerate")}
 					</Link>
-					<h2 className="pt-4 text-xl font-semibold">Turn off</h2>
+					<h2 className={`pt-4 ${subheading}`}>{t("account.two_factor.turn_off")}</h2>
 					<form onSubmit={submitDisable} className="space-y-4">
 						<Field
-							label="Current password"
+							label={t("account.common.current_password")}
 							type="password"
 							autoComplete="current-password"
 							required
@@ -64,24 +72,27 @@ export default function TwoFactor({ enabled, pending, secret, qr, recoveryCodes,
 							onChange={(e) => disable.setData("password", e.target.value)}
 							error={disable.errors.password}
 						/>
-						<button type="submit" disabled={disable.processing} className={button}>
-							Disable two-factor authentication
+						<button type="submit" disabled={disable.processing} className={dangerButton}>
+							{t("account.two_factor.disable")}
 						</button>
 					</form>
 				</div>
 			) : pending && qr ? (
 				<div className="space-y-4">
+					<p>{t("account.two_factor.scan")}</p>
+					<img
+						src={qr}
+						alt={t("account.two_factor.qr_alt")}
+						width={200}
+						height={200}
+						className="rounded bg-white p-2"
+					/>
 					<p>
-						Scan this QR code with your authenticator app, or enter the setup key by hand, then type the
-						code it shows.
-					</p>
-					<img src={qr} alt="Two-factor QR code" width={200} height={200} className="rounded bg-white p-2" />
-					<p>
-						Setup key: <code className="font-mono">{secret}</code>
+						{t("account.two_factor.setup_key")} <code className="font-mono">{secret}</code>
 					</p>
 					<form onSubmit={submitConfirm} className="space-y-4">
 						<Field
-							label="Code"
+							label={t("account.two_factor.code")}
 							inputMode="numeric"
 							autoComplete="one-time-code"
 							required
@@ -90,23 +101,23 @@ export default function TwoFactor({ enabled, pending, secret, qr, recoveryCodes,
 							error={confirm.errors.code}
 						/>
 						<button type="submit" disabled={confirm.processing} className={button}>
-							Confirm
+							{t("account.two_factor.confirm")}
 						</button>
 					</form>
 				</div>
 			) : (
 				<div className="space-y-4">
-					<p>Add a second step to your login: a code from an authenticator app on your phone.</p>
+					<p>{t("account.two_factor.intro")}</p>
 					<Link href="/user/two-factor" method="post" as="button" className={button}>
-						Enable two-factor authentication
+						{t("account.two_factor.enable")}
 					</Link>
 				</div>
 			)}
 			<p className="mt-6 text-sm">
-				<Link href="/dashboard" className="text-indigo-600 hover:underline dark:text-indigo-400">
-					Back to the dashboard
+				<Link href="/account/security" className={link}>
+					{t("account.security.title")}
 				</Link>
 			</p>
-		</>
+		</section>
 	);
 }
