@@ -35,6 +35,7 @@ export default function LocaleMenu(): JSX.Element {
 								<Menu.RadioItem
 									key={code}
 									value={code}
+									closeOnClick
 									className="grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-3 py-2 text-sm outline-hidden select-none data-highlighted:bg-action-500 data-highlighted:text-white"
 								>
 									<Menu.RadioItemIndicator className="col-start-1">✓</Menu.RadioItemIndicator>
