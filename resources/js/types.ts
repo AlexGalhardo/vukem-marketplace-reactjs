@@ -5,6 +5,7 @@ export interface User {
 	name: string;
 	email: string;
 	email_verified_at: string | null;
+	role: "user" | "admin";
 }
 
 export interface SharedProps {
@@ -15,4 +16,10 @@ export interface SharedProps {
 	// Present once the Auth phase ships.
 	auth?: { user: User | null };
 	[key: string]: unknown;
+}
+
+// Account/Security page props (controllers/account.ShowSecurity).
+export interface SecurityProps {
+	twoFactorEnabled: boolean;
+	recoveryCodesLeft: number;
 }

@@ -165,10 +165,10 @@ func TestGraphQLCartMutations(t *testing.T) {
 	vukemtest.AssertDatabaseCount(t, app, "cart_items", 0)
 
 	// Session callers: same-origin only, and never mutations over GET.
-	session := app.Client(t).ActingAs("web", f.Carl)
+	session := apifixture.ActingAs(t, app, app.Client(t), f.Carl)
 	session.WithHeader("Sec-Fetch-Site", "cross-site").
 		PostJSON("/graphql", map[string]any{"query": `mutation { removeCartItem(product: "pen") }`}).AssertForbidden()
-	app.Client(t).ActingAs("web", f.Carl).
+	apifixture.ActingAs(t, app, app.Client(t), f.Carl).
 		Get(`/graphql?query=mutation%20%7B%20removeCartItem(product%3A%20%22pen%22)%20%7D`).AssertStatus(405)
 }
 

@@ -34,13 +34,13 @@ var (
 	// ErrNoTwoFactorChallenge means there is no pending login, or it expired.
 	ErrNoTwoFactorChallenge = errors.New("accounts: no pending two-factor login")
 
-	errTwoFactorEnabled = errs.New(http.StatusConflict, "Two-factor authentication is already enabled.")
-	errTwoFactorOff     = errs.New(http.StatusConflict, "Two-factor authentication is not enabled.")
+	errTwoFactorEnabled = errs.New(http.StatusConflict, "account.errors.two_factor_enabled")
+	errTwoFactorOff     = errs.New(http.StatusConflict, "account.errors.two_factor_off")
 )
 
 // InvalidTwoFactorCode is the validation error for a wrong code.
 func InvalidTwoFactorCode() error {
-	return errs.NewValidation().Add("code", "The code is invalid.")
+	return errs.NewValidation().Add("code", "account.errors.code_invalid")
 }
 
 // TwoFactor returns the two-factor state of the user.
@@ -165,7 +165,7 @@ func (a *Accounts) CheckTwoFactor(ctx context.Context, userID int64, code, recov
 	}
 
 	if code == "" && recovery == "" {
-		return errs.NewValidation().Add("code", "Enter the code from your authenticator app or a recovery code.")
+		return errs.NewValidation().Add("code", "account.errors.code_required")
 	}
 
 	ok, err := a.VerifyTwoFactor(ctx, userID, code, recovery)

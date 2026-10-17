@@ -4,9 +4,9 @@ import (
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth"
 	"github.com/AlexGalhardo/vukem/router"
-	"github.com/AlexGalhardo/vukem/web"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/account"
 )
 
 // Social registers "sign in with" routes (vukem install:auth --social).
@@ -16,43 +16,13 @@ func Social(r *router.Router, app *vukem.App) error {
 		return err
 	}
 
-	s := accounts.NewSocial(app, "google")
+	L := account.Localized
+	h := account.NewSocial(acc, accounts.NewSocial(app, "google"))
 
-	r.Get("/auth/{provider}/redirect", func(c *web.Ctx) error {
-		return s.Redirect(c, c.Param("provider"))
-	}).Name("social.redirect").Use(auth.Guest(acc.Web))
-
-	callback := func(c *web.Ctx) error {
-		su, err := s.User(c, c.Param("provider"))
-		if err != nil {
-			return err
-		}
-
-		u, err := acc.FindOrCreateFromSocial(c.Context(), su)
-		if err != nil {
-			return err
-		}
-
-		// Users with two-factor authentication enter a code first (vukem install:auth --2fa).
-		pending, err := acc.StartTwoFactorChallenge(c, u, false)
-		if err != nil {
-			return err
-		}
-
-		if pending {
-			return c.Redirect("/two-factor-challenge")
-		}
-
-		if err := acc.Web.Login(c, u); err != nil {
-			return err
-		}
-
-		return c.Redirect("/dashboard")
-	}
-
-	r.Get("/auth/{provider}/callback", callback).Name("social.callback")
+	r.Get("/auth/{provider}/redirect", L(h.Redirect)).Name("social.redirect").Use(auth.Guest(acc.Web))
+	r.Get("/auth/{provider}/callback", L(h.Callback)).Name("social.callback")
 	// Apple answers with response_mode=form_post.
-	r.Post("/auth/{provider}/callback", callback)
+	r.Post("/auth/{provider}/callback", L(h.Callback))
 
 	return nil
 }

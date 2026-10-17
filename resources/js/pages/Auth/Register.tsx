@@ -1,9 +1,12 @@
 import { Head, Link, useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import { button, card, heading, link } from "../../components/ui";
+import { useT } from "../../lib/i18n";
 
-export default function Register() {
+export default function Register(): JSX.Element {
+	const { t } = useT();
 	const form = useForm({ name: "", email: "", password: "", password_confirmation: "" });
 
 	const submit = (e: FormEvent) => {
@@ -12,12 +15,12 @@ export default function Register() {
 	};
 
 	return (
-		<>
-			<Head title="Create an account" />
-			<h1 className="mb-4 text-2xl font-semibold">Create an account</h1>
+		<section className={card}>
+			<Head title={t("account.register.title")} />
+			<h1 className={heading}>{t("account.register.title")}</h1>
 			<form onSubmit={submit} className="space-y-4">
 				<Field
-					label="Name"
+					label={t("account.common.name")}
 					autoComplete="name"
 					required
 					value={form.data.name}
@@ -25,7 +28,7 @@ export default function Register() {
 					error={form.errors.name}
 				/>
 				<Field
-					label="Email"
+					label={t("account.common.email")}
 					type="email"
 					autoComplete="email"
 					required
@@ -34,7 +37,7 @@ export default function Register() {
 					error={form.errors.email}
 				/>
 				<Field
-					label="Password (at least 12 characters)"
+					label={t("account.register.password")}
 					type="password"
 					autoComplete="new-password"
 					minLength={12}
@@ -44,7 +47,7 @@ export default function Register() {
 					error={form.errors.password}
 				/>
 				<Field
-					label="Confirm password"
+					label={t("account.common.confirm_password")}
 					type="password"
 					autoComplete="new-password"
 					required
@@ -52,19 +55,15 @@ export default function Register() {
 					onChange={(e) => form.setData("password_confirmation", e.target.value)}
 					error={form.errors.password_confirmation}
 				/>
-				<button
-					type="submit"
-					disabled={form.processing}
-					className="rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-				>
-					Create account
+				<button type="submit" disabled={form.processing} className={button}>
+					{t("account.register.submit")}
 				</button>
 			</form>
 			<p className="mt-6 text-sm">
-				<Link href="/login" className="text-indigo-600 hover:underline dark:text-indigo-400">
-					Already registered?
+				<Link href="/login" className={link}>
+					{t("account.register.have_account")}
 				</Link>
 			</p>
-		</>
+		</section>
 	);
 }

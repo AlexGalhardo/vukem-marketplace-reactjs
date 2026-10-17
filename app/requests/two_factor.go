@@ -23,7 +23,7 @@ var TwoFactorChallengeSchema = z.Struct[TwoFactorChallenge](z.Shape{
 	"recovery_code": z.String().Trim().Max(32).Optional(),
 }).Refine(func(r TwoFactorChallenge) error {
 	if r.Code == "" && r.RecoveryCode == "" {
-		return z.FieldError("code", "Enter the code from your authenticator app or a recovery code.")
+		return z.FieldError("code", MsgCodeRequired)
 	}
 
 	return nil

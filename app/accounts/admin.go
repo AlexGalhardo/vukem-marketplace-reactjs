@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/web"
 
@@ -48,7 +49,7 @@ func (a *Accounts) RequireAdmin(next http.Handler) http.Handler {
 
 		tf, err := a.TwoFactor(r.Context(), u.ID)
 		if err != nil || !tf.Enabled() {
-			_ = c.Flash("status", "Administrators must enable two-factor authentication.")
+			_ = c.Flash("status", i18n.T(r.Context(), "account.flash.admin_needs_two_factor"))
 			_ = c.Redirect("/user/two-factor")
 
 			return

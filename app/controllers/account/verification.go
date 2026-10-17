@@ -31,14 +31,14 @@ func (h *Handlers) Verify(c *web.Ctx) error {
 	}
 
 	if c.Param("id") != u.AuthID() {
-		return errs.New(403, "This verification link belongs to another account.")
+		return errs.New(403, "account.errors.verify_other_account")
 	}
 
 	if err := h.a.MarkVerified(c.Context(), h.a.DB, &u); err != nil {
 		return err
 	}
 
-	inertia.Flash(c, "status", "Your email address is verified.")
+	flash(c, "account.flash.email_verified")
 
 	return c.Redirect("/dashboard")
 }
@@ -54,7 +54,7 @@ func (h *Handlers) Resend(c *web.Ctx) error {
 		return err
 	}
 
-	inertia.Flash(c, "status", "A new verification link was sent.")
+	flash(c, "account.flash.verification_sent")
 
 	return c.Redirect("/email/verify")
 }

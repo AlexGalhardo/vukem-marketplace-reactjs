@@ -67,9 +67,13 @@ func TestAdminAreaRequiresAdminAndTwoFactor(t *testing.T) {
 	makeAdmin(t, app, "admin1@example.com")
 	noTwoFactor.Get("/admin").AssertRedirect("/user/two-factor")
 
-	// Admin with confirmed 2FA: allowed.
+	// Admin with confirmed 2FA but no verified email: sent to verify it.
 	withTwoFactor := app.Client(t).Inertia("")
 	enableTwoFactor(t, app, withTwoFactor, "admin2@example.com")
 	makeAdmin(t, app, "admin2@example.com")
+	withTwoFactor.Get("/admin").AssertRedirect("/email/verify")
+
+	// Admin with confirmed 2FA and a verified email: allowed.
+	withTwoFactor.Get(link(t, app, "admin2@example.com")).AssertRedirect("/dashboard")
 	withTwoFactor.Get("/admin").AssertOK().AssertInertia("Admin/Dashboard")
 }

@@ -32,7 +32,7 @@ var RegisterSchema = z.Struct[Register](z.Shape{
 	"password_confirmation": z.String(),
 }).Refine(func(r Register) error {
 	if r.Password != r.PasswordConfirmation {
-		return z.FieldError("password_confirmation", "The password confirmation does not match.")
+		return z.FieldError("password_confirmation", MsgPasswordMismatch)
 	}
 
 	return nil
@@ -62,7 +62,7 @@ var ResetPasswordSchema = z.Struct[ResetPassword](z.Shape{
 	"password_confirmation": z.String(),
 }).Refine(func(r ResetPassword) error {
 	if r.Password != r.PasswordConfirmation {
-		return z.FieldError("password_confirmation", "The password confirmation does not match.")
+		return z.FieldError("password_confirmation", MsgPasswordMismatch)
 	}
 
 	return nil

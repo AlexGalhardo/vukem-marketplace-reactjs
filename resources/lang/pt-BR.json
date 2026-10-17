@@ -83,5 +83,168 @@
 			"shop:read": "Ler sua loja",
 			"shop:write": "Gerenciar sua loja"
 		}
+	},
+	"account": {
+		"nav": {
+			"account": "Minha conta",
+			"dashboard": "Painel"
+		},
+		"common": {
+			"email": "E-mail",
+			"password": "Senha",
+			"current_password": "Senha atual",
+			"new_password": "Nova senha (mínimo de 12 caracteres)",
+			"confirm_password": "Confirme a senha",
+			"name": "Nome",
+			"save": "Salvar",
+			"back_dashboard": "Voltar ao painel"
+		},
+		"login": {
+			"title": "Entrar",
+			"remember": "Lembrar de mim",
+			"submit": "Entrar",
+			"forgot": "Esqueceu a senha?",
+			"register": "Criar uma conta"
+		},
+		"register": {
+			"title": "Criar uma conta",
+			"password": "Senha (mínimo de 12 caracteres)",
+			"submit": "Criar conta",
+			"have_account": "Já tem cadastro?"
+		},
+		"forgot": {
+			"title": "Esqueceu a senha?",
+			"intro": "Enviaremos por e-mail um link para você escolher uma nova.",
+			"submit": "Enviar link de redefinição"
+		},
+		"reset": {
+			"title": "Escolha uma nova senha",
+			"submit": "Redefinir senha"
+		},
+		"verify": {
+			"title": "Confirme seu e-mail",
+			"body": "Enviamos um link para {email}. Abra-o para confirmar seu endereço.",
+			"resend": "Enviar o link novamente"
+		},
+		"two_factor": {
+			"title": "Autenticação em dois fatores",
+			"on": "A autenticação em dois fatores está ativa: o login pede um código do seu app autenticador.",
+			"store_codes": "Guarde estes códigos de recuperação em um lugar seguro.",
+			"store_codes_body": "Cada um funciona uma vez se você perder seu aparelho; eles não serão mostrados de novo.",
+			"codes_left": "Você tem {count} códigos de recuperação restantes.",
+			"regenerate": "Gerar novos códigos de recuperação",
+			"turn_off": "Desativar",
+			"disable": "Desativar a autenticação em dois fatores",
+			"scan": "Escaneie este QR code com seu app autenticador, ou digite a chave manualmente, e informe o código exibido.",
+			"qr_alt": "QR code da autenticação em dois fatores",
+			"setup_key": "Chave de configuração:",
+			"code": "Código",
+			"confirm": "Confirmar",
+			"intro": "Adicione uma segunda etapa ao login: um código de um app autenticador no seu celular.",
+			"enable": "Ativar a autenticação em dois fatores"
+		},
+		"challenge": {
+			"title": "Autenticação em dois fatores",
+			"enter_code": "Digite o código do seu app autenticador.",
+			"enter_recovery": "Digite um dos seus códigos de recuperação.",
+			"recovery_code": "Código de recuperação",
+			"submit": "Entrar",
+			"use_app": "Usar um código do app autenticador",
+			"use_recovery": "Perdeu o aparelho? Use um código de recuperação"
+		},
+		"dashboard": {
+			"title": "Painel",
+			"hello": "Olá, {name}",
+			"verified": "Seu e-mail está confirmado.",
+			"verify": "Confirme seu e-mail",
+			"settings": "Configurações da conta"
+		},
+		"profile": {
+			"title": "Minha conta",
+			"heading": "Perfil",
+			"password_hint": "Necessária apenas para trocar o e-mail.",
+			"unverified": "Seu e-mail ainda não foi confirmado.",
+			"resend": "Enviar o link de confirmação novamente",
+			"security": "Segurança: senha, autenticação em dois fatores e sessões"
+		},
+		"security": {
+			"title": "Segurança",
+			"password_title": "Trocar senha",
+			"password_submit": "Trocar senha",
+			"two_factor_title": "Autenticação em dois fatores",
+			"two_factor_on": "Ativa. {count} códigos de recuperação restantes.",
+			"two_factor_off": "Desativada. Recomendamos ativá-la.",
+			"two_factor_manage": "Gerenciar a autenticação em dois fatores",
+			"sessions_title": "Outras sessões",
+			"sessions_body": "Saia de todos os outros navegadores e aparelhos conectados à sua conta. Logins lembrados também são esquecidos.",
+			"sessions_submit": "Sair das outras sessões",
+			"back_profile": "Voltar para minha conta"
+		},
+		"flash": {
+			"reset_link_sent": "Se esse e-mail tiver uma conta, enviamos um link para redefinir a senha.",
+			"password_reset": "Sua senha foi redefinida. Você já pode entrar.",
+			"email_verified": "Seu e-mail foi confirmado.",
+			"verification_sent": "Enviamos um novo link de confirmação.",
+			"two_factor_on": "A autenticação em dois fatores está ativa.",
+			"two_factor_off": "A autenticação em dois fatores foi desativada.",
+			"login_expired": "Seu login expirou. Entre novamente.",
+			"admin_needs_two_factor": "Administradores precisam ativar a autenticação em dois fatores.",
+			"profile_updated": "Seu perfil foi salvo.",
+			"email_changed": "Seu e-mail foi alterado. Abra o link que enviamos para o novo endereço para confirmá-lo.",
+			"password_changed": "Sua senha foi alterada. Suas outras sessões foram encerradas.",
+			"other_sessions_ended": "Suas outras sessões foram encerradas."
+		},
+		"errors": {
+			"credentials": "Essas credenciais não correspondem aos nossos registros.",
+			"reset_invalid": "Este link de redefinição de senha é inválido ou expirou.",
+			"password_incorrect": "A senha está incorreta.",
+			"password_mismatch": "A confirmação da senha não confere.",
+			"password_required_for_email": "Informe sua senha atual para trocar o e-mail.",
+			"email_taken": "Este e-mail já está em uso.",
+			"code_invalid": "O código é inválido.",
+			"recovery_invalid": "O código de recuperação é inválido.",
+			"code_required": "Digite o código do app autenticador ou um código de recuperação.",
+			"two_factor_enabled": "A autenticação em dois fatores já está ativa.",
+			"two_factor_off": "A autenticação em dois fatores não está ativa.",
+			"verify_other_account": "Este link de confirmação pertence a outra conta.",
+			"unverified": "Seu e-mail não foi confirmado.",
+			"social_no_email": "O provedor de login não compartilhou um endereço de e-mail.",
+			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro.",
+			"social_state": "A tentativa de login expirou ou é inválida. Tente novamente.",
+			"social_denied": "O login foi cancelado."
+		},
+		"mail": {
+			"hello": "Olá {name},",
+			"verify_subject": "Confirme seu endereço de e-mail",
+			"verify_body": "Confirme seu endereço de e-mail:",
+			"verify_action": "Confirmar e-mail",
+			"verify_expiry": "O link expira em uma hora.",
+			"reset_subject": "Redefina sua senha",
+			"reset_body": "Alguém pediu para redefinir sua senha. Se foi você:",
+			"reset_action": "Redefinir senha",
+			"reset_expiry": "O link expira em uma hora e funciona uma única vez. Se não foi você, ignore este e-mail."
+		}
+	},
+	"validation": {
+		"required": "O campo {field} é obrigatório.",
+		"too_small": {
+			"string": "O campo {field} deve ter pelo menos {min} caracteres."
+		},
+		"too_big": {
+			"string": "O campo {field} não pode ter mais de {max} caracteres."
+		},
+		"string": {
+			"email": "O campo {field} deve ser um e-mail válido."
+		},
+		"attributes": {
+			"name": "nome",
+			"email": "e-mail",
+			"password": "senha",
+			"password_confirmation": "confirmação da senha",
+			"current_password": "senha atual",
+			"code": "código",
+			"recovery_code": "código de recuperação",
+			"token": "token"
+		}
 	}
 }

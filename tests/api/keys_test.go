@@ -171,7 +171,7 @@ func TestKeysInvalidTokensLookAlike(t *testing.T) {
 	}
 
 	// A bad Authorization header is a 401 even with a valid session.
-	app.Client(t).ActingAs("web", u).WithHeader("Authorization", apifixture.Bearer("mkt_nope")).
+	apifixture.ActingAs(t, app, app.Client(t), u).WithHeader("Authorization", apifixture.Bearer("mkt_nope")).
 		GetJSON("/api/v1/cart/items").AssertProblem(401)
 }
 
@@ -268,7 +268,7 @@ func TestKeysAccountPage(t *testing.T) {
 
 	app := apifixture.NewApp(t, nil)
 	u := apifixture.MakeUser(t, app, "ana@example.com")
-	c := app.Client(t).Inertia("").ActingAs("web", u)
+	c := apifixture.ActingAs(t, app, app.Client(t).Inertia(""), u)
 
 	app.Client(t).Inertia("").Get("/account/api-keys").AssertRedirect("/login")
 
@@ -321,13 +321,13 @@ func TestKeysRevokeIsOwnerScoped(t *testing.T) {
 	path := "/account/api-keys/" + strconv.FormatInt(key.ID, 10)
 
 	// Bia cannot see or revoke Ana's key: same 404 as a missing one.
-	app.Client(t).Inertia("").ActingAs("web", bia).Delete(path).AssertNotFound()
-	app.Client(t).Inertia("").ActingAs("web", bia).Delete("/account/api-keys/999999").AssertNotFound()
-	app.Client(t).Inertia("").ActingAs("web", bia).Get("/account/api-keys").
+	apifixture.ActingAs(t, app, app.Client(t).Inertia(""), bia).Delete(path).AssertNotFound()
+	apifixture.ActingAs(t, app, app.Client(t).Inertia(""), bia).Delete("/account/api-keys/999999").AssertNotFound()
+	apifixture.ActingAs(t, app, app.Client(t).Inertia(""), bia).Get("/account/api-keys").
 		AssertInertia("Account/ApiKeys").PropEquals("keys", []any{})
 	app.Client(t).WithHeader("Authorization", apifixture.Bearer(tok)).GetJSON("/api/v1/cart/items").AssertOK()
 
-	app.Client(t).Inertia("").ActingAs("web", ana).Delete(path).AssertRedirect("/account/api-keys")
+	apifixture.ActingAs(t, app, app.Client(t).Inertia(""), ana).Delete(path).AssertRedirect("/account/api-keys")
 	app.Client(t).WithHeader("Authorization", apifixture.Bearer(tok)).GetJSON("/api/v1/cart/items").AssertProblem(401)
 }
 
@@ -356,7 +356,7 @@ func TestKeysSessionCallersNeedSameOrigin(t *testing.T) {
 
 	app := apifixture.NewApp(t, nil)
 	f := apifixture.SeedCatalog(t, app)
-	c := app.Client(t).ActingAs("web", f.Carl)
+	c := apifixture.ActingAs(t, app, app.Client(t), f.Carl)
 
 	c.GetJSON("/api/v1/cart/items").AssertOK()
 
@@ -365,6 +365,6 @@ func TestKeysSessionCallersNeedSameOrigin(t *testing.T) {
 		PostJSON("/api/v1/cart/items", map[string]any{"product": f.Cheap, "quantity": 1}).AssertForbidden()
 	vukemtest.AssertDatabaseCount(t, app, "cart_items", 0)
 
-	app.Client(t).ActingAs("web", f.Carl).WithHeader("Sec-Fetch-Site", "same-origin").
+	apifixture.ActingAs(t, app, app.Client(t), f.Carl).WithHeader("Sec-Fetch-Site", "same-origin").
 		PostJSON("/api/v1/cart/items", map[string]any{"product": f.Cheap, "quantity": 1}).AssertCreated()
 }

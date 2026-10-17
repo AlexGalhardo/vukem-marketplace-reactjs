@@ -1,9 +1,12 @@
-import { Head, useForm } from "@inertiajs/react";
-import type { FormEvent } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
+import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import { button, card, heading, link, muted } from "../../components/ui";
+import { useT } from "../../lib/i18n";
 
-export default function ForgotPassword() {
+export default function ForgotPassword(): JSX.Element {
+	const { t } = useT();
 	const form = useForm({ email: "" });
 
 	const submit = (e: FormEvent) => {
@@ -12,13 +15,13 @@ export default function ForgotPassword() {
 	};
 
 	return (
-		<>
-			<Head title="Forgot your password?" />
-			<h1 className="mb-2 text-2xl font-semibold">Forgot your password?</h1>
-			<p className="mb-4 text-zinc-600 dark:text-zinc-400">We will email you a link to choose a new one.</p>
+		<section className={card}>
+			<Head title={t("account.forgot.title")} />
+			<h1 className={heading}>{t("account.forgot.title")}</h1>
+			<p className={`mb-4 ${muted}`}>{t("account.forgot.intro")}</p>
 			<form onSubmit={submit} className="space-y-4">
 				<Field
-					label="Email"
+					label={t("account.common.email")}
 					type="email"
 					autoComplete="email"
 					required
@@ -26,14 +29,15 @@ export default function ForgotPassword() {
 					onChange={(e) => form.setData("email", e.target.value)}
 					error={form.errors.email}
 				/>
-				<button
-					type="submit"
-					disabled={form.processing}
-					className="rounded-md bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-				>
-					Email me a reset link
+				<button type="submit" disabled={form.processing} className={button}>
+					{t("account.forgot.submit")}
 				</button>
 			</form>
-		</>
+			<p className="mt-6 text-sm">
+				<Link href="/login" className={link}>
+					{t("account.login.title")}
+				</Link>
+			</p>
+		</section>
 	);
 }

@@ -56,6 +56,12 @@ export default function AppLayout({ children }: { children: ReactNode }): JSX.El
 									{page.props.auth.user.name}
 								</Link>
 								<Link
+									href="/account"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{t("account.nav.account")}
+								</Link>
+								<Link
 									href="/logout"
 									method="post"
 									as="button"

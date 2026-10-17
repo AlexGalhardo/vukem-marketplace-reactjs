@@ -21,6 +21,7 @@ import (
 // New builds the application; cmd/app and the tests call it.
 func New(opts ...vukem.Option) (*vukem.App, error) {
 	deps := &platform.Deps{}
+	jobBinding := &jobs.Binding{}
 
 	redisOpts, err := platform.RedisOptions(context.Background(), deps)
 	if err != nil {
@@ -33,7 +34,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		vukem.WithMigrations(migrations.All()),
 		vukem.WithSeeders(seeders.All()...),
 		vukem.WithListeners(listeners.All()...),
-		vukem.WithJobs(jobs.All()...),
+		vukem.WithJobs(jobs.All(jobBinding)...),
 		vukem.WithSchedule(routes.Schedule),
 		vukem.WithViews(resources.Views()),
 		vukem.WithVite(resources.Public()),
@@ -54,6 +55,8 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 
 		return nil, err
 	}
+
+	jobBinding.Bind(app)
 
 	if deps.Redis != nil {
 		app.OnShutdown(func(context.Context) error { return deps.Redis.Close() })

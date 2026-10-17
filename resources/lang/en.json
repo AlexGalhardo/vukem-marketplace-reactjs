@@ -83,5 +83,168 @@
 			"shop:read": "Read your shop",
 			"shop:write": "Manage your shop"
 		}
+	},
+	"account": {
+		"nav": {
+			"account": "My account",
+			"dashboard": "Dashboard"
+		},
+		"common": {
+			"email": "Email",
+			"password": "Password",
+			"current_password": "Current password",
+			"new_password": "New password (at least 12 characters)",
+			"confirm_password": "Confirm password",
+			"name": "Name",
+			"save": "Save",
+			"back_dashboard": "Back to the dashboard"
+		},
+		"login": {
+			"title": "Log in",
+			"remember": "Remember me",
+			"submit": "Log in",
+			"forgot": "Forgot your password?",
+			"register": "Create an account"
+		},
+		"register": {
+			"title": "Create an account",
+			"password": "Password (at least 12 characters)",
+			"submit": "Create account",
+			"have_account": "Already registered?"
+		},
+		"forgot": {
+			"title": "Forgot your password?",
+			"intro": "We will email you a link to choose a new one.",
+			"submit": "Email me a reset link"
+		},
+		"reset": {
+			"title": "Choose a new password",
+			"submit": "Reset password"
+		},
+		"verify": {
+			"title": "Verify your email",
+			"body": "We sent a link to {email}. Open it to verify your address.",
+			"resend": "Send the link again"
+		},
+		"two_factor": {
+			"title": "Two-factor authentication",
+			"on": "Two-factor authentication is on: logging in asks for a code from your authenticator app.",
+			"store_codes": "Store these recovery codes somewhere safe.",
+			"store_codes_body": "Each one works once if you lose your device; they are not shown again.",
+			"codes_left": "You have {count} recovery codes left.",
+			"regenerate": "Regenerate recovery codes",
+			"turn_off": "Turn off",
+			"disable": "Disable two-factor authentication",
+			"scan": "Scan this QR code with your authenticator app, or enter the setup key by hand, then type the code it shows.",
+			"qr_alt": "Two-factor QR code",
+			"setup_key": "Setup key:",
+			"code": "Code",
+			"confirm": "Confirm",
+			"intro": "Add a second step to your login: a code from an authenticator app on your phone.",
+			"enable": "Enable two-factor authentication"
+		},
+		"challenge": {
+			"title": "Two-factor authentication",
+			"enter_code": "Enter the code from your authenticator app.",
+			"enter_recovery": "Enter one of your recovery codes.",
+			"recovery_code": "Recovery code",
+			"submit": "Log in",
+			"use_app": "Use a code from your authenticator app",
+			"use_recovery": "Lost your device? Use a recovery code"
+		},
+		"dashboard": {
+			"title": "Dashboard",
+			"hello": "Hello, {name}",
+			"verified": "Your email is verified.",
+			"verify": "Verify your email",
+			"settings": "Account settings"
+		},
+		"profile": {
+			"title": "My account",
+			"heading": "Profile",
+			"password_hint": "Only needed to change your email.",
+			"unverified": "Your email is not verified yet.",
+			"resend": "Send the verification link again",
+			"security": "Security: password, two-factor authentication and sessions"
+		},
+		"security": {
+			"title": "Security",
+			"password_title": "Change password",
+			"password_submit": "Change password",
+			"two_factor_title": "Two-factor authentication",
+			"two_factor_on": "On. {count} recovery codes left.",
+			"two_factor_off": "Off. We recommend turning it on.",
+			"two_factor_manage": "Manage two-factor authentication",
+			"sessions_title": "Other sessions",
+			"sessions_body": "Log out of every other browser and device signed in to your account. Remembered logins are forgotten too.",
+			"sessions_submit": "Log out other sessions",
+			"back_profile": "Back to my account"
+		},
+		"flash": {
+			"reset_link_sent": "If that email has an account, we sent a password reset link.",
+			"password_reset": "Your password was reset. You can log in now.",
+			"email_verified": "Your email address is verified.",
+			"verification_sent": "A new verification link was sent.",
+			"two_factor_on": "Two-factor authentication is on.",
+			"two_factor_off": "Two-factor authentication is off.",
+			"login_expired": "Your login expired. Please log in again.",
+			"admin_needs_two_factor": "Administrators must enable two-factor authentication.",
+			"profile_updated": "Your profile was saved.",
+			"email_changed": "Your email was changed. Open the link we sent to the new address to verify it.",
+			"password_changed": "Your password was changed. Your other sessions were logged out.",
+			"other_sessions_ended": "Your other sessions were logged out."
+		},
+		"errors": {
+			"credentials": "These credentials do not match our records.",
+			"reset_invalid": "This password reset link is invalid or has expired.",
+			"password_incorrect": "The password is incorrect.",
+			"password_mismatch": "The password confirmation does not match.",
+			"password_required_for_email": "Enter your current password to change your email.",
+			"email_taken": "This email is already in use.",
+			"code_invalid": "The code is invalid.",
+			"recovery_invalid": "The recovery code is invalid.",
+			"code_required": "Enter the code from your authenticator app or a recovery code.",
+			"two_factor_enabled": "Two-factor authentication is already enabled.",
+			"two_factor_off": "Two-factor authentication is not enabled.",
+			"verify_other_account": "This verification link belongs to another account.",
+			"unverified": "Your email address is not verified.",
+			"social_no_email": "The sign-in provider did not share an email address.",
+			"social_email_taken": "An account with this email already exists. Log in with your password first.",
+			"social_state": "The sign-in attempt expired or is invalid. Please try again.",
+			"social_denied": "Sign-in was cancelled."
+		},
+		"mail": {
+			"hello": "Hello {name},",
+			"verify_subject": "Verify your email address",
+			"verify_body": "Please confirm your email address:",
+			"verify_action": "Verify email",
+			"verify_expiry": "The link expires in one hour.",
+			"reset_subject": "Reset your password",
+			"reset_body": "Someone asked to reset your password. If it was you:",
+			"reset_action": "Reset password",
+			"reset_expiry": "The link expires in one hour and works once. If you did not ask, ignore this email."
+		}
+	},
+	"validation": {
+		"required": "The {field} field is required.",
+		"too_small": {
+			"string": "The {field} field must be at least {min} characters."
+		},
+		"too_big": {
+			"string": "The {field} field must not be greater than {max} characters."
+		},
+		"string": {
+			"email": "The {field} field must be a valid email address."
+		},
+		"attributes": {
+			"name": "name",
+			"email": "email",
+			"password": "password",
+			"password_confirmation": "password confirmation",
+			"current_password": "current password",
+			"code": "code",
+			"recovery_code": "recovery code",
+			"token": "token"
+		}
 	}
 }
