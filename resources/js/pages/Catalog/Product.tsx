@@ -9,20 +9,21 @@ import Shelf from "../../components/catalog/Shelf";
 import AddToCartButton from "../../components/commerce/AddToCartButton";
 import FreightBox from "../../components/commerce/FreightBox";
 import { ChatIcon, ChevronRightIcon, StoreIcon, TruckIcon } from "../../components/icons";
+import ReviewsSection from "../../components/reviews/ReviewsSection";
 import { useT } from "../../lib/i18n";
-import type { ProductCard, ProductDetail } from "../../types";
+import type { ProductCard, ProductDetail, ReviewsBlock } from "../../types";
 
 interface Props {
 	product: ProductDetail;
 	more: ProductCard[];
+	reviews?: ReviewsBlock;
 }
 
-export default function Product({ product, more }: Props): JSX.Element {
+export default function Product({ product, more, reviews }: Props): JSX.Element {
 	const { t, locale } = useT();
 	const [current, setCurrent] = useState(0);
 	const image = product.images[current];
 	const since = new Intl.DateTimeFormat(locale, { year: "numeric" }).format(new Date(product.shop.since));
-	const avg = product.rating_avg_x100 / 100;
 
 	return (
 		<>
@@ -175,21 +176,16 @@ export default function Product({ product, more }: Props): JSX.Element {
 						</p>
 					</section>
 
-					<section aria-labelledby="reviews-title">
-						<h2 id="reviews-title" className="mb-3 text-xl font-semibold text-ink">
-							{t("storefront.product.reviews")}
-						</h2>
-						{product.rating_count > 0 ? (
-							<div className="flex items-center gap-4">
-								<p aria-hidden="true" className="text-5xl font-normal text-action-600 tabular-nums">
-									{avg.toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
-								</p>
-								<Rating avgX100={product.rating_avg_x100} count={product.rating_count} size="md" />
-							</div>
-						) : (
+					{reviews ? (
+						<ReviewsSection block={reviews} />
+					) : (
+						<section aria-labelledby="reviews-title">
+							<h2 id="reviews-title" className="mb-3 text-xl font-semibold text-ink">
+								{t("storefront.product.reviews")}
+							</h2>
 							<p className="text-muted">{t("storefront.product.no_reviews")}</p>
-						)}
-					</section>
+						</section>
+					)}
 
 					<section aria-labelledby="questions-title">
 						<h2 id="questions-title" className="mb-3 text-xl font-semibold text-ink">

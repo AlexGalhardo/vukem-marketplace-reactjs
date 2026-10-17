@@ -259,3 +259,56 @@ export interface FeatureFlagChange {
 	user_email: string;
 	at: string;
 }
+
+// Reviews (app/reviews, controllers/reviews).
+
+export interface ReviewReply {
+	body: string;
+	at: string;
+}
+
+export interface ReviewView {
+	id: number;
+	rating: number;
+	title: string;
+	body: string;
+	recommend: boolean | null;
+	helpful_count: number;
+	author: string;
+	created_at: string;
+	reply: ReviewReply | null;
+	verified: boolean;
+	own: boolean;
+	voted: boolean;
+}
+
+export interface ReviewsBlock {
+	enabled: boolean;
+	summary: { avg_x100: number; count: number; distribution: number[] };
+	list: Page<ReviewView> & { sort: "newest" | "helpful" };
+	pending_item: number;
+	can_vote: boolean;
+	can_reply: boolean;
+	max_reply: number;
+}
+
+export interface ReviewItem {
+	order_item_id: number;
+	product_id: number;
+	product_slug: string;
+	product_title: string;
+	review_id: number;
+}
+
+export interface AdminReview {
+	id: number;
+	rating: number;
+	title: string;
+	body: string;
+	author: string;
+	product_slug: string;
+	product_title: string;
+	created_at: string;
+	hidden_at: string | null;
+	hidden_reason: string;
+}

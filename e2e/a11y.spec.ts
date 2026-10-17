@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { type BrowserContext, type Cookie, expect, type Page, test } from "@playwright/test";
 
-import { canRunAppCommands, createAdmin, demoPassword, sessionCookies, uniqueEmail } from "./support";
+import { appCommand, canRunAppCommands, createAdmin, demoPassword, sessionCookies, uniqueEmail } from "./support";
 
 // Accessibility: axe-core scans every page and UI state in light and dark
 // themes, EN and PT-BR, on desktop and mobile (the two Playwright
@@ -120,6 +120,31 @@ test.describe("a11y buyer", () => {
 			await page.goto("/checkout/payment");
 			await scan(page, `${combo.theme}/${combo.locale} checkout payment (or its redirect)`);
 		});
+
+		// A paid order (dev:paid-order) makes the demo drill reviewable: the
+		// write link, the form, its errors and the list with vote buttons.
+		test(`review form and list ${combo.theme} ${combo.locale}`, async ({ page, context }) => {
+			test.skip(!canRunAppCommands, "needs the compose app container or E2E_APP_BIN for dev:paid-order");
+			await prepare(context, combo, cookies);
+			appCommand("dev:paid-order", "buyer@example.com", product.replace("/p/", ""));
+
+			await page.goto(product);
+			await scan(page, `${combo.theme}/${combo.locale} product with write link`);
+			await page.locator('a[href^="/order-items/"]').first().click();
+			await expect(page).toHaveURL(/\/order-items\/\d+\/review$/);
+			await scan(page, `${combo.theme}/${combo.locale} review form`);
+
+			await page.locator('main form button[type="submit"]').click();
+			await expect(page.getByRole("alert").first()).toBeVisible();
+			await scan(page, `${combo.theme}/${combo.locale} review form errors`);
+
+			await page.locator('main form input[name="rating"][value="5"]').check({ force: true });
+			await page.locator('main form button[type="submit"]').click();
+			await expect(page).toHaveURL(new RegExp(`${product}$`));
+			await page.getByLabel(/^(Sort by|Ordenar por)$/).selectOption("helpful");
+			await expect(page).toHaveURL(/rsort=helpful/);
+			await scan(page, `${combo.theme}/${combo.locale} product reviews sorted`);
+		});
 	}
 });
 
@@ -142,6 +167,8 @@ test.describe("a11y seller", () => {
 				"/seller/settings",
 				"/seller/payouts",
 				"/seller/webhooks",
+				// The demo seller owns the drill: reply forms under its reviews.
+				product,
 			]);
 
 			await page.goto("/seller/products");
@@ -170,7 +197,13 @@ test.describe("a11y admin", () => {
 	for (const combo of combos) {
 		test(`admin pages ${combo.theme} ${combo.locale}`, async ({ page, context }) => {
 			await prepare(context, combo, cookies);
-			await scanAll(page, combo, ["/admin", "/admin/payouts", "/admin/flags"]);
+			await scanAll(page, combo, [
+				"/admin",
+				"/admin/payouts",
+				"/admin/flags",
+				"/admin/reviews",
+				"/admin/reviews?filter=hidden",
+			]);
 		});
 	}
 });
