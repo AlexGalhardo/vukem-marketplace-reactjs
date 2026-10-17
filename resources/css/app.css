@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* Dark mode follows the .dark class set on <html> before paint (app.html). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Design tokens. Inspired by big LatAm marketplaces (warm yellow header,
+   blue actions) without copying any brand. Components use these tokens,
+   never raw hex values. */
+@theme {
+	--font-sans: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+
+	--color-brand-50: #fffbe6;
+	--color-brand-100: #fff3b0;
+	--color-brand-300: #ffe566;
+	--color-brand-400: #ffdb15;
+	--color-brand-500: #f5cc00;
+	--color-brand-900: #3d3300;
+
+	--color-action-500: #2d6cdf;
+	--color-action-600: #1f57c3;
+	--color-action-700: #17449b;
+
+	--color-success-600: #00a650;
+	--color-danger-600: #d63031;
+
+	--color-surface: #f2f2f2;
+	--color-card: #ffffff;
+	--color-ink: #1f1f1f;
+	--color-muted: #5f5f5f;
+	--color-line: #e2e2e2;
+}
+
+@layer base {
+	.dark {
+		--color-surface: #0f1012;
+		--color-card: #1a1b1e;
+		--color-ink: #ededee;
+		--color-muted: #a1a1a6;
+		--color-line: #2c2d31;
+		--color-action-500: #5b8ef0;
+		--color-action-600: #7aa4f4;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--color-action-500);
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+}
