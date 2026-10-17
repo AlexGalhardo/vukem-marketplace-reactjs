@@ -5,8 +5,6 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"reflect"
-	"strings"
 	"time"
 
 	"github.com/AlexGalhardo/vukem/contrib/graphql"
@@ -274,51 +272,7 @@ func NewGraphQL(svc Services, log *slog.Logger) (*graphql.Schema, error) {
 		}),
 	}
 
-	// workaround(vukem): contrib/graphql default resolver ignores Go names of json-tagged fields
-	opts = append(opts, camelFields[PageMeta]("PageMeta")...)
-	opts = append(opts, camelFields[Shop]("Shop")...)
-	opts = append(opts, camelFields[Product]("Product")...)
-	opts = append(opts, camelFields[ProductDetail]("ProductDetail")...)
-	opts = append(opts, camelFields[Category]("Category")...)
-	opts = append(opts, camelFields[Order]("Order")...)
-	opts = append(opts, camelFields[CartItem]("CartItem")...)
-
 	return graphql.New(sdl, opts...)
-}
-
-// camelFields binds the camelCase GraphQL name of every snake_case json
-// field of T (price_cents → priceCents), so the REST DTOs serve GraphQL
-// unchanged.
-func camelFields[T any](typeName string) []graphql.Option {
-	var opts []graphql.Option
-
-	for _, f := range reflect.VisibleFields(reflect.TypeFor[T]()) {
-		name, _, _ := strings.Cut(f.Tag.Get("json"), ",")
-		if !strings.Contains(name, "_") {
-			continue
-		}
-
-		idx := f.Index
-		opts = append(
-			opts,
-			graphql.Field(typeName, camel(name), func(_ context.Context, p T, _ graphql.NoArgs) (any, error) {
-				return reflect.ValueOf(p).FieldByIndex(idx).Interface(), nil
-			}),
-		)
-	}
-
-	return opts
-}
-
-func camel(snake string) string {
-	parts := strings.Split(snake, "_")
-	for i := 1; i < len(parts); i++ {
-		if parts[i] != "" {
-			parts[i] = strings.ToUpper(parts[i][:1]) + parts[i][1:]
-		}
-	}
-
-	return strings.Join(parts, "")
 }
 
 // GraphQLHandler serves schema over HTTP. Introspection is off unless
