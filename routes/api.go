@@ -3,7 +3,6 @@ package routes
 import (
 	"context"
 	"crypto/tls"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -151,9 +150,13 @@ func grpcRunner(app *vukem.App) error {
 	certFile, keyFile := app.Source.Get("GRPC_TLS_CERT_FILE"), app.Source.Get("GRPC_TLS_KEY_FILE")
 	useTLS := certFile != "" && keyFile != ""
 
+	// Fail closed by not serving gRPC, rather than by refusing to boot: the
+	// web app must stay deployable while the gRPC certificate is pending.
 	if app.Config.IsProduction() && !useTLS && app.Source.Get("GRPC_INSECURE_PLAINTEXT") != "true" {
-		return errors.New("gRPC needs TLS in production: set GRPC_TLS_CERT_FILE and GRPC_TLS_KEY_FILE, " +
-			"GRPC_INSECURE_PLAINTEXT=true when a proxy terminates TLS, or GRPC_PORT=off")
+		app.Log.Error("gRPC disabled: production needs GRPC_TLS_CERT_FILE and GRPC_TLS_KEY_FILE, " +
+			"or GRPC_INSECURE_PLAINTEXT=true when a proxy terminates TLS")
+
+		return nil
 	}
 
 	host := app.Source.Get("HOST")
