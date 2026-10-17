@@ -1,10 +1,13 @@
+// Package alerts is the Telegram ops channel: contact form messages and
+// rate-limited 5xx alerts, both sent from queue jobs through vukem's
+// app.Telegram. Without TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID every send
+// is a no-op.
 package alerts
 
 import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"html"
 	"log/slog"
@@ -14,7 +17,7 @@ import (
 	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
-	"github.com/AlexGalhardo/vukem/config"
+	"github.com/AlexGalhardo/vukem/logging/telegram"
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/web"
@@ -205,8 +208,6 @@ func dbLoader(app *vukem.App) LoadContact {
 	}
 }
 
-var errInsecureAPIURL = errors.New("alerts: TELEGRAM_API_URL must be https in production")
-
 // Provider registers the Telegram jobs and, when Telegram is configured,
 // the 5xx alert middleware. Register it before the route providers.
 type Provider struct {
@@ -216,16 +217,7 @@ type Provider struct {
 
 // Register implements vukem.Provider.
 func (p Provider) Register(app *vukem.App) error {
-	cfg, err := config.Load[TelegramConfig](app.Source)
-	if err != nil {
-		return fmt.Errorf("alerts: %w", err)
-	}
-
-	if app.Config.IsProduction() && !strings.HasPrefix(cfg.APIURL, "https://") {
-		return errInsecureAPIURL
-	}
-
-	tg := NewTelegram(cfg)
+	tg := app.Telegram
 
 	q, err := app.Queue()
 	if err != nil {
@@ -233,7 +225,7 @@ func (p Provider) Register(app *vukem.App) error {
 	}
 
 	if err := q.Register(
-		queue.Handle(func(ctx context.Context, j SendJob) error { return tg.Send(ctx, j.Text) },
+		queue.Handle(func(ctx context.Context, j SendJob) error { return send(ctx, tg, j.Text) },
 			queue.Retries(3), queue.Backoff(queue.Exponential(10*time.Second))),
 		queue.Handle(forwardHandler(tg, dbLoader(app)),
 			queue.Retries(5), queue.Backoff(queue.Exponential(30*time.Second))),
@@ -241,7 +233,7 @@ func (p Provider) Register(app *vukem.App) error {
 		return fmt.Errorf("alerts: %w", err)
 	}
 
-	if !tg.Enabled() {
+	if tg == nil {
 		return nil
 	}
 
@@ -260,9 +252,19 @@ func (p Provider) Register(app *vukem.App) error {
 	return nil
 }
 
-func forwardHandler(tg *Telegram, load LoadContact) func(ctx context.Context, j ForwardContact) error {
+// send delivers htmlText now and returns the delivery error, so the job
+// retries a lost message; it is a no-op when Telegram is not configured.
+func send(ctx context.Context, tg *telegram.Handler, htmlText string) error {
+	if tg == nil {
+		return nil
+	}
+
+	return tg.SendSync(ctx, htmlText)
+}
+
+func forwardHandler(tg *telegram.Handler, load LoadContact) func(ctx context.Context, j ForwardContact) error {
 	return func(ctx context.Context, j ForwardContact) error {
-		if !tg.Enabled() {
+		if tg == nil {
 			return nil
 		}
 
@@ -271,7 +273,7 @@ func forwardHandler(tg *Telegram, load LoadContact) func(ctx context.Context, j 
 			return fmt.Errorf("load contact message %d: %w", j.MessageID, err)
 		}
 
-		return tg.Send(ctx, FormatContact(m))
+		return send(ctx, tg, FormatContact(m))
 	}
 }
 
@@ -289,4 +291,14 @@ func cacheAllow(app *vukem.App) func(ctx context.Context, key string, ttl time.D
 
 		return c.Store().Add(ctx, key, []byte("1"), ttl)
 	}
+}
+
+// truncate cuts s to at most n runes.
+func truncate(s string, n int) string {
+	r := []rune(s)
+	if len(r) <= n {
+		return s
+	}
+
+	return string(r[:n-1]) + "…"
 }

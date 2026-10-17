@@ -13,7 +13,8 @@ import (
 	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
-	"github.com/AlexGalhardo/vukem/config"
+	"github.com/AlexGalhardo/vukem/logging/telegram"
+	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 	"github.com/AlexGalhardo/vukem/web"
@@ -75,16 +76,38 @@ func (f *fakeTelegram) messages() []sent {
 	return append([]sent(nil), f.msgs...)
 }
 
-func client(url string) *alerts.Telegram {
-	return alerts.NewTelegram(alerts.TelegramConfig{BotToken: config.NewSecret(token), ChatID: "-100", APIURL: url})
+// telegramApp boots the app with Telegram pointed at url; log records are
+// not forwarded (TELEGRAM_LOG=false), so only the alerts jobs post.
+func telegramApp(t *testing.T, url string, opts ...vukem.Option) *vukemtest.App {
+	t.Helper()
+
+	return vukemtest.New(t, bootstrap.New, vukemtest.Options{
+		Env: map[string]string{
+			"TELEGRAM_BOT_TOKEN": token,
+			"TELEGRAM_CHAT_ID":   "-100",
+			"TELEGRAM_LOG":       "false",
+		},
+		AppOptions: append(opts, vukem.WithTelegram(func(c *telegram.Config) { c.BaseURL = url })),
+	})
 }
 
-func TestTelegramSend(t *testing.T) {
+func dispatch(t *testing.T, app *vukemtest.App, j queue.Job) error {
+	t.Helper()
+
+	q, err := app.Queue()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return q.Dispatch(t.Context(), j)
+}
+
+func TestSendJobDeliversSynchronously(t *testing.T) {
 	t.Parallel()
 
 	f := newFakeTelegram(t)
 
-	if err := client(f.URL).Send(t.Context(), "<b>hi</b>"); err != nil {
+	if err := dispatch(t, telegramApp(t, f.URL), alerts.SendJob{Text: "<b>hi</b>"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -94,44 +117,38 @@ func TestTelegramSend(t *testing.T) {
 	}
 }
 
-func TestTelegramErrorsNeverContainTheToken(t *testing.T) {
+// The job must see the delivery error, or the queue could never retry a
+// lost alert; the error must not carry the bot token.
+func TestSendJobReturnsTheDeliveryErrorWithoutTheToken(t *testing.T) {
 	t.Parallel()
 
 	f := newFakeTelegram(t)
 	f.status = http.StatusInternalServerError
 
-	err := client(f.URL).Send(t.Context(), "x")
-	if !errors.Is(err, alerts.ErrTelegramStatus) {
-		t.Fatalf("err = %v, want ErrTelegramStatus", err)
-	}
-
 	down := httptest.NewServer(http.NotFoundHandler())
 	down.Close()
 
-	errDown := client(down.URL).Send(t.Context(), "x")
-	if errDown == nil {
-		t.Fatal("send to a closed server succeeded")
-	}
+	for _, url := range []string{f.URL, down.URL} {
+		err := dispatch(t, telegramApp(t, url), alerts.SendJob{Text: "x"})
+		if err == nil {
+			t.Fatalf("send to %s succeeded, want an error", url)
+		}
 
-	for _, e := range []error{err, errDown} {
-		if strings.Contains(e.Error(), "SECRET") {
-			t.Errorf("error leaks the bot token: %v", e)
+		if strings.Contains(err.Error(), "SECRET") {
+			t.Errorf("error leaks the bot token: %v", err)
 		}
 	}
 }
 
-func TestTelegramDisabledWithoutConfig(t *testing.T) {
+func TestJobsAreNoOpsWithoutTelegram(t *testing.T) {
 	t.Parallel()
 
-	f := newFakeTelegram(t)
-	tg := alerts.NewTelegram(alerts.TelegramConfig{APIURL: f.URL})
+	app := vukemtest.New(t, bootstrap.New)
 
-	if tg.Enabled() {
-		t.Fatal("enabled without token and chat")
-	}
-
-	if err := tg.Send(t.Context(), "x"); err != nil || len(f.messages()) != 0 {
-		t.Fatalf("disabled client sent: err=%v msgs=%v", err, f.messages())
+	for _, j := range []queue.Job{alerts.SendJob{Text: "x"}, alerts.ForwardContact{MessageID: 1}} {
+		if err := dispatch(t, app, j); err != nil {
+			t.Errorf("%s without Telegram: %v", j.Kind(), err)
+		}
 	}
 }
 
@@ -221,22 +238,12 @@ func TestServerErrorsAlertTelegramOnceWithoutRequestData(t *testing.T) {
 
 	f := newFakeTelegram(t)
 
-	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{
-		Env: map[string]string{
-			"TELEGRAM_BOT_TOKEN": token,
-			"TELEGRAM_CHAT_ID":   "-100",
-			"TELEGRAM_API_URL":   f.URL,
-			// workaround(vukem): keeps vukem's own Telegram log handler (same
-			// env vars) from posting every error log to the real Bot API.
-			"TELEGRAM_MIN_LEVEL": "ERROR+8",
-		},
-		AppOptions: []vukem.Option{vukem.WithRoutes(func(r *router.Router, _ *vukem.App) error {
-			r.Post("/boom/{id}", func(*web.Ctx) error { panic("db password is hunter2") })
-			r.Get("/fail", func(*web.Ctx) error { return errors.New("upstream said hunter2") })
+	app := telegramApp(t, f.URL, vukem.WithRoutes(func(r *router.Router, _ *vukem.App) error {
+		r.Post("/boom/{id}", func(*web.Ctx) error { panic("db password is hunter2") })
+		r.Get("/fail", func(*web.Ctx) error { return errors.New("upstream said hunter2") })
 
-			return nil
-		})},
-	})
+		return nil
+	}))
 
 	c := app.Client(t).WithHeader("Authorization", "Bearer hunter2-token")
 

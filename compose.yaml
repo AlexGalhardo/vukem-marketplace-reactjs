@@ -29,6 +29,9 @@ services:
       S3_USE_PATH_STYLE: "true"
       S3_INSECURE_HTTP: "true"
       LOG_FORMAT: json
+      # Telegram (when TELEGRAM_BOT_TOKEN/CHAT_ID are added) sends only the
+      # alerts and contact jobs, never forwarded error logs.
+      TELEGRAM_LOG: "false"
       # The worker and scheduler services below do this work, so serve
       # does not run them in process (the single-service default).
       QUEUE_IN_SERVE: "false"
