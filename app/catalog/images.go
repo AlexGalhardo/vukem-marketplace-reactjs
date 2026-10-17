@@ -86,6 +86,15 @@ func imageURL(key string, processed bool, width int) string {
 	return "/media/" + variantPath(key, width)
 }
 
+// VariantKey is the stored object of the width variant of a processed
+// image key.
+func VariantKey(key string, width int) string { return variantPath(key, width) }
+
+// SharedDir holds placeholder images that many demo products share
+// (database/seeders); no product has id 0. Deleting one product's image
+// must not remove them, so deleteObject keeps everything under it.
+const SharedDir = "products/0"
+
 // MediaURL is the public URL of the width variant of a processed product
 // image key (served by the media route; the bucket itself stays private).
 func MediaURL(key string, width int) string { return imageURL(key, true, width) }
@@ -257,6 +266,10 @@ func (s *Service) logoThumbnail(ctx context.Context, job ThumbnailJob) error {
 // deleteObject removes one object; failures only leave an orphan behind,
 // so they are logged, not returned.
 func (s *Service) deleteObject(ctx context.Context, p string) {
+	if strings.HasPrefix(p, SharedDir+"/") {
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
 	defer cancel()
 

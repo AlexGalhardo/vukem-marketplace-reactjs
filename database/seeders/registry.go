@@ -13,6 +13,7 @@ func All() []vukem.AppSeeder {
 		Users{},
 		db("Categories", Categories{}),
 		DemoShop{},
+		DemoCatalog{},
 		db("FreightRates", FreightRates{}),
 	}
 }
