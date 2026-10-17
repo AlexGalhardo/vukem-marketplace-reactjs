@@ -102,6 +102,19 @@ jobs:
       MAILTRAP_SANDBOX_ID: ${{ secrets.MAILTRAP_SANDBOX_ID }}
       SMTP_USERNAME: ${{ secrets.MAILTRAP_SMTP_USERNAME }}
       SMTP_PASSWORD: ${{ secrets.MAILTRAP_SMTP_PASSWORD }}
+      # Provider sandboxes: each test skips when its secret is absent.
+      ABACATEPAY_API_KEY: ${{ secrets.ABACATEPAY_API_KEY }}
+      ABACATEPAY_WEBHOOK_SECRET: ${{ secrets.ABACATEPAY_WEBHOOK_SECRET }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+      STRIPE_WEBHOOK_SECRETS: ${{ secrets.STRIPE_WEBHOOK_SECRETS }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    # The Mailtrap free plan has one sandbox shared with other apps: never
+    # run two email suites at once.
+    concurrency:
+      group: mailtrap-sandbox
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-go@v7.0.0
