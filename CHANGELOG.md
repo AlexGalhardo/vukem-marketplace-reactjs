@@ -21,6 +21,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- vukem bumped to v0.23.0 and `drivers/postgres` to v0.4.0 (outgoing webhooks, `contrib/imaging`, shared rate limits via `RATE_LIMIT_STORE`, `key:generate`).
 - MongoDB database name comes from `MONGO_DATABASE`, else the `MONGO_URL` path, else `marketplace`, so Railway's plugin URL (no path) works unchanged.
 - vukem bumped to v0.22.0: read-only visits no longer create sessions, and `vukemtest` sends the asset version from `Inertia("")` (local test helper removed).
 
