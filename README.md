@@ -1,6 +1,6 @@
 # Vukem Marketplace
 
-A mini marketplace inspired by Mercado Livre's layout (not affiliated, no brand assets), built with the [vukem](https://github.com/AlexGalhardo/vukem) Go framework, Inertia v3, React 19, Base UI and Tailwind v4. Live (soon): <https://marketplace.vukem.com>.
+A mini marketplace inspired by Mercado Livre's layout (not affiliated, no brand assets), built with the [vukem](https://github.com/AlexGalhardo/vukem) Go framework, Inertia v3, React 19, Base UI and Tailwind v4. Live (soon): <https://marketplace.vukem.dev>.
 
 Buyers browse shops, fill a multi-seller cart and pay with card (Stripe Connect Express, test mode) or PIX (AbacatePay sandbox). Sellers list products and ship orders; admins moderate. It is also the flagship battle test for vukem 1.0.
 

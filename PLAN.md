@@ -4,9 +4,9 @@ Main onboarding file for every session and agent. Read this first, then `AGENTS.
 
 ## 1. Briefing
 
-A mini marketplace inspired by Mercado Livre's layout (never its brand), live at <https://marketplace.vukem.com>. Buyers browse shops and products, fill a multi-seller cart, pay with card (Stripe Connect Express) or PIX (AbacatePay), and follow their orders in real time. Sellers open a shop, list products with images, ship orders and get paid. Admins moderate.
+A mini marketplace inspired by Mercado Livre's layout (never its brand), live at <https://marketplace.vukem.dev>. Buyers browse shops and products, fill a multi-seller cart, pay with card (Stripe Connect Express) or PIX (AbacatePay), and follow their orders in real time. Sellers open a shop, list products with images, ship orders and get paid. Admins moderate.
 
-It is also the **flagship battle test for vukem 1.0** (<https://github.com/AlexGalhardo/vukem>, docs <https://vukem.vercel.app>): every vukem bug, missing feature, awkward API, security issue or docs problem goes to `../framework-feedback/marketplace.md` (rule: `.claude/rules/framework-feedback.md`), with a local workaround tagged `// workaround(vukem): <entry title>`.
+It is also the **flagship battle test for vukem 1.0** (<https://github.com/AlexGalhardo/vukem>, docs <https://vukem.dev>): every vukem bug, missing feature, awkward API, security issue or docs problem goes to `../framework-feedback/marketplace.md` (rule: `.claude/rules/framework-feedback.md`), with a local workaround tagged `// workaround(vukem): <entry title>`.
 
 Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only at `../_reference-nuxt-marketplace`). This project reaches feature parity with it (section 11 maps every feature) and adds auth hardening, PIX, i18n, three data stores, three API styles and the framework showcase items.
 
@@ -86,7 +86,7 @@ compose.yaml, Dockerfile    local stack and production image
 
 | Port | What | Local (compose host port) | Railway |
 | --- | --- | --- | --- |
-| 3000 | HTTP: Inertia pages, REST `/api/v1`, GraphQL `/graphql`, webhooks, SSE | 3200 | public domain `marketplace.vukem.com` |
+| 3000 | HTTP: Inertia pages, REST `/api/v1`, GraphQL `/graphql`, webhooks, SSE | 3200 | public domain `marketplace.vukem.dev` |
 | 50051 | gRPC (`contrib/grpc`) | 50061 | TCP proxy (`*.proxy.rlwy.net:<port>`) |
 | 5432 / 6379 / 27017 | Postgres / Redis / Mongo | 5442 / 6389 / 27027 | private network |
 | 9000 / 9001 | RustFS S3 / console | 9200 / 9201 | Railway bucket |
@@ -349,8 +349,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 ### D — Deploy and release
 
 - [ ] D.1 Railway: services (app, worker, scheduler), Postgres, Redis, Mongo, bucket, TCP proxy for gRPC, healthcheck `/ready`, env vars
-  → verify: `curl https://marketplace.vukem.com/ready` = ok
-- [ ] D.2 DNS `marketplace.vukem.com`, HTTPS, Stripe/AbacatePay webhook endpoints registered
+  → verify: `curl https://marketplace.vukem.dev/ready` = ok
+- [ ] D.2 DNS `marketplace.vukem.dev`, HTTPS, Stripe/AbacatePay webhook endpoints registered
   → verify: provider dashboards show 2xx deliveries
 - [ ] D.3 `v1.0.0` release (CHANGELOG, tag, GHCR image)
   → verify: `gh release view v1.0.0`
@@ -360,14 +360,14 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 | What | Where it goes | Notes |
 | --- | --- | --- |
 | Stripe **test** secret + publishable keys; enable Connect (Express); platform account country (BR for BRL card charges) | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` | restricted key preferred; confirm the platform can create Express accounts in test mode |
-| Stripe webhook endpoints (platform + Connect) → `https://marketplace.vukem.com/webhooks/stripe` | `STRIPE_WEBHOOK_SECRETS` (comma-separated) | local: `stripe listen --forward-to localhost:3200/webhooks/stripe` |
+| Stripe webhook endpoints (platform + Connect) → `https://marketplace.vukem.dev/webhooks/stripe` | `STRIPE_WEBHOOK_SECRETS` (comma-separated) | local: `stripe listen --forward-to localhost:3200/webhooks/stripe` |
 | AbacatePay sandbox API key (permissions: transparents create/simulate, webhooks) + webhook secret | `ABACATEPAY_API_KEY`, `ABACATEPAY_WEBHOOK_SECRET` | webhook URL must be public HTTPS (staging) |
-| Google OAuth client (Web), redirect `https://marketplace.vukem.com/auth/google/callback` and `http://localhost:3200/auth/google/callback` | `SOCIAL_GOOGLE_CLIENT_ID`, `SOCIAL_GOOGLE_CLIENT_SECRET` | |
+| Google OAuth client (Web), redirect `https://marketplace.vukem.dev/auth/google/callback` and `http://localhost:3200/auth/google/callback` | `SOCIAL_GOOGLE_CLIENT_ID`, `SOCIAL_GOOGLE_CLIENT_SECRET` | |
 | Mailtrap Email Sandbox: API token, account id, sandbox (inbox) id, SMTP credentials | `MAILTRAP_API_TOKEN`, `MAILTRAP_ACCOUNT_ID`, `MAILTRAP_SANDBOX_ID`, `SMTP_USERNAME`, `SMTP_PASSWORD` (host `sandbox.smtp.mailtrap.io:2525`) | also as GitHub Actions secrets for e2e email specs; optional MCP: `claude mcp add mailtrap -e MAILTRAP_API_TOKEN=… -e MAILTRAP_ACCOUNT_ID=… -- npx -y mcp-mailtrap` |
 | Production email later: Mailtrap sending domain (CNAME/DKIM/DMARC) or another SMTP | `SMTP_*` | transport is env-only, no code change |
 | Telegram bot token (BotFather) + chat id | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | |
 | Railway project: app, worker and scheduler services, Postgres, Redis, Mongo, bucket, TCP proxy on 50051, tracing enabled | Railway variables (`DATABASE_URL`, `REDIS_URL`, `MONGO_URL`, `S3_*`, `OTEL_*`, `APP_KEY`, `APP_URL`) | |
-| DNS: `marketplace.vukem.com` CNAME to Railway | DNS provider | |
+| DNS: `marketplace.vukem.dev` CNAME to Railway | DNS provider | |
 | GitHub: repo secrets `MAILTRAP_API_TOKEN`, `MAILTRAP_SANDBOX_ID`, `MAILTRAP_SMTP_USERNAME`, `MAILTRAP_SMTP_PASSWORD` (integration job), GHCR enabled, branch protection on `main` requiring CI | GitHub settings | the Mailtrap test skips until they exist |
 
 ## 8. Status log
