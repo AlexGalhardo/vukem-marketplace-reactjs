@@ -23,7 +23,7 @@ func (h *Handlers) SendResetLink(c *web.Ctx) error {
 		return err
 	}
 
-	inertia.Flash(c, "status", "If that email has an account, we sent a password reset link.")
+	flash(c, "account.flash.reset_link_sent")
 
 	return c.Redirect("/forgot-password")
 }
@@ -48,7 +48,7 @@ func (h *Handlers) Reset(c *web.Ctx) error {
 	// stamp); this browser gets a fresh session id as well.
 	c.Session().Regenerate()
 
-	inertia.Flash(c, "status", "Your password was reset. You can log in now.")
+	flash(c, "account.flash.password_reset")
 
 	return c.Redirect("/login")
 }

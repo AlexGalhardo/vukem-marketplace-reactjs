@@ -88,7 +88,7 @@ func (h *TwoFactorHandlers) Confirm(c *web.Ctx) error {
 	}
 
 	c.Session().Flash(recoveryCodesFlash, codes)
-	inertia.Flash(c, "status", "Two-factor authentication is on.")
+	flash(c, "account.flash.two_factor_on")
 
 	return c.Redirect("/user/two-factor")
 }
@@ -126,14 +126,14 @@ func (h *TwoFactorHandlers) Disable(c *web.Ctx) error {
 
 	if ok, err := h.a.Hasher.Verify(u.Password, in.Password); err != nil || !ok {
 		web.SecurityEvent(c.Request(), "auth.2fa_failed", "user_id", u.AuthID(), "stage", "disable")
-		return errs.NewValidation().Add("password", "The password is incorrect.")
+		return errs.NewValidation().Add("password", "account.errors.password_incorrect")
 	}
 
 	if err := h.a.DisableTwoFactor(c.Context(), u.ID); err != nil {
 		return err
 	}
 
-	inertia.Flash(c, "status", "Two-factor authentication is off.")
+	flash(c, "account.flash.two_factor_off")
 
 	return c.Redirect("/user/two-factor")
 }
@@ -169,7 +169,7 @@ func (h *TwoFactorHandlers) Challenge(c *web.Ctx) error {
 		web.SecurityEvent(c.Request(), "auth.2fa_failed", "user_id", u.AuthID(), "stage", "challenge")
 
 		if in.Code == "" {
-			return errs.NewValidation().Add("recovery_code", "The recovery code is invalid.")
+			return errs.NewValidation().Add("recovery_code", "account.errors.recovery_invalid")
 		}
 
 		return accounts.InvalidTwoFactorCode()
@@ -191,7 +191,7 @@ func expiredChallenge(c *web.Ctx, err error) error {
 		return err
 	}
 
-	inertia.Flash(c, "status", "Your login expired. Please log in again.")
+	flash(c, "account.flash.login_expired")
 
 	return c.Redirect("/login")
 }

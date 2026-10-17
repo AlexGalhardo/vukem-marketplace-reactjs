@@ -14,6 +14,7 @@ import (
 	"github.com/AlexGalhardo/vukem/auth"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/errs"
+	"github.com/AlexGalhardo/vukem/i18n"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/mail"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
@@ -88,10 +89,13 @@ func (a *Accounts) SendResetLink(ctx context.Context, email string) error {
 
 	link := a.URL + "/reset-password/" + token + "?email=" + url.QueryEscape(email)
 
-	return a.Mailer.Send(ctx, mail.ResetPassword{User: u, Link: link})
+	return a.Mailer.Send(
+		ctx,
+		mail.ResetPassword{User: u, Link: link, Subject: i18n.T(ctx, "account.mail.reset_subject")},
+	)
 }
 
-var errInvalidReset = errs.NewValidation().Add("email", "This password reset link is invalid or has expired.")
+var errInvalidReset = errs.NewValidation().Add("email", "account.errors.reset_invalid")
 
 // ResetPassword checks the token (constant time, single use, ResetTTL) and
 // sets the new password, ending every remembered session and API token.

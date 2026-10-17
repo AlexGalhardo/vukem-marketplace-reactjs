@@ -16,12 +16,13 @@ func Social(r *router.Router, app *vukem.App) error {
 		return err
 	}
 
+	L := account.Localized
 	h := account.NewSocial(acc, accounts.NewSocial(app, "google"))
 
-	r.Get("/auth/{provider}/redirect", h.Redirect).Name("social.redirect").Use(auth.Guest(acc.Web))
-	r.Get("/auth/{provider}/callback", h.Callback).Name("social.callback")
+	r.Get("/auth/{provider}/redirect", L(h.Redirect)).Name("social.redirect").Use(auth.Guest(acc.Web))
+	r.Get("/auth/{provider}/callback", L(h.Callback)).Name("social.callback")
 	// Apple answers with response_mode=form_post.
-	r.Post("/auth/{provider}/callback", h.Callback)
+	r.Post("/auth/{provider}/callback", L(h.Callback))
 
 	return nil
 }

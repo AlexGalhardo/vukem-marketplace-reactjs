@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/queue"
 
@@ -45,7 +46,10 @@ func (a *Accounts) SendVerification(ctx context.Context, u models.User) error {
 		return err
 	}
 
-	return a.mailLater(ctx, mail.VerifyEmail{User: u, Link: link}, mailRetries()...)
+	return a.mailLater(
+		ctx,
+		mail.VerifyEmail{User: u, Link: link, Subject: i18n.T(ctx, "account.mail.verify_subject")},
+		mailRetries()...)
 }
 
 // MarkVerified sets email_verified_at using ex (a.DB, or the transaction

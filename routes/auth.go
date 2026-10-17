@@ -32,6 +32,7 @@ func authRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 		return err
 	}
 
+	L := account.Localized
 	h := account.New(acc)
 	guest := auth.Guest(acc.Web)
 	required := auth.Required(acc.Web)
@@ -44,22 +45,33 @@ func authRoutes(r *router.Router, app *vukem.App, deps *platform.Deps) error {
 
 	r.Use(acc.CheckSessionStamp, shareAuth(acc))
 
-	r.Get("/login", h.ShowLogin).Name("login").Use(guest)
-	r.Post("/login", h.Login).Use(guest, throttle, perAccount)
-	r.Get("/register", h.ShowRegister).Name("register").Use(guest)
-	r.Post("/register", h.Register).Use(guest)
-	r.Post("/logout", h.Logout).Name("logout").Use(required)
+	r.Get("/login", L(h.ShowLogin)).Name("login").Use(guest)
+	r.Post("/login", L(h.Login)).Use(guest, throttle, perAccount)
+	r.Get("/register", L(h.ShowRegister)).Name("register").Use(guest)
+	r.Post("/register", L(h.Register)).Use(guest)
+	r.Post("/logout", L(h.Logout)).Name("logout").Use(required)
 
-	r.Get("/forgot-password", h.ShowForgot).Name("password.request").Use(guest)
-	r.Post("/forgot-password", h.SendResetLink).Name("password.email").Use(guest, mails)
-	r.Get("/reset-password/{token}", h.ShowReset).Name("password.reset").Use(guest)
-	r.Post("/reset-password", h.Reset).Name("password.update").Use(guest)
+	r.Get("/forgot-password", L(h.ShowForgot)).Name("password.request").Use(guest)
+	r.Post("/forgot-password", L(h.SendResetLink)).Name("password.email").Use(guest, mails)
+	r.Get("/reset-password/{token}", L(h.ShowReset)).Name("password.reset").Use(guest)
+	r.Post("/reset-password", L(h.Reset)).Name("password.update").Use(guest)
 
-	r.Get("/email/verify", h.Notice).Name("verification.notice").Use(required)
-	r.Get("/email/verify/{id}", h.Verify).Name("verification.verify").Use(required, acc.Signer.Middleware())
-	r.Post("/email/verification-notification", h.Resend).Name("verification.send").Use(required, mails)
+	r.Get("/email/verify", L(h.Notice)).Name("verification.notice").Use(required)
+	r.Get("/email/verify/{id}", L(h.Verify)).Name("verification.verify").Use(required, acc.Signer.Middleware())
+	r.Post("/email/verification-notification", L(h.Resend)).Name("verification.send").Use(required, mails)
 
-	r.Get("/dashboard", h.Dashboard).Name("dashboard").Use(required)
+	r.Get("/dashboard", L(h.Dashboard)).Name("dashboard").Use(required)
+
+	// Account pages. Every change that checks the current password shares
+	// one throttle per user and IP.
+	password := ratelimit.Middleware(deps.Limiter("account-password", 5, time.Minute), account.PasswordThrottleKey)
+
+	r.Get("/account", L(h.ShowProfile)).Name("account.profile").Use(required)
+	r.Put("/account", L(h.UpdateProfile)).Name("account.update").Use(required, password)
+	r.Get("/account/security", L(h.ShowSecurity)).Name("account.security").Use(required)
+	r.Put("/account/password", L(h.ChangePassword)).Name("account.password").Use(required, password)
+	r.Post("/account/sessions/logout-others", L(h.LogoutOtherSessions)).
+		Name("account.sessions.logout-others").Use(required, password)
 
 	return nil
 }

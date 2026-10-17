@@ -10,11 +10,13 @@ import (
 type VerifyEmail struct {
 	User models.User
 	Link string
+	// Subject is translated by the caller (Envelope has no context).
+	Subject string
 }
 
 // Envelope implements mail.Mailable.
 func (m VerifyEmail) Envelope() mail.Envelope {
-	return mail.Envelope{To: []string{m.User.Email}, Subject: "Verify your email address"}
+	return mail.Envelope{To: []string{m.User.Email}, Subject: m.Subject}
 }
 
 // Content implements mail.Mailable.
@@ -24,11 +26,13 @@ func (m VerifyEmail) Content() mail.Content { return mail.View("mail/verify_emai
 type ResetPassword struct {
 	User models.User
 	Link string
+	// Subject is translated by the caller (Envelope has no context).
+	Subject string
 }
 
 // Envelope implements mail.Mailable.
 func (m ResetPassword) Envelope() mail.Envelope {
-	return mail.Envelope{To: []string{m.User.Email}, Subject: "Reset your password"}
+	return mail.Envelope{To: []string{m.User.Email}, Subject: m.Subject}
 }
 
 // Content implements mail.Mailable.
