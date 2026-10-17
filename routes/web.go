@@ -12,25 +12,22 @@ import (
 	"github.com/AlexGalhardo/vukem/router"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/resources"
 )
 
 // Web registers the browser routes and the probes. vukem route:list shows them.
-func Web(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
+func Web() func(r *router.Router, app *vukem.App) error {
 	return func(r *router.Router, app *vukem.App) error {
 		if err := vukem.DefaultMiddleware(app, r); err != nil {
 			return err
 		}
 
-		db, err := app.DB()
-		if err != nil {
+		// Opens the database, which registers vukem's "db" health check.
+		if _, err := app.DB(); err != nil {
 			return err
 		}
 
-		deps.AddCheck("database", db.Ping)
-
-		probes := controllers.Probes{Deps: deps, Log: app.Log, Version: app.Source.Get("APP_VERSION")}
+		probes := controllers.Probes{Ready: app.ReadyHandler(), Log: app.Log, Version: app.Source.Get("APP_VERSION")}
 		r.UseServer(probes.Middleware)
 		r.UseServer(middleware.StaticFS(resources.Public(), middleware.StaticConfig{Prefix: "/"}))
 		r.Use(app.Inertia.Middleware, shareProps(app))

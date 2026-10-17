@@ -1,11 +1,9 @@
 package platform
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/config"
@@ -26,8 +24,11 @@ type RedisConfig struct {
 //
 // workaround(vukem): stores must be passed to vukem.New, but the app only
 // loads .env inside New, so the URL is resolved here from the same sources
-// (process env first, then .env files in the working directory).
-func RedisOptions(ctx context.Context, deps *Deps) ([]vukem.Option, error) {
+// (process env first, then .env files in the working directory). The
+// lazy WithCacheStoreFunc/WithSessionStoreFunc/WithQueueDriverFunc of
+// v0.25.0 cannot fall back to the configured default (cookie sessions,
+// sync queue) when REDIS_URL is unset, so they do not fit yet.
+func RedisOptions(deps *Deps) ([]vukem.Option, error) {
 	src, err := config.LoadSource(os.DirFS("."), os.LookupEnv, os.ReadFile)
 	if err != nil {
 		return nil, fmt.Errorf("platform: load env: %w", err)
@@ -49,10 +50,9 @@ func RedisOptions(ctx context.Context, deps *Deps) ([]vukem.Option, error) {
 		return nil, nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
-	rc, err := redis.Open(ctx, cfg.URL)
+	// Lazy: the app boots while Redis is down; /ready reports it and the
+	// first command connects.
+	rc, err := redis.OpenLazy(cfg.URL)
 	if err != nil {
 		return nil, fmt.Errorf("platform: open redis: %w", err)
 	}

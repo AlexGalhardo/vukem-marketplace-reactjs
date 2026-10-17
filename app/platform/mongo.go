@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"go.mongodb.org/mongo-driver/v2/x/mongo/driver/connstring"
 
@@ -51,7 +50,7 @@ type MongoProvider struct {
 func (p MongoProvider) Register(*vukem.App) error { return nil }
 
 // Boot implements vukem.Booter.
-func (p MongoProvider) Boot(ctx context.Context, app *vukem.App) error {
+func (p MongoProvider) Boot(_ context.Context, app *vukem.App) error {
 	url := app.Source.Get("MONGO_URL")
 	if url == "" {
 		if app.Config.IsProduction() {
@@ -61,15 +60,13 @@ func (p MongoProvider) Boot(ctx context.Context, app *vukem.App) error {
 		return nil
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
-
 	name, err := MongoDatabase(url, app.Source.Get("MONGO_DATABASE"))
 	if err != nil {
 		return err
 	}
 
-	mc, err := mongo.Open(ctx, url, name)
+	// Lazy: the app boots while MongoDB is down; /ready reports it.
+	mc, err := mongo.OpenLazy(url, name)
 	if err != nil {
 		return fmt.Errorf("platform: open mongo: %w", err)
 	}

@@ -16,7 +16,7 @@ func TestProbes(t *testing.T) {
 	app.Client(t).Get("/health").AssertOK().
 		AssertJSONPath("status", "ok").AssertHeader("Cache-Control", "no-store")
 	app.Client(t).Get("/ready").AssertOK().
-		AssertJSONPath("status", "ok").AssertJSONPath("checks.database", "ok")
+		AssertJSONPath("status", "ok").AssertJSONPath("checks.db", "ok")
 }
 
 func TestProbesDoNotStartSessions(t *testing.T) {

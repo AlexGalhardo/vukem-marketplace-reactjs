@@ -4,15 +4,15 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
-
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
 )
 
 // Probes answers the platform probes: /health (liveness: the process
 // serves requests) and /ready (readiness: Postgres, Redis and MongoDB
 // answer). Railway's healthcheck points at /ready.
 type Probes struct {
-	Deps    *platform.Deps
+	// Ready is the readiness handler (app.ReadyHandler: every registered
+	// health check, details only in the log).
+	Ready   http.Handler
 	Log     *slog.Logger
 	Version string
 }
@@ -31,25 +31,11 @@ func (p Probes) Middleware(next http.Handler) http.Handler {
 		case "/health":
 			p.write(w, http.StatusOK, map[string]any{"status": "ok", "version": p.Version})
 		case "/ready":
-			p.ready(w, r)
+			p.Ready.ServeHTTP(w, r)
 		default:
 			next.ServeHTTP(w, r)
 		}
 	})
-}
-
-// ready runs every dependency check; 503 when one fails. Failure details
-// go to the log only.
-func (p Probes) ready(w http.ResponseWriter, r *http.Request) {
-	checks, err := p.Deps.Ready(r.Context())
-	if err != nil {
-		p.Log.WarnContext(r.Context(), "readiness check failed", "err", err)
-		p.write(w, http.StatusServiceUnavailable, map[string]any{"status": "fail", "checks": checks})
-
-		return
-	}
-
-	p.write(w, http.StatusOK, map[string]any{"status": "ok", "checks": checks})
 }
 
 func (p Probes) write(w http.ResponseWriter, status int, body map[string]any) {

@@ -6,13 +6,9 @@ package platform
 
 import (
 	"context"
-	"errors"
-	"fmt"
-	"maps"
-	"slices"
 	"sync"
-	"time"
 
+	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/drivers/mongo"
 	"github.com/AlexGalhardo/vukem/drivers/redis"
 
@@ -29,72 +25,43 @@ type Deps struct {
 
 	redisPrefix string
 
-	mu     sync.RWMutex
-	checks map[string]Check
+	mu      sync.Mutex
+	app     *vukem.App
+	pending map[string]Check
 }
 
 // Check reports whether one dependency is usable.
 type Check func(ctx context.Context) error
 
-// AddCheck registers a readiness check under name.
+// AddCheck registers a readiness check with the app (vukem
+// AddHealthCheck, reported by app.ReadyHandler at /ready). Checks added
+// before the app exists (Redis opens before vukem.New) wait for Bind.
 func (d *Deps) AddCheck(name string, c Check) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	if d.checks == nil {
-		d.checks = map[string]Check{}
+	if d.app != nil {
+		d.app.AddHealthCheck(name, vukem.HealthCheck(c))
+		return
 	}
 
-	d.checks[name] = c
+	if d.pending == nil {
+		d.pending = map[string]Check{}
+	}
+
+	d.pending[name] = c
 }
 
-// ErrNotReady is returned by Ready when at least one check failed.
-var ErrNotReady = errors.New("platform: not ready")
+// Bind attaches the app and registers the checks added before it existed.
+func (d *Deps) Bind(app *vukem.App) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
 
-// checkTimeout bounds each readiness check so a hung dependency cannot
-// hold the probe past the platform's timeout.
-const checkTimeout = 3 * time.Second
+	d.app = app
 
-// Ready runs every check in parallel and returns "ok"/"fail" per check.
-// Error details are logged by the caller, never exposed to clients.
-func (d *Deps) Ready(ctx context.Context) (map[string]string, error) {
-	d.mu.RLock()
-	checks := maps.Clone(d.checks)
-	d.mu.RUnlock()
-
-	ctx, cancel := context.WithTimeout(ctx, checkTimeout)
-	defer cancel()
-
-	var (
-		wg      sync.WaitGroup
-		mu      sync.Mutex
-		results = make(map[string]string, len(checks))
-		errs    []error
-	)
-
-	for _, name := range slices.Sorted(maps.Keys(checks)) {
-		wg.Go(func() {
-			err := checks[name](ctx)
-
-			mu.Lock()
-			defer mu.Unlock()
-
-			if err != nil {
-				results[name] = "fail"
-				errs = append(errs, fmt.Errorf("%s: %w", name, err))
-
-				return
-			}
-
-			results[name] = "ok"
-		})
+	for name, c := range d.pending {
+		app.AddHealthCheck(name, vukem.HealthCheck(c))
 	}
 
-	wg.Wait()
-
-	if len(errs) > 0 {
-		return results, errors.Join(append([]error{ErrNotReady}, errs...)...)
-	}
-
-	return results, nil
+	d.pending = nil
 }

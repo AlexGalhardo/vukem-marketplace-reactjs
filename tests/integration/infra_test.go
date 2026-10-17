@@ -42,7 +42,7 @@ func TestReadyAgainstRealServices(t *testing.T) {
 	}})
 
 	app.Client(t).Get("/ready").AssertOK().
-		AssertJSONPath("checks.database", "ok").
+		AssertJSONPath("checks.db", "ok").
 		AssertJSONPath("checks.redis", "ok").
 		AssertJSONPath("checks.mongo", "ok")
 

@@ -10,7 +10,7 @@ import (
 // All lists the route files, in order.
 func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 	return []func(r *router.Router, app *vukem.App) error{
-		Web(deps),
+		Web(),
 		Auth(deps),
 		Social,
 		TwoFactor(deps),

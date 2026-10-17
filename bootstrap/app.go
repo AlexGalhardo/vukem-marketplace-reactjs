@@ -23,7 +23,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 	deps := &platform.Deps{}
 	jobBinding := &jobs.Binding{}
 
-	redisOpts, err := platform.RedisOptions(context.Background(), deps)
+	redisOpts, err := platform.RedisOptions(deps)
 	if err != nil {
 		return nil, err
 	}
@@ -57,6 +57,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 	}
 
 	jobBinding.Bind(app)
+	deps.Bind(app)
 
 	if deps.Redis != nil {
 		app.OnShutdown(func(context.Context) error { return deps.Redis.Close() })
