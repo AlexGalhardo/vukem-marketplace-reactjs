@@ -1,0 +1,608 @@
+package seeders
+
+import (
+	"bytes"
+	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/base32"
+	"errors"
+	"fmt"
+	"image/color"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
+
+	vukem "github.com/AlexGalhardo/vukem"
+	"github.com/AlexGalhardo/vukem/auth/hash"
+	"github.com/AlexGalhardo/vukem/config"
+	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/factory"
+	"github.com/AlexGalhardo/vukem/orm"
+	"github.com/AlexGalhardo/vukem/storage"
+
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+)
+
+// DemoSellerDomain is the email domain of every demo catalog seller; it
+// identifies them for idempotency and DemoCatalog.Purge.
+const DemoSellerDomain = "vendedores.example.com"
+
+// DemoCatalogSeed is the default fake-data seed: the same seed always
+// produces the same sellers, shops and products.
+const DemoCatalogSeed uint64 = 20261018
+
+// Demo catalog defaults: 100 sellers with 10–30 products each, exactly 20
+// on average (2000 products).
+const (
+	DefaultDemoSellers     = 100
+	DefaultDemoMinProducts = 10
+	DefaultDemoMaxProducts = 30
+)
+
+// ErrDemoCatalogInProduction stops the demo catalog in production unless
+// it was asked for explicitly (demo:catalog --allow-production).
+var ErrDemoCatalogInProduction = errors.New(
+	"seeders: the demo catalog is not seeded in production without demo:catalog --allow-production")
+
+// sellerChunk sellers (with their shops, products and images) are written
+// per transaction: a seller is either fully seeded or absent.
+const sellerChunk = 25
+
+// placeholdersPerCategory shared images exist per category.
+const placeholdersPerCategory = 3
+
+// DemoCatalog seeds demo sellers, one shop each, and their published
+// products with shared placeholder images. It is deterministic (Seed) and
+// idempotent: sellers whose email exists are skipped. The sellers get
+// random passwords nobody knows; they are not meant to log in.
+type DemoCatalog struct {
+	Sellers     int    // default DefaultDemoSellers
+	MinProducts int    // default DefaultDemoMinProducts
+	MaxProducts int    // default DefaultDemoMaxProducts
+	Seed        uint64 // default DemoCatalogSeed
+	// AllowProduction is the explicit opt-in for APP_ENV=production.
+	AllowProduction bool
+	// Env overrides the app's environment (tests); empty uses the app's.
+	Env config.Env
+	// Hasher hashes the random passwords; nil uses hash.Default().
+	Hasher hash.Hasher
+}
+
+// DemoCatalogResult reports what one run created.
+type DemoCatalogResult struct {
+	Sellers  int
+	Products int
+	Elapsed  time.Duration
+}
+
+// Name implements the db:seed name hook.
+func (DemoCatalog) Name() string { return "DemoCatalog" }
+
+// SeedApp implements vukem.AppSeeder.
+func (d DemoCatalog) SeedApp(ctx context.Context, app *vukem.App) error {
+	res, err := d.RunApp(ctx, app)
+	if err != nil {
+		return err
+	}
+
+	app.Log.InfoContext(ctx, "demo catalog seeded",
+		"sellers", res.Sellers, "products", res.Products, "elapsed", res.Elapsed.Round(time.Millisecond))
+
+	return nil
+}
+
+// RunApp checks the environment, then runs the seeder on the app's
+// database and image disk.
+func (d DemoCatalog) RunApp(ctx context.Context, app *vukem.App) (DemoCatalogResult, error) {
+	if d.Env == "" {
+		d.Env = app.Config.Env
+	}
+
+	if err := d.allowed(); err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	db, err := app.DB()
+	if err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	disk, err := catalog.OpenDisk(app.Source, app.Config.Env, app.Kind == vukem.KindTest)
+	if err != nil {
+		return DemoCatalogResult{}, fmt.Errorf("seed demo catalog: %w", err)
+	}
+
+	return d.Run(ctx, db, disk)
+}
+
+func (d DemoCatalog) allowed() error {
+	if d.Env == config.Production && !d.AllowProduction {
+		return ErrDemoCatalogInProduction
+	}
+
+	return nil
+}
+
+func (d DemoCatalog) withDefaults() DemoCatalog {
+	if d.Sellers <= 0 {
+		d.Sellers = DefaultDemoSellers
+	}
+
+	if d.MinProducts <= 0 {
+		d.MinProducts = DefaultDemoMinProducts
+	}
+
+	if d.MaxProducts < d.MinProducts {
+		d.MaxProducts = max(DefaultDemoMaxProducts, d.MinProducts)
+	}
+
+	if d.Seed == 0 {
+		d.Seed = DemoCatalogSeed
+	}
+
+	if d.Hasher == nil {
+		d.Hasher = hash.Default()
+	}
+
+	return d
+}
+
+// Run seeds the catalog into db, storing the shared placeholders on disk.
+// It does not check the environment: SeedApp and demo:catalog do.
+func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk) (DemoCatalogResult, error) {
+	start := time.Now()
+	d = d.withDefaults()
+
+	if err := (Categories{}).Seed(ctx, db); err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	catIDs, err := categoryIDs(ctx, db)
+	if err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	images, err := storePlaceholders(ctx, disk)
+	if err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	plan := d.plan(catIDs, images, time.Now().UTC())
+
+	todo, err := missingSellers(ctx, db, plan)
+	if err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	if err := d.hashPasswords(todo); err != nil {
+		return DemoCatalogResult{}, err
+	}
+
+	res := DemoCatalogResult{}
+
+	for chunk := range slicesChunk(todo, sellerChunk) {
+		if err := database.RunInTx(
+			ctx,
+			db,
+			func(tx *database.Tx) error { return insertSellers(ctx, tx, chunk) },
+		); err != nil {
+			return DemoCatalogResult{}, fmt.Errorf("seed demo catalog: %w", err)
+		}
+
+		for i := range chunk {
+			res.Sellers++
+			res.Products += len(chunk[i].products)
+		}
+	}
+
+	res.Elapsed = time.Since(start)
+
+	return res, nil
+}
+
+// Purge deletes every demo catalog seller with its shop, products and
+// images (cascades). Shops with orders cannot be deleted (the orders keep
+// them); Purge then fails and changes nothing.
+func (DemoCatalog) Purge(ctx context.Context, db *database.DB) error {
+	return database.RunInTx(ctx, db, func(tx *database.Tx) error {
+		pattern := "%@" + DemoSellerDomain
+		d := tx.Dialect()
+
+		if _, err := tx.ExecContext(ctx, database.Rebind(d,
+			`DELETE FROM shops WHERE owner_id IN (SELECT id FROM users WHERE email LIKE ?)`), pattern); err != nil {
+			return fmt.Errorf("purge demo shops: %w", err)
+		}
+
+		if _, err := tx.ExecContext(
+			ctx,
+			database.Rebind(d, `DELETE FROM users WHERE email LIKE ?`),
+			pattern,
+		); err != nil {
+			return fmt.Errorf("purge demo sellers: %w", err)
+		}
+
+		return nil
+	})
+}
+
+// slicesChunk yields consecutive chunks of s of at most n items.
+func slicesChunk[T any](s []T, n int) func(yield func([]T) bool) {
+	return func(yield func([]T) bool) {
+		for len(s) > 0 {
+			k := min(n, len(s))
+			if !yield(s[:k]) {
+				return
+			}
+
+			s = s[k:]
+		}
+	}
+}
+
+func categoryIDs(ctx context.Context, db *database.DB) (map[string]int64, error) {
+	cats, err := orm.QueryOf[catalog.Category](db).Get(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("load categories: %w", err)
+	}
+
+	out := make(map[string]int64, len(cats))
+	for i := range cats {
+		out[cats[i].Slug] = cats[i].ID
+	}
+
+	return out, nil
+}
+
+// plannedSeller is one seller and everything it owns, ids not yet set.
+type plannedSeller struct {
+	user     models.User
+	shop     catalog.Shop
+	products []plannedProduct
+}
+
+type plannedProduct struct {
+	product catalog.Product
+	images  []catalog.ProductImage
+}
+
+// productCounts returns n counts in [lo, hi] averaging (lo+hi)/2: each
+// random count is paired with its mirror (lo+hi-c).
+func productCounts(f *factory.Faker, n, lo, hi int) []int {
+	out := make([]int, n)
+
+	for i := 0; i+1 < n; i += 2 {
+		c := f.Int(lo, hi)
+		out[i], out[i+1] = c, lo+hi-c
+	}
+
+	if n%2 == 1 {
+		out[n-1] = (lo + hi) / 2
+	}
+
+	return out
+}
+
+// plan builds the whole catalog in memory. It depends only on the seed
+// (and now, for published_at), so a re-run plans the same sellers.
+func (d DemoCatalog) plan(
+	catIDs map[string]int64,
+	images map[string][]catalog.ProductImage,
+	now time.Time,
+) []plannedSeller {
+	counts := productCounts(factory.NewFaker(d.Seed), d.Sellers, d.MinProducts, d.MaxProducts)
+
+	users := factory.New(func(f *factory.Faker) models.User {
+		first, last := f.FirstName(), f.LastName()
+		local := strings.ReplaceAll(catalog.Slugify(first+" "+last), "-", ".")
+
+		return models.User{
+			Name:  first + " " + last,
+			Email: fmt.Sprintf("%s.%03d@%s", local, f.Seq(), DemoSellerDomain),
+			Role:  models.RoleUser,
+		}
+	}).Seed(d.Seed).Count(d.Sellers).State(func(u *models.User) {
+		u.EmailVerifiedAt.V, u.EmailVerifiedAt.Valid = now, true
+	}).Make()
+
+	out := make([]plannedSeller, d.Sellers)
+
+	for i := range out {
+		f := factory.NewFaker(d.Seed + uint64(i) + 1)
+		main := demoCategories[i%len(demoCategories)]
+		second := demoCategories[(i*5+3)%len(demoCategories)]
+		shop := demoShop(f, i, users[i], main.slug)
+
+		products := factory.New(func(f *factory.Faker) plannedProduct {
+			cat := main
+			if f.Int(1, 10) > 7 {
+				cat = second
+			}
+
+			return demoProduct(f, cat, catIDs[cat.slug], images[cat.slug], shop.ShipFromUF,
+				fmt.Sprintf("%03d%02d", i+1, f.Seq()), now)
+		}).Seed(d.Seed ^ uint64(i+1)<<20).Count(counts[i]).Make()
+
+		out[i] = plannedSeller{user: users[i], shop: shop, products: products}
+	}
+
+	return out
+}
+
+func demoShop(f *factory.Faker, i int, owner models.User, mainCategory string) catalog.Shop {
+	last := owner.Name[strings.LastIndex(owner.Name, " ")+1:]
+
+	var name string
+	if f.Bool() {
+		name = factory.Pick(f, shopPrefixes...) + " " + last
+	} else {
+		name = last + " " + factory.Pick(f, shopSuffixes[mainCategory]...)
+	}
+
+	desc := fmt.Sprintf("%s %s Loja de demonstração: dados fictícios gerados para desenvolvimento.",
+		factory.Pick(f, shopSlogans...), factory.Pick(f, shopSlogans...))
+
+	return catalog.Shop{
+		Slug:        fmt.Sprintf("%s-%03d", catalog.Slugify(name), i+1),
+		Name:        name,
+		Description: nullStr(desc),
+		Status:      catalog.ShopActive,
+		ShipFromUF:  catalog.UFs[(i*7)%len(catalog.UFs)], // 7 and 27 are coprime: every UF gets shops
+	}
+}
+
+func nullStr(s string) sql.Null[string] { return sql.Null[string]{V: s, Valid: true} }
+
+func demoProduct(f *factory.Faker, cat demoCategory, categoryID int64, images []catalog.ProductImage,
+	uf, suffix string, now time.Time,
+) plannedProduct {
+	k := factory.Pick(f, cat.kinds...)
+	brand := factory.Pick(f, cat.brands...)
+
+	specs := make([]string, len(k.specs))
+	for j, group := range k.specs {
+		specs[j] = factory.Pick(f, group...)
+	}
+
+	var title string
+	if k.model {
+		model := factory.Pick(f, "A", "K", "M", "N", "S", "X", "Z") + strconv.Itoa(f.Int(1, 99))
+		if series := factory.Pick(f, modelSeries...); series != "" {
+			model += " " + series
+		}
+
+		title = strings.Join(append([]string{k.noun, brand, model}, specs...), " ")
+	} else {
+		title = strings.Join(append([]string{k.noun}, specs...), " ") + " - " + brand
+	}
+
+	reais := f.Int(k.minReais, k.maxReais)
+	cents := int64(reais)*100 - int64(factory.Pick(f, 10, 1, 100)) // R$ x,90 / x,99 / (x-1),00
+
+	var b strings.Builder
+
+	b.WriteString(title + ".\n\nDestaques:\n")
+
+	for _, feat := range k.features {
+		b.WriteString("- " + feat + "\n")
+	}
+
+	fmt.Fprintf(&b, "\n%s %s Enviamos a partir de %s.\n\n", factory.Pick(f, productClosings...),
+		factory.Pick(f, productClosings...), uf)
+	b.WriteString("Anúncio de demonstração: produto e loja fictícios, gerados para desenvolvimento.")
+
+	p := catalog.Product{
+		CategoryID:  sql.Null[int64]{V: categoryID, Valid: categoryID != 0},
+		Slug:        catalog.Slugify(title) + "-dm" + suffix,
+		Title:       title,
+		Description: b.String(),
+		PriceCents:  max(cents, 100),
+		Stock:       f.Int(1, 150),
+		WeightGrams: f.Int(k.minGrams, k.maxGrams),
+		Status:      catalog.StatusPublished,
+	}
+	p.PublishedAt.V, p.PublishedAt.Valid = now.Add(-time.Duration(f.Int(0, 180*24*60))*time.Minute), true
+
+	first := f.Int(0, len(images)-1)
+	imgs := make([]catalog.ProductImage, f.Int(1, 2))
+
+	for j := range imgs {
+		imgs[j] = images[(first+j)%len(images)]
+		imgs[j].Position = j
+		imgs[j].Alt = title
+	}
+
+	return plannedProduct{product: p, images: imgs}
+}
+
+// missingSellers keeps the planned sellers whose email is not stored yet.
+func missingSellers(ctx context.Context, db *database.DB, plan []plannedSeller) ([]plannedSeller, error) {
+	emails := make([]any, len(plan))
+	for i := range plan {
+		emails[i] = plan[i].user.Email
+	}
+
+	have, err := orm.QueryOf[models.User](db).WhereIn("email", emails...).Pluck[string](ctx, "email")
+	if err != nil {
+		return nil, fmt.Errorf("load demo sellers: %w", err)
+	}
+
+	seen := make(map[string]bool, len(have))
+	for _, e := range have {
+		seen[e] = true
+	}
+
+	out := make([]plannedSeller, 0, len(plan))
+
+	for i := range plan {
+		if !seen[plan[i].user.Email] {
+			out = append(out, plan[i])
+		}
+	}
+
+	return out, nil
+}
+
+// hashPasswords gives each seller a random 192-bit password that is never
+// stored or printed, hashed on a few goroutines (argon2id is the slow part).
+func (d DemoCatalog) hashPasswords(sellers []plannedSeller) error {
+	var (
+		wg   sync.WaitGroup
+		mu   sync.Mutex
+		errs []error
+	)
+
+	work := make(chan int)
+
+	for range 4 {
+		wg.Go(func() {
+			for i := range work {
+				h, err := d.Hasher.Make(rand.Text())
+				if err != nil {
+					mu.Lock()
+					errs = append(errs, err)
+					mu.Unlock()
+
+					continue
+				}
+
+				sellers[i].user.Password = h
+			}
+		})
+	}
+
+	for i := range sellers {
+		work <- i
+	}
+
+	close(work)
+	wg.Wait()
+
+	if err := errors.Join(errs...); err != nil {
+		return fmt.Errorf("hash demo seller passwords: %w", err)
+	}
+
+	return nil
+}
+
+// insertSellers writes a chunk with one multi-row INSERT per table.
+func insertSellers(ctx context.Context, tx *database.Tx, chunk []plannedSeller) error {
+	users := make([]models.User, len(chunk))
+	for i := range chunk {
+		users[i] = chunk[i].user
+	}
+
+	if err := orm.CreateMany(ctx, tx, users); err != nil {
+		return fmt.Errorf("insert sellers: %w", err)
+	}
+
+	shops := make([]catalog.Shop, len(chunk))
+	for i := range chunk {
+		shops[i] = chunk[i].shop
+		shops[i].OwnerID = users[i].ID
+	}
+
+	if err := orm.CreateMany(ctx, tx, shops); err != nil {
+		return fmt.Errorf("insert shops: %w", err)
+	}
+
+	var (
+		products []catalog.Product
+		owners   []*plannedProduct
+	)
+
+	for i := range chunk {
+		for j := range chunk[i].products {
+			p := &chunk[i].products[j]
+			pr := p.product
+			pr.ShopID = shops[i].ID
+			products = append(products, pr)
+			owners = append(owners, p)
+		}
+	}
+
+	if err := orm.CreateMany(ctx, tx, products); err != nil {
+		return fmt.Errorf("insert products: %w", err)
+	}
+
+	var images []catalog.ProductImage
+
+	for i, p := range owners {
+		for _, img := range p.images {
+			img.ProductID = products[i].ID
+			images = append(images, img)
+		}
+	}
+
+	if err := orm.CreateMany(ctx, tx, images); err != nil {
+		return fmt.Errorf("insert product images: %w", err)
+	}
+
+	return nil
+}
+
+// storePlaceholders makes sure the shared placeholder images exist on disk
+// (already processed: every width variant is drawn directly, so no
+// thumbnail job runs) and returns, per category, image rows pointing at
+// them.
+func storePlaceholders(ctx context.Context, disk storage.Disk) (map[string][]catalog.ProductImage, error) {
+	out := make(map[string][]catalog.ProductImage, len(demoCategories))
+
+	for _, cat := range demoCategories {
+		from, to := categoryColors(cat.slug)
+
+		for n := range placeholdersPerCategory {
+			key := sharedKey(cat.slug, n)
+			largest := min(catalog.Widths[0], placeholderSize)
+
+			for _, w := range catalog.Widths {
+				obj := catalog.VariantKey(key, w)
+
+				ok, err := disk.Exists(ctx, obj)
+				if err != nil {
+					return nil, fmt.Errorf("check placeholder %s: %w", obj, err)
+				}
+
+				if ok {
+					continue
+				}
+
+				img, err := placeholder(min(w, placeholderSize), from, to, n*5+len(cat.slug))
+				if err != nil {
+					return nil, err
+				}
+
+				if err := disk.Put(ctx, obj, bytes.NewReader(img)); err != nil {
+					return nil, fmt.Errorf("store placeholder %s: %w", obj, err)
+				}
+			}
+
+			out[cat.slug] = append(out[cat.slug], catalog.ProductImage{Key: key, Width: largest, Height: largest})
+		}
+	}
+
+	return out, nil
+}
+
+// sharedKey is the stored key of placeholder n of a category: a fixed
+// name in the catalog's object format under catalog.SharedDir.
+func sharedKey(slug string, n int) string {
+	sum := sha256.Sum256([]byte("vukem-demo-placeholder:" + slug + ":" + strconv.Itoa(n)))
+	name := strings.ToLower(base32.StdEncoding.EncodeToString(sum[:]))[:26]
+
+	return catalog.SharedDir + "/" + name + ".png"
+}
+
+// categoryColors reuses the DemoShop gradient of the category.
+func categoryColors(slug string) (color.RGBA, color.RGBA) {
+	for _, p := range demoProducts {
+		if p.category == slug {
+			return p.from, p.to
+		}
+	}
+
+	return rgb(55, 65, 81), rgb(156, 163, 175)
+}

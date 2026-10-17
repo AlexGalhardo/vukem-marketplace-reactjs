@@ -12,6 +12,7 @@ import (
 
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/auth/hash"
+	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
 
@@ -72,7 +73,10 @@ const DemoSellerEmail = "seller@example.com"
 //
 // workaround(vukem): seeders receive only *database.DB — no app config or
 // services — so the image disk is opened from the environment here.
-type DemoShop struct{}
+type DemoShop struct {
+	// Env overrides the app's environment (tests); empty uses the app's.
+	Env config.Env
+}
 
 var demoProducts = []struct {
 	title, category string
@@ -98,7 +102,17 @@ func rgb(r, g, b uint8) color.RGBA { return color.RGBA{R: r, G: g, B: b, A: 255}
 
 // SeedApp implements vukem.AppSeeder: it uses the app's media disk (the
 // memory disk in tests).
-func (DemoShop) SeedApp(ctx context.Context, app *vukem.App) error {
+func (d DemoShop) SeedApp(ctx context.Context, app *vukem.App) error {
+	if d.Env == "" {
+		d.Env = app.Config.Env
+	}
+
+	// The demo seller has a known password: never in production, even with
+	// db:seed --force (fail closed like Users).
+	if d.Env == config.Production {
+		return ErrDemoUsersInProduction
+	}
+
 	db, err := app.DB()
 	if err != nil {
 		return err
@@ -120,7 +134,7 @@ func (DemoShop) SeedApp(ctx context.Context, app *vukem.App) error {
 		return err
 	}
 
-	seller, err := demoSeller(ctx, db, src.Get("SEED_SELLER_PASSWORD"))
+	seller, err := demoSeller(ctx, db, src.Get("SEED_PASSWORD"))
 	if err != nil {
 		return err
 	}
@@ -179,7 +193,7 @@ func demoSeller(ctx context.Context, db *database.DB, password string) (models.U
 	}
 
 	if password == "" {
-		password = "demo-seller-password" // dev-only demo account, documented in the README
+		password = DefaultSeedPassword // dev-only demo account, documented in the README
 	}
 
 	h, err := hash.Default().Make(password)
@@ -217,7 +231,7 @@ func seedProduct(ctx context.Context, db *database.DB, svc *catalog.Service, sel
 		return fmt.Errorf("seed product %q: %w", title, err)
 	}
 
-	img, err := placeholder(from, to, i)
+	img, err := placeholder(placeholderSize, from, to, i)
 	if err != nil {
 		return err
 	}
@@ -239,13 +253,15 @@ func seedProduct(ctx context.Context, db *database.DB, svc *catalog.Service, sel
 	return nil
 }
 
-// placeholder draws a 900×900 PNG: a diagonal gradient with a lighter
-// disc whose position varies per product.
-func placeholder(from, to color.RGBA, i int) ([]byte, error) {
-	const size = 900
+// placeholderSize is the side of the generated placeholder images.
+const placeholderSize = 900
 
+// placeholder draws a size×size PNG: a diagonal gradient with a lighter
+// disc whose position varies with i (the layout is the same at any size).
+func placeholder(size int, from, to color.RGBA, i int) ([]byte, error) {
 	img := image.NewRGBA(image.Rect(0, 0, size, size))
-	cx, cy, r := 300+(i%3)*150, 300+(i%4)*100, 180+(i%5)*20
+	scale := func(v int) int { return v * size / placeholderSize }
+	cx, cy, r := scale(300+(i%3)*150), scale(300+(i%4)*100), scale(180+(i%5)*20)
 
 	for y := range size {
 		for x := range size {

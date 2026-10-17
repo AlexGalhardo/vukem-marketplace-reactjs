@@ -5,6 +5,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/config"
@@ -17,7 +18,7 @@ import (
 
 // Commands lists the application commands; vukem make:command appends here.
 func Commands() []vukem.Command {
-	return []vukem.Command{makeAdmin{}, referenceSync{}, mediaBucket{}}
+	return []vukem.Command{makeAdmin{}, referenceSync{}, mediaBucket{}, &demoCatalog{}}
 }
 
 var errEmailRequired = errors.New("usage: users:make-admin <email>")
@@ -98,4 +99,51 @@ func (mediaBucket) Run(ctx context.Context, app *vukem.App, _ []string) error {
 	}
 
 	return catalog.CreateBucket(ctx, cfg, app.Config.Env)
+}
+
+// demoCatalog seeds the demo catalog (100 sellers, 2000 products) on its
+// own. db:seed runs it outside production; in production it needs
+// --allow-production, and it never creates a known-password account.
+type demoCatalog struct {
+	allowProduction, fresh *bool
+}
+
+func (*demoCatalog) Name() string { return "demo:catalog" }
+
+func (*demoCatalog) Description() string {
+	return "Seed the demo catalog (100 sellers, 2000 products); production needs --allow-production"
+}
+
+func (d *demoCatalog) Flags(fs *flag.FlagSet) {
+	d.allowProduction = fs.Bool("allow-production", false, "allow seeding when APP_ENV=production")
+	d.fresh = fs.Bool("fresh", false, "delete the demo sellers (shops, products) first")
+}
+
+func (d *demoCatalog) Run(ctx context.Context, app *vukem.App, _ []string) error {
+	s := seeders.DemoCatalog{AllowProduction: *d.allowProduction}
+
+	if *d.fresh {
+		if app.Config.IsProduction() && !*d.allowProduction {
+			return seeders.ErrDemoCatalogInProduction
+		}
+
+		db, err := app.DB()
+		if err != nil {
+			return err
+		}
+
+		if err := s.Purge(ctx, db); err != nil {
+			return err
+		}
+	}
+
+	res, err := s.RunApp(ctx, app)
+	if err != nil {
+		return err
+	}
+
+	_, err = fmt.Fprintf(app.Stdout(), "Demo catalog: %d sellers and %d products created in %s.\n",
+		res.Sellers, res.Products, res.Elapsed.Round(time.Millisecond))
+
+	return err
 }
