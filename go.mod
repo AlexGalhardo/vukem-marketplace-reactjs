@@ -4,6 +4,7 @@ go 1.27.2
 
 require (
 	github.com/AlexGalhardo/vukem v0.22.0
+	github.com/AlexGalhardo/vukem/contrib/stripe v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0
