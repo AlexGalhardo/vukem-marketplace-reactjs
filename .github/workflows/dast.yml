@@ -1,0 +1,45 @@
+name: DAST
+
+# Dynamic scans against the full docker compose stack: OWASP ZAP baseline
+# (passive) and nuclei. Weekly and on demand; findings are reports, the
+# OWASP abuse suite in Go/Playwright is the blocking gate.
+on:
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - name: Generate APP_KEY
+        run: echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env
+      - name: Start the stack
+        run: docker compose up -d --build --wait --wait-timeout 300 app
+      - name: ZAP baseline
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: http://localhost:3200
+          rules_file_name: .zap/rules.tsv
+          allow_issue_writing: false
+          fail_action: false
+      - name: nuclei
+        uses: projectdiscovery/nuclei-action@v3.1.0
+        with:
+          args: -u http://localhost:3200 -severity medium,high,critical -o nuclei.txt
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: dast-reports
+          path: |
+            report_html.html
+            report_json.json
+            nuclei.txt
+          retention-days: 14
