@@ -1,0 +1,42 @@
+{
+	"app": {
+		"name": "Vukem Marketplace",
+		"tagline": "Compre e venda de tudo, de lojas de todo o Brasil."
+	},
+	"nav": {
+		"search_placeholder": "Buscar produtos, marcas e muito mais…",
+		"search": "Buscar",
+		"categories": "Categorias",
+		"offers": "Ofertas",
+		"sell": "Vender",
+		"login": "Entrar",
+		"register": "Crie a sua conta",
+		"cart": "Carrinho"
+	},
+	"theme": {
+		"toggle": "Alternar tema de cores",
+		"light": "Claro",
+		"dark": "Escuro"
+	},
+	"locale": {
+		"label": "Idioma",
+		"en": "English",
+		"pt-BR": "Português (Brasil)"
+	},
+	"home": {
+		"hero_title": "Tudo o que você precisa, entregue.",
+		"hero_body": "Frete grátis em milhares de produtos, PIX ou cartão e compra garantida em todo pedido.",
+		"cta_browse": "Ver o catálogo",
+		"cta_sell": "Abrir sua loja",
+		"benefits": {
+			"pix": "Pague com PIX ou cartão",
+			"shipping": "Frete calculado pelo CEP",
+			"protection": "Compra garantida"
+		},
+		"coming_soon": "O catálogo abre em breve."
+	},
+	"footer": {
+		"rights": "© {year} Vukem Marketplace. Uma demo feita com o framework Go vukem.",
+		"not_affiliated": "Sem afiliação com nenhum outro marketplace."
+	}
+}

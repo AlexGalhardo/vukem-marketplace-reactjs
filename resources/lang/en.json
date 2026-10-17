@@ -1,0 +1,42 @@
+{
+	"app": {
+		"name": "Vukem Marketplace",
+		"tagline": "Buy and sell anything, from shops all over Brazil."
+	},
+	"nav": {
+		"search_placeholder": "Search products, brands and more…",
+		"search": "Search",
+		"categories": "Categories",
+		"offers": "Offers",
+		"sell": "Sell",
+		"login": "Log in",
+		"register": "Create account",
+		"cart": "Cart"
+	},
+	"theme": {
+		"toggle": "Toggle color theme",
+		"light": "Light",
+		"dark": "Dark"
+	},
+	"locale": {
+		"label": "Language",
+		"en": "English",
+		"pt-BR": "Português (Brasil)"
+	},
+	"home": {
+		"hero_title": "Everything you need, delivered.",
+		"hero_body": "Free shipping on thousands of products, PIX or card, and buyer protection on every order.",
+		"cta_browse": "Browse the catalog",
+		"cta_sell": "Open your shop",
+		"benefits": {
+			"pix": "Pay with PIX or card",
+			"shipping": "Shipping calculated by ZIP code",
+			"protection": "Buyer protection"
+		},
+		"coming_soon": "The catalog opens soon."
+	},
+	"footer": {
+		"rights": "© {year} Vukem Marketplace. A demo built with the vukem Go framework.",
+		"not_affiliated": "Not affiliated with any other marketplace."
+	}
+}

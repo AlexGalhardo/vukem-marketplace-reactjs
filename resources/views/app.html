@@ -1,0 +1,25 @@
+{{/* layout: none */}}<!doctype html>
+<html lang="{{locale}}">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="color-scheme" content="light dark">
+	<title>Vukem Marketplace</title>
+	<meta property="csp-nonce" nonce="{{cspNonce}}">
+	<script nonce="{{cspNonce}}">
+		(function () {
+			try {
+				var saved = localStorage.getItem("theme");
+				var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+				document.documentElement.classList.toggle("dark", dark);
+			} catch (e) {}
+		})();
+	</script>
+	{{viteReactRefresh}}
+	{{vite "resources/css/app.css" "resources/js/app.tsx"}}
+	{{.Head}}
+</head>
+<body class="min-h-dvh bg-surface text-ink antialiased">
+	{{.Inertia}}
+</body>
+</html>
