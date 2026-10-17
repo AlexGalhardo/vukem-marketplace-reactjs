@@ -135,7 +135,11 @@ jobs:
       - name: Generate APP_KEY
         run: echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env
       - name: Start the stack
-        run: docker compose up -d --build --wait --wait-timeout 300 app worker
+        # The worker has no healthcheck (it serves no HTTP), so it is started
+        # after app is healthy instead of being waited on.
+        run: |
+          docker compose up -d --build --wait --wait-timeout 300 app
+          docker compose up -d worker
       - name: Seed demo data
         run: |
           docker compose exec -T app /app/app media:bucket
