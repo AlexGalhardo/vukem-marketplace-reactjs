@@ -307,6 +307,9 @@ func TestKeysAccountPage(t *testing.T) {
 	}{
 		{map[string]any{"name": "", "scopes": []string{"cart:read"}}, "name"},
 		{map[string]any{"name": "x", "scopes": []string{"admin:everything"}}, "scopes"},
+		// z required on a list means present (v0.25.0); min=1 keeps [] out.
+		{map[string]any{"name": "x", "scopes": []string{}}, "scopes"},
+		{map[string]any{"name": "x"}, "scopes"},
 		{map[string]any{"name": "x", "scopes": []string{"cart:read"}, "expires_in_days": 7}, "expires_in_days"},
 	}
 	for _, tt := range tests {
