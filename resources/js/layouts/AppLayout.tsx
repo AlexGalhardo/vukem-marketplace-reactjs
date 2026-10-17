@@ -56,6 +56,17 @@ export default function AppLayout({ children }: { children: ReactNode }): JSX.El
 									{page.props.auth.user.name}
 								</Link>
 								<Link
+									href="/cart"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{t("nav.cart")}
+									{(page.props.cartCount ?? 0) > 0 && (
+										<span className="ml-1 rounded-full bg-action-500 px-1.5 text-xs font-semibold text-white tabular-nums">
+											{page.props.cartCount}
+										</span>
+									)}
+								</Link>
+								<Link
 									href="/logout"
 									method="post"
 									as="button"
