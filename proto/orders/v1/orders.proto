@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package orders.v1;
+
+option go_package = "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1;ordersv1";
+
+// OrderService reads the caller's own orders (as a buyer). Calls need an
+// API key with the orders:read scope; other users' orders are NotFound.
+service OrderService {
+  rpc ListOrders(ListOrdersRequest) returns (ListOrdersResponse);
+  rpc GetOrder(GetOrderRequest) returns (GetOrderResponse);
+  // WatchOrder sends the order's current state, then (for now) waits
+  // until the client cancels; live updates arrive with the realtime phase.
+  rpc WatchOrder(WatchOrderRequest) returns (stream WatchOrderResponse);
+}
+
+message OrderItem {
+  string product_slug = 1;
+  string title = 2;
+  int64 price_cents = 3;
+  int32 quantity = 4;
+}
+
+message SellerOrder {
+  string shop_slug = 1;
+  string shop_name = 2;
+  string status = 3;
+  int64 subtotal_cents = 4;
+  int64 shipping_cents = 5;
+  string carrier = 6;
+  string tracking_code = 7;
+  repeated OrderItem items = 8;
+}
+
+message Order {
+  // The order's public UUID.
+  string id = 1;
+  string status = 2;
+  string payment_method = 3;
+  int64 subtotal_cents = 4;
+  int64 shipping_cents = 5;
+  int64 total_cents = 6;
+  string currency = 7;
+  // RFC 3339.
+  string created_at = 8;
+  repeated SellerOrder seller_orders = 9;
+}
+
+message PageMeta {
+  int32 page = 1;
+  int32 per_page = 2;
+  int64 total = 3;
+  int32 last_page = 4;
+}
+
+message ListOrdersRequest {
+  int32 page = 1;
+  int32 per_page = 2;
+}
+
+message ListOrdersResponse {
+  repeated Order orders = 1;
+  PageMeta meta = 2;
+}
+
+message GetOrderRequest {
+  string id = 1;
+}
+
+message GetOrderResponse {
+  Order order = 1;
+}
+
+message WatchOrderRequest {
+  string id = 1;
+}
+
+message WatchOrderResponse {
+  Order order = 1;
+}

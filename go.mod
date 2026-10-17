@@ -3,12 +3,17 @@ module github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs
 go 1.27.2
 
 require (
+	connectrpc.com/connect v1.21.1
+	connectrpc.com/grpchealth v1.5.0
 	github.com/AlexGalhardo/vukem v0.23.0
+	github.com/AlexGalhardo/vukem/contrib/graphql v0.1.0
+	github.com/AlexGalhardo/vukem/contrib/grpc v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/otel v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0
 	github.com/google/go-cmp v0.7.0
+	github.com/google/uuid v1.6.0
 	go.mongodb.org/mongo-driver/v2 v2.9.2
 	go.opentelemetry.io/otel v1.47.0
 	go.opentelemetry.io/otel/sdk v1.47.0
@@ -18,12 +23,12 @@ require (
 )
 
 require (
+	connectrpc.com/grpcreflect v1.3.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
@@ -54,7 +59,7 @@ require (
 	golang.org/x/tools v0.52.0 // indirect
 	golang.org/x/vuln v1.9.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20260928230214-8a89bd6388cc // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260928230214-8a89bd6388cc // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261012220534-4341edf3f941 // indirect
 	google.golang.org/grpc v1.83.2 // indirect
 	modernc.org/libc v1.77.1 // indirect
 	modernc.org/mathutil v1.7.1 // indirect

@@ -43,5 +43,45 @@
 	"admin": {
 		"title": "Admin",
 		"intro": "Moderation, payouts and the ledger arrive in the admin phase."
+	},
+	"api": {
+		"keys": {
+			"title": "API keys",
+			"intro": "Use an API key to call the REST, GraphQL and gRPC APIs from your own scripts. Each key only does what its scopes allow.",
+			"docs": "Read the API reference",
+			"create_title": "Create a key",
+			"name": "Name",
+			"name_hint": "Something that tells you where the key is used, like \"Inventory script\".",
+			"scopes": "Scopes",
+			"expires": "Expires",
+			"expires_never": "Never",
+			"expires_days": "In {days} days",
+			"create": "Create key",
+			"created_title": "Copy your new key now",
+			"created_body": "This is the only time \"{name}\" is shown. Store it in a password manager or a secret store; if you lose it, revoke it and create a new one.",
+			"copy": "Copy key",
+			"copied": "Copied",
+			"list_title": "Your keys",
+			"limit": "{count} of {max} active keys.",
+			"empty": "No keys yet. Create one above to start calling the API.",
+			"prefix": "Key",
+			"last_used": "Last used",
+			"never_used": "Never used",
+			"expires_at": "Expires",
+			"status_active": "Active",
+			"status_revoked": "Revoked",
+			"status_expired": "Expired",
+			"revoke": "Revoke",
+			"revoke_confirm": "Revoke \"{name}\"? Anything using it stops working immediately.",
+			"back": "Back to the dashboard"
+		},
+		"scope": {
+			"catalog:read": "Read the catalog",
+			"cart:read": "Read your cart",
+			"cart:write": "Change your cart",
+			"orders:read": "Read your orders",
+			"shop:read": "Read your shop",
+			"shop:write": "Manage your shop"
+		}
 	}
 }
