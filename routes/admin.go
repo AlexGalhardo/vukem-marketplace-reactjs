@@ -10,7 +10,7 @@ import (
 )
 
 // Admin registers the admin area. Every route is behind
-// accounts.RequireAdmin: admin role and confirmed 2FA.
+// accounts.RequireAdmin (admin role and confirmed 2FA) and a verified email.
 func Admin(r *router.Router, app *vukem.App) error {
 	acc, err := accounts.New(app)
 	if err != nil {
@@ -18,7 +18,7 @@ func Admin(r *router.Router, app *vukem.App) error {
 	}
 
 	r.Group("/admin", func(g *router.Group) {
-		g.Use(acc.RequireAdmin)
+		g.Use(acc.RequireAdmin, acc.RequireVerified)
 		g.Get("", func(c *web.Ctx) error { return inertia.Render(c, "Admin/Dashboard", nil) }).Name("admin.dashboard")
 	})
 

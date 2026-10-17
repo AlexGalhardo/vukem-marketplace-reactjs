@@ -4,6 +4,8 @@
 package accounts
 
 import (
+	"context"
+	"net/http"
 	"strings"
 	"time"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/AlexGalhardo/vukem/auth/hash"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/mail"
+	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/signed"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
@@ -33,6 +36,12 @@ type Accounts struct {
 	ResetTTL time.Duration
 	// VerifyTTL is how long email verification links work.
 	VerifyTTL time.Duration
+
+	// mailLater renders a mail now and sends it from a queue job, so SMTP
+	// latency and failures stay off the request path.
+	mailLater func(ctx context.Context, m mail.Mailable, opts ...queue.Option) error
+	queue     *queue.Queue
+	stampKey  []byte
 	now       func() time.Time
 }
 
@@ -44,6 +53,11 @@ func New(app *vukem.App) (*Accounts, error) {
 	}
 
 	mailer, err := app.Mailer()
+	if err != nil {
+		return nil, err
+	}
+
+	q, err := app.Queue()
 	if err != nil {
 		return nil, err
 	}
@@ -66,6 +80,17 @@ func New(app *vukem.App) (*Accounts, error) {
 		URL:       strings.TrimSuffix(app.Config.URL, "/"),
 		ResetTTL:  time.Hour,
 		VerifyTTL: time.Hour,
-		now:       time.Now,
+		mailLater: app.MailLater,
+		queue:     q,
+		stampKey:  app.Key.Derive("session.stamp", 32),
+		now:       app.Now,
 	}, nil
+}
+
+// RequireVerified lets signed-in users with a verified email through.
+// Guests go to the login page; unverified browsers (Inertia visits
+// included) are redirected to the verification notice, JSON clients get
+// 403. Checkout, selling and the admin area use it.
+func (a *Accounts) RequireVerified(next http.Handler) http.Handler {
+	return auth.Required(a.Web)(auth.Verified(a.Web)(next))
 }

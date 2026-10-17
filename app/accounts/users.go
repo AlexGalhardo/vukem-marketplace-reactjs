@@ -8,6 +8,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
+	"github.com/AlexGalhardo/vukem/queue"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/mail"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
@@ -36,14 +37,15 @@ func (a *Accounts) Register(ctx context.Context, in requests.Register) (models.U
 	return u, a.SendVerification(ctx, u)
 }
 
-// SendVerification emails a signed link that verifies u's address.
+// SendVerification queues an email with a signed link that verifies u's
+// address.
 func (a *Accounts) SendVerification(ctx context.Context, u models.User) error {
 	link, err := a.Signer.Sign(fmt.Sprintf("%s/email/verify/%d", a.URL, u.ID), a.VerifyTTL)
 	if err != nil {
 		return err
 	}
 
-	return a.Mailer.Send(ctx, mail.VerifyEmail{User: u, Link: link})
+	return a.mailLater(ctx, mail.VerifyEmail{User: u, Link: link}, mailRetries()...)
 }
 
 // MarkVerified sets email_verified_at using ex (a.DB, or the transaction
@@ -78,4 +80,9 @@ func (a *Accounts) updatePassword(ctx context.Context, tx database.Executor, id 
 
 func (a *Accounts) expired(created time.Time, ttl time.Duration) bool {
 	return a.now().After(created.Add(ttl))
+}
+
+// mailRetries retries a failed send a few times before the job fails.
+func mailRetries() []queue.Option {
+	return []queue.Option{queue.Retries(3), queue.Backoff(queue.Exponential(10 * time.Second))}
 }
