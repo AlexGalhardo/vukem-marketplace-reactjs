@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://json.schemastore.org/lefthook.json
+# Git hooks, installed by `bun install` (prepare script) or `bunx lefthook install`.
+output:
+  - summary
+  - failure
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: go fmt
+      glob: "*.go"
+      run: golangci-lint fmt {staged_files}
+      stage_fixed: true
+    - name: go lint
+      glob: "*.go"
+      run: golangci-lint run --new-from-rev=HEAD ./...
+    - name: go mod tidy
+      glob: "{go.mod,go.sum}"
+      run: go mod tidy -diff
+    - name: biome
+      glob: "*.{ts,tsx,js,json,jsonc}"
+      run: bunx biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      stage_fixed: true
+    - name: markdownlint
+      glob: "*.md"
+      exclude:
+        - ".claude/skills/**"
+      run: bunx markdownlint-cli2 {staged_files}
+
+commit-msg:
+  jobs:
+    - name: conventional commit
+      run: bunx commitlint --edit {1}
+
+# The race detector, integration and e2e suites run in GitHub Actions.
+pre-push:
+  parallel: true
+  jobs:
+    - name: go vet
+      run: go vet ./...
+    - name: go test
+      run: go test ./...
+    - name: typecheck
+      run: bun run typecheck
+    - name: govulncheck
+      run: go tool govulncheck ./...

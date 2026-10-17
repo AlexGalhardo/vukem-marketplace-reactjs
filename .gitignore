@@ -1,0 +1,37 @@
+# Environment
+.env
+.env.*.local
+.env.local
+
+# Local agent settings (owner-only, e.g. {"disableAllHooks": true})
+.claude/settings.local.json
+
+# Build output and caches
+/bin/
+/tmp/
+.vukem/
+coverage.out
+*.test
+
+# Local data
+storage/*
+!storage/.gitkeep
+
+node_modules/
+
+# Vite: dev server marker and build output
+/resources/public/hot
+/resources/public/build/
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
