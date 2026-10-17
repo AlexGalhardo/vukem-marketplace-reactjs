@@ -53,6 +53,7 @@ func RedisOptions(ctx context.Context, deps *Deps) ([]vukem.Option, error) {
 	}
 
 	deps.Redis = rc
+	deps.redisPrefix = cfg.Prefix
 	deps.AddCheck("redis", rc.Ping)
 
 	return []vukem.Option{

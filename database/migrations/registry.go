@@ -7,5 +7,9 @@ import "github.com/AlexGalhardo/vukem/schema"
 func All() []schema.Migration {
 	return []schema.Migration{
 		m20261017100000EnablePostgresExtensions(),
+		m20261017131452CreateUsersTable(),
+		m20261017131453CreateAuthTables(),
+		m20261017131454CreateSocialAccountsTable(),
+		m20261017131455AddTwoFactorColumns(),
 	}
 }

@@ -11,5 +11,8 @@ import (
 func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 	return []func(r *router.Router, app *vukem.App) error{
 		Web(deps),
+		Auth(deps),
+		Social,
+		TwoFactor(deps),
 	}
 }

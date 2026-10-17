@@ -23,6 +23,8 @@ type Deps struct {
 	Redis *redis.Client
 	Mongo *mongo.Client
 
+	redisPrefix string
+
 	mu     sync.RWMutex
 	checks map[string]Check
 }

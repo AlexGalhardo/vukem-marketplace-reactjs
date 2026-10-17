@@ -11,7 +11,8 @@
 		"sell": "Vender",
 		"login": "Entrar",
 		"register": "Crie a sua conta",
-		"cart": "Carrinho"
+		"cart": "Carrinho",
+		"logout": "Sair"
 	},
 	"theme": {
 		"toggle": "Alternar tema de cores",

@@ -11,7 +11,8 @@
 		"sell": "Sell",
 		"login": "Log in",
 		"register": "Create account",
-		"cart": "Cart"
+		"cart": "Cart",
+		"logout": "Log out"
 	},
 	"theme": {
 		"toggle": "Toggle color theme",

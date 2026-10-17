@@ -46,7 +46,40 @@ export default function AppLayout({ children }: { children: ReactNode }): JSX.El
 							</button>
 						</form>
 					</search>
-					<nav className="ml-auto flex items-center gap-1">
+					<nav className="ml-auto flex items-center gap-1 text-sm text-brand-900 dark:text-ink">
+						{page.props.auth?.user ? (
+							<>
+								<Link
+									href="/dashboard"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{page.props.auth.user.name}
+								</Link>
+								<Link
+									href="/logout"
+									method="post"
+									as="button"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{t("nav.logout")}
+								</Link>
+							</>
+						) : (
+							<>
+								<Link
+									href="/register"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{t("nav.register")}
+								</Link>
+								<Link
+									href="/login"
+									className="rounded-full px-3 py-2 hover:bg-black/10 dark:hover:bg-white/10"
+								>
+									{t("nav.login")}
+								</Link>
+							</>
+						)}
 						<LocaleMenu />
 						<ThemeToggle />
 					</nav>
