@@ -82,12 +82,9 @@ func API(r *router.Router, app *vukem.App) error {
 	}).Name("api.v1.")
 
 	// The API is public, so its document and reference are served in
-	// production too (vukem.ServeOpenAPI would need OPENAPI_IN_PRODUCTION).
-	r.Get("/api/v1/openapi.json", func(c *web.Ctx) error {
-		return c.JSON(http.StatusOK, openapi.Generate(app.Router.Routes(), openapi.Info{
-			Title: app.Config.Name + " API", Version: "v1", Servers: []string{app.Config.URL}, PathPrefix: "/api/v1",
-		}))
-	}).Name("api.v1.openapi").Doc(openapi.Skip{})
+	// production too.
+	vukem.ServeOpenAPIWith(app, r, "/api/v1/openapi.json",
+		vukem.OpenAPIOptions{PathPrefix: "/api/v1", InProduction: true}).Name("api.v1.openapi")
 	apidocs.Register(r, "/docs/api", apidocs.Config{
 		SpecURL: "/api/v1/openapi.json", Title: app.Config.Name + " API",
 		Authentication: map[string]any{"preferredSecurityScheme": "bearer"},
