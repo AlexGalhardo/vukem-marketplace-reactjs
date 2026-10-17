@@ -1,6 +1,9 @@
 //nolint:misspell // pt-BR demo vocabulary, not English typos.
 package seeders
 
+// workaround(vukem): factory.Faker has no locale or product/company/text data
+// (only lorem ipsum), so the pt-BR vocabulary lives here.
+//
 // Demo catalog vocabulary (pt-BR). Brands are invented; any resemblance to
 // a real trademark is accidental. Prices are whole reais (the generator
 // adds the cents), weights grams.
