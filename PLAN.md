@@ -307,7 +307,7 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
   → verify: `go test ./tests/orders`
 - [ ] O.2 SSE + Redis pub/sub for order status and notifications; React `useEventStream`
   → verify: e2e status changes without reload
-- [ ] O.3 Reviews (eligible items only, one per item, rating recalc job)
+- [x] O.3 Reviews (eligible items only, one per item, rating recalc job)
   → verify: `go test ./tests/reviews`
 
 ### M — Admin and moderation

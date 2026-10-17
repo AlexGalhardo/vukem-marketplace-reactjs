@@ -45,6 +45,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - Storefront redesign in the big LatAm marketplace style with our own brand: header with deliver-to CEP, banner carousel, shortcut panels, offer shelves, category grid, cards with installments and stars, search filter column with list/grid view, product buy box with buy now, reviews summary and Q&A placeholder, cart summary, footer with a non-affiliation note; light and dark tokens with AA contrast; skip link.
 - Product cards carry `rating_avg_x100` and `rating_count`.
 - Project-scoped Impeccable design skill (cli-v4.6.0) and zod 4.6.7 for client-side form validation.
+- Product questions and answers: buyers ask on product pages (10–500 characters, no contact data, 5 per 10 minutes), sellers answer at `/seller/questions` with a realtime and email notice, admins hide/unhide at `/admin/questions` (audited); `product_questions` flag.
+- Product reviews: buyers of paid/shipped/delivered order lines review once (1–5 stars, title, text, recommend); the product page shows the average, count, 5→1 distribution, newest/most-helpful sort, verified-purchase badge, the seller's reply and helpful votes; admins hide/unhide at `/admin/reviews` (audited); `reviews` flag; `reviews:recalculate` command and a daily recalculation task.
+- `app/moderation.ContainsContact` shared by questions, answers, reviews and replies (links, emails, handles, phone numbers; CEPs allowed).
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
