@@ -1,0 +1,115 @@
+# Local development stack. Host ports are offset from the defaults so this
+# project runs next to other vukem apps; override them in .env (MKT_*_PORT).
+name: vukem-marketplace
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        APP_VERSION: local
+    environment:
+      APP_ENV: development
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:${MKT_APP_PORT:-3200}
+      APP_KEY: "${APP_KEY:?APP_KEY is missing, run vukem key:generate}"
+      DATABASE_URL: postgres://marketplace:marketplace@postgres:5432/marketplace?sslmode=disable
+      REDIS_URL: redis://redis:6379/0
+      MONGO_URL: mongodb://mongo:27017/marketplace
+      MAIL_MAILER: smtp
+      MAIL_FROM: Vukem Marketplace <no-reply@marketplace.local>
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_INSECURE: "true"
+      S3_ENDPOINT: http://rustfs:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: marketplace
+      S3_ACCESS_KEY_ID: rustfsadmin
+      S3_SECRET_ACCESS_KEY: rustfsadmin
+      S3_USE_PATH_STYLE: "true"
+      S3_INSECURE_HTTP: "true"
+      LOG_FORMAT: json
+    command: ["sh", "-c", "/app/app migrate && exec /app/app"]
+    ports:
+      - "${MKT_APP_PORT:-3200}:3000"
+      - "${MKT_GRPC_PORT:-50061}:50051"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+      rustfs:
+        condition: service_started
+
+  postgres:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_USER: marketplace
+      POSTGRES_PASSWORD: marketplace
+      POSTGRES_DB: marketplace
+    ports:
+      - "${MKT_PG_PORT:-5442}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U marketplace -d marketplace"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8.10.2-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${MKT_REDIS_PORT:-6389}:6379"
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mongo:
+    image: mongo:8.3.13
+    ports:
+      - "${MKT_MONGO_PORT:-27027}:27017"
+    volumes:
+      - mongo:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  # S3-compatible object storage (stands in for the Railway bucket). MinIO
+  # stopped publishing images, so RustFS is the local replacement.
+  rustfs:
+    image: rustfs/rustfs:1.0.2
+    environment:
+      RUSTFS_ACCESS_KEY: rustfsadmin
+      RUSTFS_SECRET_KEY: rustfsadmin
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "${MKT_S3_PORT:-9200}:9000"
+      - "${MKT_S3_CONSOLE_PORT:-9201}:9001"
+    volumes:
+      - rustfs:/data
+
+  # Fully offline mail catcher. Dev/staging/e2e email assertions use the
+  # Mailtrap Email Sandbox instead (SMTP_* + MAILTRAP_* in .env).
+  mailpit:
+    image: axllent/mailpit:v1.31.6
+    ports:
+      - "${MKT_SMTP_PORT:-1035}:1025"
+      - "${MKT_MAILPIT_PORT:-8035}:8025"
+
+volumes:
+  postgres:
+  redis:
+  mongo:
+  rustfs:
