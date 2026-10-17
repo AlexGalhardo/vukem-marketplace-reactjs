@@ -4,20 +4,23 @@ import { type JSX, useState } from "react";
 import Installments from "../../components/catalog/Installments";
 import Price from "../../components/catalog/Price";
 import ProductImage from "../../components/catalog/ProductImage";
+import ProductQuestions from "../../components/catalog/ProductQuestions";
 import Rating from "../../components/catalog/Rating";
 import Shelf from "../../components/catalog/Shelf";
 import AddToCartButton from "../../components/commerce/AddToCartButton";
 import FreightBox from "../../components/commerce/FreightBox";
-import { ChatIcon, ChevronRightIcon, StoreIcon, TruckIcon } from "../../components/icons";
+import { ChevronRightIcon, StoreIcon, TruckIcon } from "../../components/icons";
 import { useT } from "../../lib/i18n";
-import type { ProductCard, ProductDetail } from "../../types";
+import type { Page, ProductCard, ProductDetail, PublicQuestion, QnaMeta } from "../../types";
 
 interface Props {
 	product: ProductDetail;
 	more: ProductCard[];
+	questions: Page<PublicQuestion>;
+	qna: QnaMeta;
 }
 
-export default function Product({ product, more }: Props): JSX.Element {
+export default function Product({ product, more, questions, qna }: Props): JSX.Element {
 	const { t, locale } = useT();
 	const [current, setCurrent] = useState(0);
 	const image = product.images[current];
@@ -191,15 +194,7 @@ export default function Product({ product, more }: Props): JSX.Element {
 						)}
 					</section>
 
-					<section aria-labelledby="questions-title">
-						<h2 id="questions-title" className="mb-3 text-xl font-semibold text-ink">
-							{t("storefront.product.questions")}
-						</h2>
-						<p className="flex items-start gap-2 rounded-md bg-sunken p-4 text-sm text-muted">
-							<ChatIcon className="size-5 shrink-0 text-action-600" />
-							{t("storefront.product.questions_soon")}
-						</p>
-					</section>
+					<ProductQuestions slug={product.slug} questions={questions} qna={qna} />
 				</div>
 			</article>
 

@@ -43,6 +43,9 @@ const (
 	PixCheckout Key = "pix_checkout"
 	// GraphQLAPI serves the /graphql endpoint of the public API.
 	GraphQLAPI Key = "graphql_api"
+	// ProductQuestions lets signed-in users ask on product pages. Off:
+	// existing questions stay visible and sellers can still answer.
+	ProductQuestions Key = "product_questions"
 )
 
 // Definition describes a flag.
@@ -64,6 +67,7 @@ func Definitions() []Definition {
 		{Key: CardCheckout, Default: true},
 		{Key: PixCheckout, Default: true},
 		{Key: GraphQLAPI, Default: true},
+		{Key: ProductQuestions, Default: true},
 	}
 }
 

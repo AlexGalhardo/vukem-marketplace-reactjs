@@ -17,6 +17,11 @@ export default function AdminDashboard(): JSX.Element {
 					{t("admin.flags_link")}
 				</Link>
 			</p>
+			<p className="mt-2">
+				<Link href="/admin/questions" className={link}>
+					{t("qna.admin.link")}
+				</Link>
+			</p>
 		</>
 	);
 }

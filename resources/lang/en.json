@@ -87,6 +87,10 @@
 				"graphql_api": {
 					"label": "GraphQL API",
 					"description": "Serves /graphql for API key holders. Off: the endpoint answers 404; REST and gRPC are unaffected."
+				},
+				"product_questions": {
+					"label": "Product questions",
+					"description": "Signed-in buyers can ask sellers on product pages. Off: the form is hidden and new questions are refused; existing questions stay visible and sellers can still answer."
 				}
 			}
 		}
@@ -778,8 +782,7 @@
 			"buy_now": "Buy now",
 			"reviews": "Product reviews",
 			"no_reviews": "No reviews yet.",
-			"questions": "Questions and answers",
-			"questions_soon": "Questions to the seller are not available in this demo yet."
+			"questions": "Questions and answers"
 		},
 		"cart": {
 			"summary": "Purchase summary",
@@ -823,5 +826,79 @@
 		"server": "Something went wrong on our side",
 		"generic": "Something went wrong",
 		"home": "Go to the home page"
+	},
+	"qna": {
+		"title": "Questions and answers",
+		"ask_label": "Ask the seller",
+		"ask_hint": "Between {min} and {max} characters. Links, emails and phone numbers are not allowed: keep the conversation here so you stay protected.",
+		"ask_submit": "Ask",
+		"asking": "Sending…",
+		"login_to_ask": "Log in to ask the seller",
+		"own_product": "This is your product. Answer questions from your seller area.",
+		"own_product_link": "Go to my questions",
+		"disabled": "New questions are paused for now.",
+		"empty": "No questions yet. Be the first to ask.",
+		"asked_by": "{name} asked",
+		"answer_label": "Seller answer",
+		"awaiting": "Waiting for the seller's answer",
+		"count": "{count} questions",
+		"pagination": "Questions pages",
+		"previous": "Newer questions",
+		"next": "Older questions",
+		"page_of": "Page {page} of {last}",
+		"chars": "{count}/{max}",
+		"errors": {
+			"no_contact": "For your safety, keep the conversation on the platform: links, emails, social handles and phone numbers are not allowed.",
+			"own_product": "You cannot ask questions about your own shop's products.",
+			"too_short": "Write at least {min} characters.",
+			"too_long": "Use at most {max} characters.",
+			"rate_limited": "You asked too many questions in a short time. Please wait a few minutes."
+		},
+		"flash": {
+			"asked": "Your question was sent to the seller.",
+			"answered": "Your answer was published.",
+			"hidden": "The question was hidden.",
+			"unhidden": "The question is visible again."
+		},
+		"mail": {
+			"subject": "New question about {product}",
+			"hello": "Hello, {name}.",
+			"body": "A buyer asked a question about {product}:",
+			"action": "Answer the question",
+			"footer": "Quick answers help buyers decide. Answers are public on the product page."
+		},
+		"seller": {
+			"nav": "Questions",
+			"title": "Buyer questions",
+			"intro": "Answer quickly: answers appear on the product page for every buyer.",
+			"filters": "Filter questions",
+			"unanswered": "Unanswered ({count})",
+			"answered": "Answered",
+			"empty_unanswered": "No questions waiting for an answer.",
+			"empty_answered": "No answered questions yet.",
+			"about": "About {product}",
+			"answer_label": "Your answer",
+			"answer_hint": "Up to {max} characters. Links, emails and phone numbers are not allowed.",
+			"answer_submit": "Publish answer",
+			"edit_submit": "Update answer",
+			"answering": "Publishing…",
+			"live": "New question received. The list was updated."
+		},
+		"admin": {
+			"link": "Moderate product questions",
+			"title": "Product questions",
+			"intro": "Hide questions that break the rules. Hidden questions disappear from the product page and the seller inbox.",
+			"filters": "Filter questions",
+			"all": "All",
+			"hidden": "Hidden",
+			"empty": "No questions.",
+			"shop": "Shop: {shop}",
+			"asker": "Asked by {name} (user #{id})",
+			"hidden_badge": "Hidden",
+			"hidden_reason": "Reason: {reason}",
+			"reason_label": "Reason for hiding",
+			"hide": "Hide",
+			"unhide": "Show again"
+		}
 	}
 }

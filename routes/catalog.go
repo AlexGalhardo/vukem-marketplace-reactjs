@@ -38,6 +38,11 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 		}
 
 		pub := storefront.New(svc, acc)
+
+		if pub.Questions, err = Questions(r, app, deps, acc); err != nil {
+			return err
+		}
+
 		r.Get("/", pub.Home).Name("home")
 		r.Get("/search", pub.Search).Name("catalog.search")
 		r.Get("/c/{slug}", pub.Category).Name("catalog.category")

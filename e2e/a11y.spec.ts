@@ -113,6 +113,13 @@ test.describe("a11y buyer", () => {
 				"/user/two-factor",
 			]);
 
+			// The question form (signed-in buyer) and its error state.
+			await page.goto(product);
+			await page.getByLabel(combo.locale === "en" ? "Ask the seller" : "Pergunte ao vendedor").fill("short");
+			await page.locator('form:has(textarea[name="body"]) button[type="submit"]').click();
+			await expect(page.locator("[data-invalid]").first()).toBeVisible();
+			await scan(page, `${combo.theme}/${combo.locale} question form error`);
+
 			await page.goto(product);
 			await page.locator('main form button[type="submit"]').first().click();
 			await scanAll(page, combo, ["/cart", "/checkout/address"]);
@@ -142,6 +149,10 @@ test.describe("a11y seller", () => {
 				"/seller/settings",
 				"/seller/payouts",
 				"/seller/webhooks",
+				"/seller/questions",
+				"/seller/questions?filter=answered",
+				// The owner sees a notice instead of the question form.
+				product,
 			]);
 
 			await page.goto("/seller/products");
@@ -170,7 +181,13 @@ test.describe("a11y admin", () => {
 	for (const combo of combos) {
 		test(`admin pages ${combo.theme} ${combo.locale}`, async ({ page, context }) => {
 			await prepare(context, combo, cookies);
-			await scanAll(page, combo, ["/admin", "/admin/payouts", "/admin/flags"]);
+			await scanAll(page, combo, [
+				"/admin",
+				"/admin/payouts",
+				"/admin/flags",
+				"/admin/questions",
+				"/admin/questions?filter=hidden",
+			]);
 		});
 	}
 });

@@ -260,3 +260,30 @@ export interface FeatureFlagChange {
 	user_email: string;
 	at: string;
 }
+
+// Product questions (app/qna). The asker is shown by first name only.
+export interface PublicQuestion {
+	id: number;
+	body: string;
+	answer: string;
+	answered_at: string | null;
+	asker_name: string;
+	created_at: string;
+}
+
+export interface SellerQuestion extends PublicQuestion {
+	product: { slug: string; title: string };
+}
+
+export interface AdminQuestion extends SellerQuestion {
+	asker_id: number;
+	shop_name: string;
+	hidden_at: string | null;
+	hidden_reason: string;
+}
+
+// The product page's question state (controllers/questions.ProductProps).
+export interface QnaMeta {
+	enabled: boolean;
+	own_product: boolean;
+}
