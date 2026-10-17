@@ -4,11 +4,11 @@
 // Checkout Sessions, PaymentIntents, transfers, refunds and transfer
 // reversals, each POST with a caller-chosen idempotency key.
 //
-// workaround(vukem): contrib/stripe v0.1.0 lacks Connect resources and idempotency keys.
-// contrib/stripe pins the API version and verifies webhooks (used by
-// app/payments); its Client has no Connect accounts, account links,
-// transfers, refunds or reversals, and CreateCheckoutSession/Do take no
-// idempotency key, so these calls are made here.
+// v1 calls go through contrib/stripe v0.2.0 (Call with idempotency keys).
+//
+// workaround(vukem): contrib/stripe has no Accounts v2 helpers yet (typed
+// v2 helpers are planned for v0.26.0), so the v2 account and account-link
+// calls (JSON bodies) are made here.
 package stripe
 
 import (
@@ -38,6 +38,8 @@ type Client struct {
 	key  config.Secret
 	base string
 	http *http.Client
+	// v1 sends the v1 (form-encoded) calls through vukem's client.
+	v1 *vstripe.Client
 }
 
 var _ payments.StripeAPI = (*Client)(nil)
@@ -54,37 +56,46 @@ func New(key config.Secret, base string) (*Client, error) {
 		base = APIHost
 	}
 
-	return &Client{
-		key:  key,
-		base: strings.TrimSuffix(base, "/"),
-		http: &http.Client{
-			Timeout:       30 * time.Second,
-			CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse },
-		},
-	}, nil
+	hc := &http.Client{
+		Timeout:       30 * time.Second,
+		CheckRedirect: func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse },
+	}
+
+	// No client-side retries: failed calls surface to the caller, and
+	// webhook redelivery or the next attempt retries with the same
+	// idempotency key.
+	v1, err := vstripe.New(
+		k,
+		vstripe.WithBaseURL(strings.TrimSuffix(base, "/")),
+		vstripe.WithHTTPClient(hc),
+		vstripe.WithRetries(0),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Client{key: key, base: strings.TrimSuffix(base, "/"), http: hc, v1: v1}, nil
 }
 
 // String never reveals the key.
 func (c *Client) String() string { return "stripe.Client{key: [redacted]}" }
 
-// call sends a v1 request (form-encoded body, or query on GET).
+// call sends a v1 request (form-encoded body, or query on GET) through
+// contrib/stripe, with idemKey as the Idempotency-Key of a POST.
 func (c *Client) call(ctx context.Context, method, path string, form url.Values, idemKey string, out any) error {
-	target := c.base + path
-
-	var (
-		body        io.Reader = http.NoBody
-		contentType string
-	)
-
-	if method == http.MethodGet {
-		if len(form) > 0 {
-			target += "?" + form.Encode()
+	params := make(vstripe.Params, len(form))
+	for k, v := range form {
+		if len(v) > 0 {
+			params[k] = v[0]
 		}
-	} else {
-		body, contentType = strings.NewReader(form.Encode()), "application/x-www-form-urlencoded"
 	}
 
-	return c.send(ctx, method, target, path, body, contentType, idemKey, out)
+	var opts []vstripe.RequestOption
+	if idemKey != "" {
+		opts = append(opts, vstripe.IdempotencyKey(idemKey))
+	}
+
+	return c.v1.Call(ctx, method, path, params, out, opts...)
 }
 
 // callJSON sends a v2 request: v2 endpoints take JSON bodies.
