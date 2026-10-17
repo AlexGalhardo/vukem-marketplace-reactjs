@@ -1,0 +1,28 @@
+# Contributing
+
+Thanks for helping. This project is also the battle test for the vukem framework, so reports about vukem itself are welcome too.
+
+## Setup
+
+1. Install Go 1.27.2, Bun 1.4.3, Docker and the vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.21.1`).
+2. `cp .env.example .env && vukem key:generate`
+3. `bun install` (installs the lefthook git hooks) and `go mod download`
+4. `docker compose up -d --build`, then open <http://localhost:3200>
+
+## Workflow
+
+- Pick a task from [PLAN.md](PLAN.md); write the failing test first.
+- Keep commits small and use [Conventional Commits](https://www.conventionalcommits.org/) in English: `feat(cart): re-price items on every read`.
+- Add a line to `CHANGELOG.md` under `[Unreleased]` for user-visible changes.
+- Before pushing: `golangci-lint run ./...`, `go test -race ./...`, `bun run lint`, `bun run typecheck`.
+- Open a pull request; CI (lint, tests, integration, e2e) must be green.
+
+## Style
+
+- `.editorconfig`: tabs (width 4) everywhere except YAML and Markdown (2 spaces).
+- Go is formatted by `golangci-lint fmt`; TypeScript and JSON by Biome.
+- UI strings live in `resources/lang/en.json` and `resources/lang/pt-BR.json`.
+
+## Security issues
+
+Do not open public issues for vulnerabilities; see [SECURITY.md](SECURITY.md).
