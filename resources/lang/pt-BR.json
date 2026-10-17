@@ -39,5 +39,9 @@
 	"footer": {
 		"rights": "© {year} Vukem Marketplace. Uma demo feita com o framework Go vukem.",
 		"not_affiliated": "Sem afiliação com nenhum outro marketplace."
+	},
+	"admin": {
+		"title": "Administração",
+		"intro": "Moderação, repasses e o livro-razão chegam na fase de administração."
 	}
 }

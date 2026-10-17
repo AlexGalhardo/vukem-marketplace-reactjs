@@ -164,7 +164,7 @@ func (a *Accounts) createSocialUser(
 		return models.User{}, err
 	}
 
-	u := models.User{Name: name, Email: email, Password: h}
+	u := models.User{Name: name, Email: email, Password: h, Role: models.RoleUser}
 
 	// workaround(vukem): the scaffold returned `u, orm.Create(ctx, tx, &u)`,
 	// whose evaluation order is unspecified (the ID may be missing).

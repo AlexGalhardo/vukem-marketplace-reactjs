@@ -11,5 +11,6 @@ func All() []schema.Migration {
 		m20261017131453CreateAuthTables(),
 		m20261017131454CreateSocialAccountsTable(),
 		m20261017131455AddTwoFactorColumns(),
+		m20261017150000AddRoleToUsers(),
 	}
 }

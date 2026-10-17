@@ -8,6 +8,7 @@ import (
 	"github.com/AlexGalhardo/vukem/auth/totp"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
 )
 
@@ -96,7 +97,7 @@ func enableTwoFactor(t *testing.T, app *vukemtest.App, c *vukemtest.Client, emai
 	c.PostJSON("/user/two-factor/confirm", map[string]any{"code": totpCode(t, s, 0)}).AssertRedirect("/user/two-factor")
 
 	codes := recoveryCodes(t, c)
-	if len(codes) != 8 {
+	if len(codes) != accounts.RecoveryCodeCount {
 		t.Fatalf("recovery codes = %v", codes)
 	}
 
@@ -104,7 +105,7 @@ func enableTwoFactor(t *testing.T, app *vukemtest.App, c *vukemtest.Client, emai
 	c.Get("/user/two-factor").AssertInertia("Auth/TwoFactor").
 		PropEquals("enabled", true).
 		PropEquals("recoveryCodes", nil).
-		PropEquals("recoveryCodesLeft", 8).
+		PropEquals("recoveryCodesLeft", accounts.RecoveryCodeCount).
 		PropEquals("secret", nil)
 
 	return s, codes
@@ -172,12 +173,14 @@ func TestTwoFactorRecoveryCodes(t *testing.T) {
 	c.PostJSON("/two-factor-challenge", map[string]any{"code": "", "recovery_code": codes[1]}).
 		AssertRedirect("/dashboard")
 
-	owner.Get("/user/two-factor").AssertInertia("Auth/TwoFactor").PropEquals("recoveryCodesLeft", 6)
+	owner.Get("/user/two-factor").
+		AssertInertia("Auth/TwoFactor").
+		PropEquals("recoveryCodesLeft", accounts.RecoveryCodeCount-2)
 
 	// Regenerating replaces every code.
 	owner.PostJSON("/user/two-factor/recovery-codes", nil).AssertRedirect("/user/two-factor")
 
-	if fresh := recoveryCodes(t, owner); len(fresh) != 8 || fresh[0] == codes[2] {
+	if fresh := recoveryCodes(t, owner); len(fresh) != accounts.RecoveryCodeCount || fresh[0] == codes[2] {
 		t.Fatalf("regenerated codes = %v", fresh)
 	}
 

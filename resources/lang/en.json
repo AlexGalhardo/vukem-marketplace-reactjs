@@ -39,5 +39,9 @@
 	"footer": {
 		"rights": "© {year} Vukem Marketplace. A demo built with the vukem Go framework.",
 		"not_affiliated": "Not affiliated with any other marketplace."
+	},
+	"admin": {
+		"title": "Admin",
+		"intro": "Moderation, payouts and the ledger arrive in the admin phase."
 	}
 }

@@ -14,5 +14,6 @@ func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 		Auth(deps),
 		Social,
 		TwoFactor(deps),
+		Admin,
 	}
 }

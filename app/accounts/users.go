@@ -28,7 +28,7 @@ func (a *Accounts) Register(ctx context.Context, in requests.Register) (models.U
 		return models.User{}, err
 	}
 
-	u := models.User{Name: in.Name, Email: email, Password: h}
+	u := models.User{Name: in.Name, Email: email, Password: h, Role: models.RoleUser}
 	if err := orm.Create(ctx, a.DB, &u); err != nil {
 		return models.User{}, err
 	}

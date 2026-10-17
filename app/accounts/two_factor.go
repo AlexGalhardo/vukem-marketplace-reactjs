@@ -20,7 +20,7 @@ import (
 // Two-factor authentication settings (vukem install:auth --2fa).
 const (
 	// RecoveryCodeCount is how many single-use recovery codes a user gets.
-	RecoveryCodeCount = 8
+	RecoveryCodeCount = 10
 	// TwoFactorChallengeTTL is how long the code step stays open after a
 	// correct password.
 	TwoFactorChallengeTTL = 5 * time.Minute
