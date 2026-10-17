@@ -11,11 +11,10 @@ import (
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 )
 
-// eligibleSQL selects an order line the user bought, with its product, in
+// eligibleFrom selects the order lines the user bought, with their product, in
 // a seller order that can be reviewed, from a shop the user does not own.
 // It is the only eligibility rule; Eligible, Create and PendingItem use it.
-const eligibleSQL = `SELECT oi.id, p.id, p.slug, p.title, COALESCE(r.id, 0)
-	FROM order_items oi
+const eligibleFrom = ` FROM order_items oi
 	JOIN seller_orders so ON so.id = oi.seller_order_id
 	JOIN orders o ON o.id = so.order_id
 	JOIN products p ON p.id = oi.product_id
@@ -38,7 +37,7 @@ func eligible(ctx context.Context, ex database.Executor, userID, orderItemID int
 
 	var it Item
 
-	err := dbx.QueryRow(ctx, ex, eligibleSQL+` AND oi.id = ?`, append(args, orderItemID)...).
+	err := dbx.QueryRow(ctx, ex, `SELECT oi.id, p.id, p.slug, p.title, COALESCE(r.id, 0)`+eligibleFrom+` AND oi.id = ?`, append(args, orderItemID)...).
 		Scan(&it.OrderItemID, &it.ProductID, &it.ProductSlug, &it.ProductTitle, &it.ReviewID)
 	if errors.Is(err, sql.ErrNoRows) {
 		return Item{}, ErrNotFound
@@ -68,8 +67,8 @@ func (s *Service) PendingItem(ctx context.Context, userID, productID int64) (int
 
 	var id int64
 
-	err := dbx.QueryRow(ctx, s.DB, `SELECT q.id FROM (`+eligibleSQL+` AND p.id = ? AND r.id IS NULL) q
-		ORDER BY q.id LIMIT 1`, append(args, productID)...).Scan(&id)
+	err := dbx.QueryRow(ctx, s.DB, `SELECT oi.id`+eligibleFrom+` AND p.id = ? AND r.id IS NULL ORDER BY oi.id LIMIT 1`, append(args, productID)...).
+		Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return 0, nil
 	}

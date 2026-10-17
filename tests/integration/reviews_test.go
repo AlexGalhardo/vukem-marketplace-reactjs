@@ -75,6 +75,10 @@ func TestReviewsOnPostgres(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if pending, err := svc.PendingItem(ctx, authors[0], productID); err != nil || pending != extra {
+		t.Fatalf("PendingItem = %d, %v; want %d", pending, err, extra)
+	}
+
 	results := make([]error, 4)
 	for i := range results {
 		wg.Go(func() { _, results[i] = svc.Create(ctx, authors[0], extra, reviews.Input{Rating: 3}) })
@@ -136,5 +140,14 @@ func TestReviewsOnPostgres(t *testing.T) {
 
 	if err := svc.RecalculateRatings(ctx); err != nil {
 		t.Fatal(err)
+	}
+
+	// The page queries (summary, list with the viewer's votes, shop owner,
+	// moderation list) on Postgres.
+	e.Client(t, seller).Get("/p/"+slug+"?rsort=helpful").AssertOK().AssertInertia("Catalog/Product").
+		PropEquals("reviews.can_reply", true)
+
+	if admin, err := svc.AdminList(ctx, reviews.FilterHidden, 1); err != nil || admin.Total != 1 {
+		t.Errorf("AdminList hidden = %d, %v; want 1", admin.Total, err)
 	}
 }
