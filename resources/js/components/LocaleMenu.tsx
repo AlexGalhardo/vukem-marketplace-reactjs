@@ -18,10 +18,11 @@ export default function LocaleMenu(): JSX.Element {
 	return (
 		<Menu.Root>
 			<Menu.Trigger
-				aria-label={t("locale.label")}
 				data-testid="locale-menu"
 				className="flex h-9 items-center gap-1 rounded-full px-3 text-sm font-medium text-brand-900 hover:bg-black/10 dark:text-ink dark:hover:bg-white/10"
 			>
+				{/* The accessible name keeps the visible code (WCAG 2.5.3). */}
+				<span className="sr-only">{t("locale.label")}: </span>
 				{locale === "pt-BR" ? "PT" : "EN"}
 				<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
 					<path d="M4 6l4 4 4-4z" />
@@ -36,7 +37,7 @@ export default function LocaleMenu(): JSX.Element {
 									key={code}
 									value={code}
 									closeOnClick
-									className="grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-3 py-2 text-sm outline-hidden select-none data-highlighted:bg-action-500 data-highlighted:text-white"
+									className="grid cursor-default grid-cols-[1rem_1fr] items-center gap-2 px-3 py-2 text-sm outline-hidden select-none data-highlighted:bg-action-500 data-highlighted:text-on-action"
 								>
 									<Menu.RadioItemIndicator className="col-start-1">✓</Menu.RadioItemIndicator>
 									<span className="col-start-2">{t(`locale.${code}` as MessageKey)}</span>

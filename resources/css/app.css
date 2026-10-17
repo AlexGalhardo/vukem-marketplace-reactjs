@@ -19,9 +19,13 @@
 	--color-action-500: #2d6cdf;
 	--color-action-600: #1f57c3;
 	--color-action-700: #17449b;
+	/* Text on action backgrounds: white on the light theme's blues, near-black on the dark theme's lighter blues. */
+	--color-on-action: #ffffff;
+	--color-on-status: #ffffff;
 
-	--color-success-600: #00a650;
-	--color-danger-600: #d63031;
+	/* AA (4.5:1) against white as text and as a background for white text. */
+	--color-success-600: #006b35;
+	--color-danger-600: #c62828;
 
 	--color-surface: #f2f2f2;
 	--color-card: #ffffff;
@@ -39,6 +43,11 @@
 		--color-line: #2c2d31;
 		--color-action-500: #5b8ef0;
 		--color-action-600: #7aa4f4;
+		--color-action-700: #a3c0f8;
+		--color-on-action: #0b1220;
+		--color-on-status: #111111;
+		--color-success-600: #4cd68b;
+		--color-danger-600: #ff7b7b;
 	}
 
 	:focus-visible {

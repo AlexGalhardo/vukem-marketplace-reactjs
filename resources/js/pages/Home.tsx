@@ -57,7 +57,7 @@ export default function Home({ categories, latest, deals, recent }: Props): JSX.
 				</div>
 				<Link
 					href="/sell"
-					className="shrink-0 self-start rounded-md bg-action-600 px-5 py-2.5 font-medium text-white hover:bg-action-700 sm:self-auto"
+					className="shrink-0 self-start rounded-md bg-action-600 px-5 py-2.5 font-medium text-on-action hover:bg-action-700 sm:self-auto"
 				>
 					{t("home.cta_sell")}
 				</Link>

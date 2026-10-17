@@ -72,7 +72,7 @@ export default function Contact(): JSX.Element {
 						<button
 							type="submit"
 							disabled={form.processing}
-							className="rounded-md bg-action-600 px-5 py-2.5 font-medium text-white hover:bg-action-700 disabled:opacity-50"
+							className="rounded-md bg-action-600 px-5 py-2.5 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
 						>
 							{form.processing ? t("contact.sending") : t("contact.submit")}
 						</button>

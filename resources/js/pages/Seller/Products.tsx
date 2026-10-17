@@ -20,7 +20,7 @@ export default function Products({ products }: { products: Page<SellerProduct> }
 				<h1 className="text-2xl font-semibold text-ink">{t("seller.products.title")}</h1>
 				<Link
 					href="/seller/products/new"
-					className="rounded-md bg-action-600 px-4 py-2 font-medium text-white hover:bg-action-700"
+					className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700"
 				>
 					{t("seller.products.new")}
 				</Link>

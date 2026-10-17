@@ -67,7 +67,7 @@ export default function SellerPayouts({ shop, summary, payouts, stripe, minPayou
 						<button
 							type="submit"
 							disabled={form.processing || summary.availableCents < minPayoutCents}
-							className="self-start rounded-md bg-action-500 px-5 py-2 font-semibold text-white hover:bg-action-600 disabled:opacity-50"
+							className="self-start rounded-md bg-action-500 px-5 py-2 font-semibold text-on-action hover:bg-action-600 disabled:opacity-50"
 						>
 							{t("checkout.payouts.request")}
 						</button>

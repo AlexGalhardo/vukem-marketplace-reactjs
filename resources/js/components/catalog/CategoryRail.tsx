@@ -21,7 +21,7 @@ export default function CategoryRail({
 						<Link
 							href={`/c/${c.slug}`}
 							aria-current={c.slug === active ? "page" : undefined}
-							className="block rounded-full border border-line bg-card px-4 py-2 text-sm text-ink hover:border-action-500 hover:text-action-600 aria-[current=page]:border-action-600 aria-[current=page]:bg-action-600 aria-[current=page]:text-white"
+							className="block rounded-full border border-line bg-card px-4 py-2 text-sm text-ink hover:border-action-500 hover:text-action-600 aria-[current=page]:border-action-600 aria-[current=page]:bg-action-600 aria-[current=page]:text-on-action"
 						>
 							{c.name}
 						</Link>

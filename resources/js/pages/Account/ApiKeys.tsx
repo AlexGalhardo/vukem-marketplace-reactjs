@@ -25,8 +25,7 @@ interface Props {
 	errors?: Record<string, string>;
 }
 
-const button =
-	"rounded-md bg-action-500 px-4 py-2 font-medium text-white hover:bg-action-600 disabled:opacity-50 dark:text-surface";
+const button = "rounded-md bg-action-500 px-4 py-2 font-medium text-on-action hover:bg-action-600 disabled:opacity-50";
 
 export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: Props) {
 	const { t, locale } = useT();
@@ -60,7 +59,7 @@ export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: 
 				<header className="space-y-2">
 					<h1 className="text-2xl font-semibold text-ink">{t("api.keys.title")}</h1>
 					<p className="max-w-prose text-muted">{t("api.keys.intro")}</p>
-					<a href="/docs/api" className="text-action-500 hover:underline">
+					<a href="/docs/api" className="text-action-600 hover:underline">
 						{t("api.keys.docs")}
 					</a>
 				</header>
@@ -161,7 +160,7 @@ export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: 
 										<button
 											type="button"
 											onClick={() => revoke(key)}
-											className="rounded-md border border-danger-600 px-3 py-1.5 text-sm text-danger-600 hover:bg-danger-600 hover:text-white"
+											className="rounded-md border border-danger-600 px-3 py-1.5 text-sm text-danger-600 hover:bg-danger-600 hover:text-on-status"
 										>
 											{t("api.keys.revoke")}
 										</button>
@@ -173,7 +172,7 @@ export default function ApiKeys({ keys, scopes, expiryDays, maxKeys, created }: 
 				</section>
 
 				<p className="text-sm">
-					<Link href="/dashboard" className="text-action-500 hover:underline">
+					<Link href="/dashboard" className="text-action-600 hover:underline">
 						{t("api.keys.back")}
 					</Link>
 				</p>

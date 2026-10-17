@@ -147,7 +147,7 @@ export default function ProductForm({ product, categories, maxImages }: Props): 
 					<button
 						type="submit"
 						disabled={form.processing}
-						className="rounded-md bg-action-600 px-4 py-2 font-medium text-white hover:bg-action-700 disabled:opacity-50"
+						className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
 					>
 						{product ? t("seller.form.save") : t("seller.form.create")}
 					</button>
@@ -189,7 +189,7 @@ function StatusActions({ product }: { product: SellerProduct }): JSX.Element {
 				<button
 					type="button"
 					onClick={() => set("published")}
-					className={`${button} bg-success-600 text-white hover:opacity-90`}
+					className={`${button} bg-success-600 text-on-status hover:opacity-90`}
 				>
 					{t("seller.form.publish")}
 				</button>

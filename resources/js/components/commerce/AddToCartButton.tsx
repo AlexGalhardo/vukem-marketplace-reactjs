@@ -27,7 +27,7 @@ export default function AddToCartButton({ slug, stock }: Props): JSX.Element {
 		return (
 			<Link
 				href="/login"
-				className="inline-flex h-11 items-center justify-center rounded-md bg-action-500 px-6 font-semibold text-white hover:bg-action-600"
+				className="inline-flex h-11 items-center justify-center rounded-md bg-action-500 px-6 font-semibold text-on-action hover:bg-action-600"
 			>
 				{t("cart.login_to_buy")}
 			</Link>
@@ -64,7 +64,7 @@ export default function AddToCartButton({ slug, stock }: Props): JSX.Element {
 				<button
 					type="submit"
 					disabled={busy || stock <= 0}
-					className="h-11 flex-1 rounded-md bg-action-500 px-6 font-semibold text-white hover:bg-action-600 disabled:opacity-50"
+					className="h-11 flex-1 rounded-md bg-action-500 px-6 font-semibold text-on-action hover:bg-action-600 disabled:opacity-50"
 				>
 					{busy ? t("cart.adding") : t("cart.add")}
 				</button>

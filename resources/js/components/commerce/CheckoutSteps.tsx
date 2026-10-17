@@ -16,7 +16,7 @@ export default function CheckoutSteps({ current }: { current: (typeof steps)[num
 					<li key={step} className="flex items-center gap-2" aria-current={i === at ? "step" : undefined}>
 						<span
 							className={`flex size-6 items-center justify-center rounded-full text-xs font-semibold ${
-								i <= at ? "bg-action-500 text-white" : "border border-line text-muted"
+								i <= at ? "bg-action-500 text-on-action" : "border border-line text-muted"
 							}`}
 						>
 							{i + 1}

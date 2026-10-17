@@ -1,29 +1,6 @@
-import { createHmac } from "node:crypto";
-
 import { expect, type Page, test } from "@playwright/test";
 
-const password = "Correct-Horse-Battery-9";
-
-function uniqueEmail(prefix: string): string {
-	return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
-}
-
-// totp computes the RFC 6238 code (SHA-1, 6 digits, 30 s) of a base32
-// secret at time `at`, like an authenticator app.
-function totp(secret: string, at: number): string {
-	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-	let bits = "";
-	for (const char of secret.replace(/=+$/, "").toUpperCase()) {
-		bits += alphabet.indexOf(char).toString(2).padStart(5, "0");
-	}
-	const key = Buffer.from((bits.match(/.{8}/g) ?? []).map((byte) => Number.parseInt(byte, 2)));
-	const counter = Buffer.alloc(8);
-	counter.writeBigUInt64BE(BigInt(Math.floor(at / 30_000)));
-	const mac = createHmac("sha1", key).update(counter).digest();
-	const offset = (mac.at(-1) ?? 0) & 0x0f;
-	const value = (mac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
-	return value.toString().padStart(6, "0");
-}
+import { testPassword as password, totp, uniqueEmail } from "./support";
 
 async function register(page: Page, name: string, email: string): Promise<void> {
 	await page.goto("/register");

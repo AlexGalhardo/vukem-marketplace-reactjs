@@ -24,7 +24,7 @@ export default function Open({ ufs }: { ufs: string[] }): JSX.Element {
 					<button
 						type="submit"
 						disabled={form.processing}
-						className="w-full rounded-md bg-action-600 px-4 py-2.5 font-medium text-white hover:bg-action-700 disabled:opacity-50"
+						className="w-full rounded-md bg-action-600 px-4 py-2.5 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
 					>
 						{t("seller.open.submit")}
 					</button>

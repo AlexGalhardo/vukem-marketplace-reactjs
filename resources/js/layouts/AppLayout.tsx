@@ -67,7 +67,7 @@ export default function AppLayout({ children }: { children: ReactNode }): JSX.El
 								>
 									{t("nav.cart")}
 									{(page.props.cartCount ?? 0) > 0 && (
-										<span className="ml-1 rounded-full bg-action-500 px-1.5 text-xs font-semibold text-white tabular-nums">
+										<span className="ml-1 rounded-full bg-action-500 px-1.5 text-xs font-semibold text-on-action tabular-nums">
 											{page.props.cartCount}
 										</span>
 									)}

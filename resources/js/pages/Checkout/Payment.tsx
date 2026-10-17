@@ -121,7 +121,7 @@ export default function CheckoutPayment({ quote, methods }: Props): JSX.Element 
 					<button
 						type="submit"
 						disabled={form.processing || form.data.method === ""}
-						className="rounded-md bg-action-500 px-6 py-3 font-semibold text-white hover:bg-action-600 disabled:opacity-50"
+						className="rounded-md bg-action-500 px-6 py-3 font-semibold text-on-action hover:bg-action-600 disabled:opacity-50"
 					>
 						{t("checkout.payment.place", { total: money(quote.totalCents) })}
 					</button>

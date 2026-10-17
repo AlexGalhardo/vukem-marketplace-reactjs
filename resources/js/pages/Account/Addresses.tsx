@@ -176,7 +176,7 @@ function AddressForm({ editing, onDone }: { editing: Address | null; onDone: () 
 				<button
 					type="submit"
 					disabled={form.processing}
-					className="rounded-md bg-action-500 px-4 py-2 font-semibold text-white hover:bg-action-600 disabled:opacity-50"
+					className="rounded-md bg-action-500 px-4 py-2 font-semibold text-on-action hover:bg-action-600 disabled:opacity-50"
 				>
 					{t("checkout.addresses.save")}
 				</button>
@@ -201,7 +201,7 @@ export default function Addresses({ addresses, max }: Props): JSX.Element {
 					<button
 						type="button"
 						onClick={() => setEditing("new")}
-						className="rounded-md bg-action-500 px-4 py-2 font-semibold text-white hover:bg-action-600"
+						className="rounded-md bg-action-500 px-4 py-2 font-semibold text-on-action hover:bg-action-600"
 					>
 						{t("checkout.addresses.add")}
 					</button>

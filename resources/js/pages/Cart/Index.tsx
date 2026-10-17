@@ -117,14 +117,14 @@ export default function CartIndex({ cart }: Props): JSX.Element {
 						{cart.hasIssues || cart.itemCount === 0 ? (
 							<span
 								aria-disabled="true"
-								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-white opacity-50"
+								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-on-action opacity-50"
 							>
 								{t("cart.checkout")}
 							</span>
 						) : (
 							<Link
 								href="/checkout"
-								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-white hover:bg-action-600"
+								className="mt-4 block rounded-md bg-action-500 px-4 py-3 text-center font-semibold text-on-action hover:bg-action-600"
 							>
 								{t("cart.checkout")}
 							</Link>

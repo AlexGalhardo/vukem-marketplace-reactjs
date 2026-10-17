@@ -93,7 +93,7 @@ export default function CheckoutPix({ order, brCode, qr, canSimulate }: Props): 
 							<button
 								type="button"
 								onClick={copy}
-								className="rounded-md bg-action-500 px-4 py-3 font-semibold text-white hover:bg-action-600"
+								className="rounded-md bg-action-500 px-4 py-3 font-semibold text-on-action hover:bg-action-600"
 							>
 								{copied ? t("checkout.pix.copied") : t("checkout.pix.copy")}
 							</button>

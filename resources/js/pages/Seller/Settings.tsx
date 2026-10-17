@@ -44,7 +44,7 @@ export default function Settings({ shop, ufs }: { shop: ShopView; ufs: string[] 
 					<button
 						type="submit"
 						disabled={form.processing}
-						className="rounded-md bg-action-600 px-4 py-2 font-medium text-white hover:bg-action-700 disabled:opacity-50"
+						className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
 					>
 						{t("seller.settings.save")}
 					</button>

@@ -21,7 +21,7 @@ export default function Dashboard({ shop, products }: { shop: ShopView; products
 				</div>
 				<Link
 					href="/seller/products/new"
-					className="rounded-md bg-action-600 px-4 py-2 font-medium text-white hover:bg-action-700"
+					className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700"
 				>
 					{t("seller.products.new")}
 				</Link>

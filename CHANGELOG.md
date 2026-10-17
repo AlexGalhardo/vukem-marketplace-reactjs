@@ -36,10 +36,12 @@ All notable changes to this project are documented here. The format follows [Kee
 - `/contact` form forwarded to Telegram, and rate-limited Telegram alerts for 5xx responses.
 - Outgoing seller webhooks at `/seller/webhooks` (vukem `webhook.Sender`, Standard Webhooks signatures, retries, delivery log).
 - `/events` server-sent events over Redis pub/sub and a `useEventStream` React hook.
+- Accessibility e2e suite (`e2e/a11y.spec.ts`, `@axe-core/playwright` 4.14.0): every page and UI state in light and dark, EN and PT-BR, desktop and mobile, logged out and as buyer, seller and admin; serious and critical WCAG 2.x A/AA violations fail CI.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
 
+- Accessibility fixes from the axe scans: text on blue, green and red backgrounds uses theme tokens with AA contrast in both themes (`on-action`, `on-status`, darker success/danger), text links use `action-600`, and the language menu's accessible name keeps its visible code.
 - vukem bumped to v0.24.0 (`drivers/s3` v0.2.0, `drivers/mongo` v0.2.0, `drivers/redis` v0.2.0): the scheduler runs inside serve through vukem (`SCHEDULE_IN_SERVE`, replaces `SCHEDULER_IN_PROCESS`), queued mail payloads are sealed with `APP_KEY`, Google sign-in states use vukem's shared `Social.States` store (Redis), and `users:make-admin` prints to stdout.
 - Stripe connected accounts use Accounts v2 (Express dashboard, recipient configuration with `stripe_transfers`); new Connect platforms cannot create v1 accounts.
 - The locale menu closes after a language is picked.

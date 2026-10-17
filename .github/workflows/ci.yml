@@ -135,7 +135,7 @@ jobs:
       - name: Generate APP_KEY
         run: echo "APP_KEY=base64:$(openssl rand -base64 32)" > .env
       - name: Start the stack
-        run: docker compose up -d --build --wait --wait-timeout 300 app
+        run: docker compose up -d --build --wait --wait-timeout 300 app worker
       - name: Seed demo data
         run: |
           docker compose exec -T app /app/app media:bucket

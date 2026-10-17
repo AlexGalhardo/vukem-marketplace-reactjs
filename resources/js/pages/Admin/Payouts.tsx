@@ -51,7 +51,7 @@ function PendingRow({ payout }: { payout: PayoutRow }): JSX.Element {
 					<button
 						type="submit"
 						disabled={pay.processing}
-						className="h-10 rounded-md bg-action-500 px-4 text-sm font-semibold text-white hover:bg-action-600 disabled:opacity-50"
+						className="h-10 rounded-md bg-action-500 px-4 text-sm font-semibold text-on-action hover:bg-action-600 disabled:opacity-50"
 					>
 						{t("checkout.admin_payouts.mark_paid")}
 					</button>

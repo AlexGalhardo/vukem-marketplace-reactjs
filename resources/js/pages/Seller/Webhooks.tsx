@@ -47,7 +47,7 @@ function SecretPanel({ secret }: { secret: string }): JSX.Element | null {
 					type="button"
 					onClick={copy}
 					aria-live="polite"
-					className="rounded-md bg-action-600 px-3 py-2 text-sm font-medium text-white hover:bg-action-700"
+					className="rounded-md bg-action-600 px-3 py-2 text-sm font-medium text-on-action hover:bg-action-700"
 				>
 					{copied ? t("webhooks.copied") : t("webhooks.copy")}
 				</button>
@@ -133,7 +133,7 @@ export default function Webhooks({ hasShop, endpoints, events, maxCount, secret 
 								<button
 									type="submit"
 									disabled={form.processing || endpoints.length >= maxCount}
-									className="rounded-md bg-action-600 px-4 py-2 font-medium text-white hover:bg-action-700 disabled:opacity-50"
+									className="rounded-md bg-action-600 px-4 py-2 font-medium text-on-action hover:bg-action-700 disabled:opacity-50"
 								>
 									{form.processing ? t("webhooks.adding") : t("webhooks.add")}
 								</button>
