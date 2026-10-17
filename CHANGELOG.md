@@ -16,6 +16,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Authentication from `vukem install:auth --2fa --social google`: register, login, logout, password reset, email verification, TOTP 2FA with recovery codes, Google sign-in; Base UI form fields; header auth links.
 - `users:make-admin` command, `role` column and an `/admin` area that requires the admin role and confirmed 2FA.
 - Mailtrap Email Sandbox test helper and an integration test that follows the real verification email.
+- Schema for the catalog, commerce (cart, freight, orders, ledger, payouts, provider events, reviews) and API (keys, outgoing webhooks, contact) tables, with Postgres full-text and trigram search on products.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
