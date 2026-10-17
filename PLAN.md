@@ -168,7 +168,8 @@ PIX (AbacatePay sandbox):
 | `/sell` | Open a shop (onboarding) | verified user |
 | `/seller` (+ `/products`, `/products/new`, `/products/:id/edit`, `/orders`, `/payouts`, `/settings`, `/webhooks`, `/api`) | Seller dashboard | shop owner |
 | `/admin` (vukem admin panel) + `/admin/moderation`, `/admin/payouts`, `/admin/ledger` | Admin | admin + 2FA |
-| `/login`, `/register`, `/forgot-password`, `/reset-password/:token`, `/verify-email`, `/two-factor-challenge`, `/auth/google`, `/auth/google/callback` | Auth | guest |
+| `/login`, `/register`, `/forgot-password`, `/reset-password/{token}`, `/two-factor-challenge`, `/auth/{provider}/redirect`, `/auth/{provider}/callback` | Auth (scaffolded by `vukem install:auth`) | guest |
+| `/email/verify`, `/email/verify/{id}` (signed), `/user/two-factor`, `/dashboard`, `/logout` (POST) | Verification notice, 2FA settings, account home | user |
 | `/contact`, `/terms`, `/privacy`, `/docs/api` (Scalar) | Static / docs | public |
 | `/health`, `/ready` | Probes (JSON) | public |
 | `/locale` (POST) | Locale cookie | public |
@@ -242,10 +243,10 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 ### A — Authentication
 
-- [ ] A.1 Users table + `users:make-admin` command (CLI only), seed demo users
+- [x] A.2 Scaffold with `vukem install:auth --2fa --social google` into a scratch copy, port into the app (users, auth tables, social accounts, 2FA columns on Postgres), Base UI `Field`, header auth links; login/2FA/mail throttles moved to Redis (`platform.Deps.Limiter`); QR sent as a data URI instead of raw HTML; scaffold `evalOrder` bug fixed
+  → verify: `go test ./tests/ -run 'Register|Login|Reset|TwoFactor|Social'`; `bunx playwright test e2e/auth.spec.ts` (register → verify notice → logout → login → dashboard)
+- [ ] A.1 `users:make-admin` command (CLI only), `role` column, seed demo users
   → verify: `go test ./tests/accounts -run MakeAdmin`
-- [ ] A.2 Scaffold with `vukem install:auth --2fa --social google` into a scratch copy, port to Postgres + Inertia React pages with Base UI forms; register/login/logout, session rotation, login throttle (email+IP, Redis)
-  → verify: `go test ./tests/accounts -run 'Register|Login|Throttle'`
 - [ ] A.3 Email verification (signed link, queued mail through SMTP → Mailtrap), `verified` middleware with redirect for Inertia
   → verify: integration test reads the mail from the Mailtrap Sandbox API and follows the link
 - [ ] A.4 Password reset: generic response, async mail, token hashed, 1h, single use; invalidate other sessions on change
@@ -357,7 +358,7 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 | Stripe **test** secret + publishable keys; enable Connect (Express); platform account country (BR for BRL card charges) | `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY` | restricted key preferred; confirm the platform can create Express accounts in test mode |
 | Stripe webhook endpoints (platform + Connect) → `https://marketplace.vukem.com/webhooks/stripe` | `STRIPE_WEBHOOK_SECRETS` (comma-separated) | local: `stripe listen --forward-to localhost:3200/webhooks/stripe` |
 | AbacatePay sandbox API key (permissions: transparents create/simulate, webhooks) + webhook secret | `ABACATEPAY_API_KEY`, `ABACATEPAY_WEBHOOK_SECRET` | webhook URL must be public HTTPS (staging) |
-| Google OAuth client (Web), redirect `https://marketplace.vukem.com/auth/google/callback` and `http://localhost:3200/auth/google/callback` | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | |
+| Google OAuth client (Web), redirect `https://marketplace.vukem.com/auth/google/callback` and `http://localhost:3200/auth/google/callback` | `SOCIAL_GOOGLE_CLIENT_ID`, `SOCIAL_GOOGLE_CLIENT_SECRET` | |
 | Mailtrap Email Sandbox: API token, account id, sandbox (inbox) id, SMTP credentials | `MAILTRAP_API_TOKEN`, `MAILTRAP_ACCOUNT_ID`, `MAILTRAP_SANDBOX_ID`, `SMTP_USERNAME`, `SMTP_PASSWORD` (host `sandbox.smtp.mailtrap.io:2525`) | also as GitHub Actions secrets for e2e email specs; optional MCP: `claude mcp add mailtrap -e MAILTRAP_API_TOKEN=… -e MAILTRAP_ACCOUNT_ID=… -- npx -y mcp-mailtrap` |
 | Production email later: Mailtrap sending domain (CNAME/DKIM/DMARC) or another SMTP | `SMTP_*` | transport is env-only, no code change |
 | Telegram bot token (BotFather) + chat id | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | |
@@ -367,7 +368,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 ## 8. Status log
 
-- 2026-10-17 — Foundation complete (F.1–F.11). Next: Auth (A.1).
+- 2026-10-17 — Foundation complete (F.1–F.11), CI green on first push.
+- 2026-10-17 — Auth started: A.2 done (scaffold ported, Redis throttles, e2e). Next: A.1 (make-admin), then A.3 (email verification via Mailtrap).
 
 ## 9. Operations
 
