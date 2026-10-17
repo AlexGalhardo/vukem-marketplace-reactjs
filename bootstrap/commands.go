@@ -8,11 +8,12 @@ import (
 	vukem "github.com/AlexGalhardo/vukem"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
 )
 
 // Commands lists the application commands; vukem make:command appends here.
 func Commands() []vukem.Command {
-	return []vukem.Command{makeAdmin{}}
+	return []vukem.Command{makeAdmin{}, referenceSync{}}
 }
 
 var errEmailRequired = errors.New("usage: users:make-admin <email>")
@@ -44,6 +45,34 @@ func (makeAdmin) Run(ctx context.Context, app *vukem.App, args []string) error {
 	// workaround(vukem): commands cannot reach the app's stdout writer
 	// (WithStdout is private state), so the confirmation goes to the log.
 	app.Log.InfoContext(ctx, "user is now an admin; 2FA is required before using /admin", "email", args[0])
+
+	return nil
+}
+
+// referenceSync upserts the reference data the app needs in every
+// environment (categories, freight table). Unlike db:seed it never creates
+// demo accounts, so the production image runs it on every start.
+type referenceSync struct{}
+
+func (referenceSync) Name() string { return "reference:sync" }
+
+func (referenceSync) Description() string {
+	return "Upsert reference data (categories, freight table); safe in production"
+}
+
+func (referenceSync) Flags(*flag.FlagSet) {}
+
+func (referenceSync) Run(ctx context.Context, app *vukem.App, _ []string) error {
+	db, err := app.DB()
+	if err != nil {
+		return err
+	}
+
+	for _, s := range []vukem.Seeder{seeders.Categories{}, seeders.FreightRates{}} {
+		if err := s.Seed(ctx, db); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

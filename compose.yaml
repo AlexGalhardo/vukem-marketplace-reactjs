@@ -33,7 +33,7 @@ services:
       # does not run them in process (the single-service default).
       QUEUE_WORKER_IN_PROCESS: "false"
       SCHEDULER_IN_PROCESS: "false"
-    command: ["sh", "-c", "/app/app migrate && exec /app/app"]
+    command: ["sh", "-c", "/app/app migrate && /app/app reference:sync && exec /app/app"]
     ports:
       - "${MKT_APP_PORT:-3200}:3000"
       - "${MKT_GRPC_PORT:-50061}:50051"

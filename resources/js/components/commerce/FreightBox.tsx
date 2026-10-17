@@ -51,9 +51,16 @@ export default function FreightBox({ slug }: Props): JSX.Element {
 	};
 
 	return (
-		<form onSubmit={submit} className="flex flex-col gap-2 rounded-md border border-line p-4">
-			<label htmlFor={id} className="text-sm font-medium text-ink">
+		<form
+			onSubmit={submit}
+			aria-labelledby={`${id}-title`}
+			className="flex flex-col gap-2 rounded-md border border-line p-4"
+		>
+			<h2 id={`${id}-title`} className="text-sm font-medium text-ink">
 				{t("cart.freight.title")}
+			</h2>
+			<label htmlFor={id} className="text-sm text-muted">
+				{t("cart.freight.cep")}
 			</label>
 			<div className="flex gap-2">
 				<input

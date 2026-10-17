@@ -32,4 +32,5 @@ ENV APP_ENV=production HOST=0.0.0.0 PORT=3000 APP_VERSION=${APP_VERSION}
 # 3000 HTTP (Inertia, REST, GraphQL), 50051 gRPC (Railway TCP proxy).
 EXPOSE 3000 50051
 HEALTHCHECK --interval=15s --timeout=3s --start-period=20s CMD wget -qO- http://127.0.0.1:3000/health >/dev/null || exit 1
-CMD ["/app/app"]
+# Migrations and reference data are idempotent, so every start applies them.
+CMD ["sh", "-c", "/app/app migrate && /app/app reference:sync && exec /app/app"]

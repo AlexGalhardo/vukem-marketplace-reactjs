@@ -24,10 +24,22 @@ All notable changes to this project are documented here. The format follows [Kee
 - REST `/api/v1` with OpenAPI 3.1 at `/api/v1/openapi.json`, Scalar docs at `/docs/api`, problem+json errors, `{data, meta}` pagination and caller-scoped idempotency keys.
 - GraphQL `/graphql` (`contrib/graphql`) with depth, complexity and alias limits.
 - gRPC `catalog.v1.CatalogService` and `orders.v1.OrderService` (`contrib/grpc`) on `GRPC_PORT`.
+- Catalog: categories, one shop per seller, products (draft/published/archived) with seller dashboard pages, storefront pages (home sections, search, category, product, shop) and recently viewed products.
+- Product and shop images uploaded to S3 (RustFS locally) with type sniffing and size/pixel caps; 320/640/1280 variants made by a queue job with `contrib/imaging`.
+- Search with Postgres full text and trigram fallback, filters, sorting, a 45 s anonymous page cache and search/view history in MongoDB (90-day TTL).
+- Server-priced cart with availability flags and own-shop guard, address book with ViaCEP autofill, freight table by weight band and destination region; add-to-cart and freight quote on the product page.
+- Checkout split per seller (UUIDv7 order ids); Stripe Connect Express (onboarding, Checkout, transfers, refunds, reversals); AbacatePay PIX with QR page and expiry job; ledger-based seller balance and manual PIX payouts.
+- `reference:sync` command (categories, freight table); the image runs `migrate` and `reference:sync` on every start.
+- Queue worker and scheduler in the web process by default (`QUEUE_WORKER_IN_PROCESS`, `SCHEDULER_IN_PROCESS`), plus `worker` and `scheduler` compose services; scheduled pruning of expired tokens and old provider events and webhook deliveries.
+- OpenTelemetry HTTP, SQL and queue spans over OTLP (off unless `OTEL_EXPORTER_OTLP_*` is set).
+- `/contact` form forwarded to Telegram, and rate-limited Telegram alerts for 5xx responses.
+- Outgoing seller webhooks at `/seller/webhooks` (vukem `webhook.Sender`, Standard Webhooks signatures, retries, delivery log).
+- `/events` server-sent events over Redis pub/sub and a `useEventStream` React hook.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
 
+- The locale menu closes after a language is picked.
 - vukem bumped to v0.23.0 and `drivers/postgres` to v0.4.0 (outgoing webhooks, `contrib/imaging`, shared rate limits via `RATE_LIMIT_STORE`, `key:generate`).
 - MongoDB database name comes from `MONGO_DATABASE`, else the `MONGO_URL` path, else `marketplace`, so Railway's plugin URL (no path) works unchanged.
 - vukem bumped to v0.22.0: read-only visits no longer create sessions, and `vukemtest` sends the asset version from `Inertia("")` (local test helper removed).
@@ -41,6 +53,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - Google sign-in states are single use across instances (Redis); linking a verified Google email to a never-verified account rotates its password (pre-registration takeover).
 - 2FA bypass abuse tests: half-finished login, expired challenge, throttle across restarts, recovery codes bound to their account.
 - API keys are compared in constant time with identical failures; GraphQL introspection is off in production; production gRPC is not served without TLS (or an explicit plaintext opt-in behind a TLS proxy).
+- Seller routes are owner-scoped (404 for not-owned); uploads are sniffed, capped and re-encoded (drops polyglot payloads and EXIF); media keys are allow-listed and served with `nosniff` and a sandbox CSP.
+- Payment webhooks are signature-checked (several Stripe secrets; AbacatePay secret + HMAC) and deduplicated; order transitions are conditional and provider calls carry deterministic idempotency keys; production refuses half-configured payment providers.
+- Seller webhook URLs are checked against internal networks at creation and at send time (`httpclient.Safe`); their secrets are encrypted at rest; alerts and contact jobs carry no request data.
 - New accounts always get the `user` role; a `role` sent in the registration body is ignored.
 
 [Unreleased]: https://github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/commits/main

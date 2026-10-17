@@ -39,7 +39,7 @@ test.describe("checkout", () => {
 
 	test("freight box quotes a CEP", async ({ page }) => {
 		await page.goto(`/p/${productSlug}`);
-		await page.getByLabel("Shipping").fill("01310-100");
+		await page.getByLabel("CEP").fill("01310-100");
 		await page.getByRole("button", { name: "Calculate" }).click();
 		await expect(page.getByText(/to SP, about \d+ business days/)).toBeVisible();
 	});

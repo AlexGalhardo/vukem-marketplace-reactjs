@@ -1,10 +1,10 @@
 import { Head, Link } from "@inertiajs/react";
 import { type JSX, useState } from "react";
-
-import FreightBox from "../../components/catalog/FreightBox";
 import Price from "../../components/catalog/Price";
 import ProductGrid from "../../components/catalog/ProductGrid";
 import ProductImage from "../../components/catalog/ProductImage";
+import AddToCartButton from "../../components/commerce/AddToCartButton";
+import FreightBox from "../../components/commerce/FreightBox";
 import { useT } from "../../lib/i18n";
 import type { ProductCard, ProductDetail } from "../../types";
 
@@ -91,7 +91,8 @@ export default function Product({ product, more }: Props): JSX.Element {
 							? t("catalog.product.in_stock", { count: product.stock })
 							: t("catalog.product.out_of_stock")}
 					</p>
-					<FreightBox product={product} />
+					<AddToCartButton slug={product.slug} stock={product.stock} />
+					<FreightBox slug={product.slug} />
 					<section aria-labelledby="seller-title" className="rounded-md border border-line p-3 text-sm">
 						<h2 id="seller-title" className="text-muted">
 							{t("catalog.product.sold_by")}

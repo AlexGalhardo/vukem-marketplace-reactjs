@@ -1,11 +1,11 @@
-import { expect, type Page, test } from "@playwright/test";
+import { type Cookie, expect, type Page, test } from "@playwright/test";
 
 // Catalog flows against the seeded stack (`vukem db:seed`: categories, the
 // demo shop "Loja Demo Vukem" with 12 published products owned by
 // seller@example.com). The seller tests log in as that user; set
-// E2E_SELLER_PASSWORD when the auth seeder uses another password.
+// E2E_SELLER_PASSWORD when SEED_PASSWORD differs (the users seeder creates seller@example.com first).
 const sellerEmail = "seller@example.com";
-const sellerPassword = process.env.E2E_SELLER_PASSWORD ?? "demo-seller-password";
+const sellerPassword = process.env.E2E_SELLER_PASSWORD ?? "marketplace-demo-password";
 
 const tinyPNG = Buffer.from(
 	"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==",
@@ -79,12 +79,24 @@ test.describe("storefront", () => {
 test.describe("seller", () => {
 	test.describe.configure({ mode: "serial" });
 
-	test.beforeEach(async ({ page }) => {
+	// Log in once per worker: logging in before every test trips the login
+	// throttle (5 per minute per email and IP) across projects.
+	let cookies: Cookie[] = [];
+
+	test.beforeAll(async ({ browser }) => {
+		const context = await browser.newContext();
+		const page = await context.newPage();
 		await page.goto("/login");
 		await page.getByLabel("Email").fill(sellerEmail);
 		await page.getByLabel("Password").fill(sellerPassword);
 		await page.getByRole("button", { name: "Log in" }).click();
 		await expect(page).not.toHaveURL(/\/login/);
+		cookies = (await context.storageState()).cookies;
+		await context.close();
+	});
+
+	test.beforeEach(async ({ page }) => {
+		await page.context().addCookies(cookies);
 	});
 
 	test("creates, illustrates, publishes and archives a product", async ({ page }) => {

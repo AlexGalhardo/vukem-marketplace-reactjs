@@ -266,39 +266,39 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 ### C — Catalog
 
-- [ ] C.1 Categories (seeded, EN/PT names), shops (open shop, slug, branding), policies (owner only)
+- [x] C.1 Categories (seeded, EN/PT names), shops (open shop, slug, branding), policies (owner only)
   → verify: `go test ./tests/catalog -run Shop`; IDOR test across two sellers
-- [ ] C.2 Products CRUD (draft/publish/archive), visibility rule (published + shop active + payable), slugs
+- [x] C.2 Products CRUD (draft/publish/archive), visibility rule (published + shop active + payable), slugs
   → verify: `go test ./tests/catalog -run Product`
-- [ ] C.3 Image upload: vukem upload sniffing + `image.DecodeConfig` pixel caps + resize 320/640/1280 → S3 (RustFS/Railway bucket), max 8 images, reorder
+- [x] C.3 Image upload: vukem upload sniffing + `image.DecodeConfig` pixel caps + resize 320/640/1280 → S3 (RustFS/Railway bucket), max 8 images, reorder
   → verify: abuse tests (polyglot, SVG, bomb, oversize); `go test -tags integration ./tests/integration -run Upload`
-- [ ] C.4 Search: Postgres full text + trigram on title, filters (category, price, UF), sort, pagination, Redis cache, search history to Mongo
+- [x] C.4 Search: Postgres full text + trigram on title, filters (category, price, UF), sort, pagination, Redis cache, search history to Mongo
   → verify: `go test ./tests/catalog -run Search`
-- [ ] C.5 Pages: Home sections, search, category, product (gallery, freight box), shop storefront; product views to Mongo; recently viewed
+- [x] C.5 Pages: Home sections, search, category, product (gallery, freight box), shop storefront; product views to Mongo; recently viewed
   → verify: e2e `catalog.spec.ts`
 
 ### K — Cart and shipping
 
-- [ ] K.1 Cart (login required), re-pricing on every read, availability flags, own-shop guard, quantity caps
+- [x] K.1 Cart (login required), re-pricing on every read, availability flags, own-shop guard, quantity caps
   → verify: `go test ./tests/cart`; price tampering abuse test
-- [ ] K.2 ViaCEP client (SSRF-safe fixed host, timeout, cache 24h) + address book
+- [x] K.2 ViaCEP client (SSRF-safe fixed host, timeout, cache 24h) + address book
   → verify: `go test ./app/shipping -run ViaCEP` with httptest
-- [ ] K.3 Freight table by weight band × destination UF region (seeded), per seller order
+- [x] K.3 Freight table by weight band × destination UF region (seeded), per seller order
   → verify: table-driven `go test ./app/shipping -run Freight`
 
 ### P — Payments and checkout
 
-- [ ] P.1 Ledger + provider_events tables, money helpers (cents, fee bps)
+- [x] P.1 Ledger + provider_events tables, money helpers (cents, fee bps)
   → verify: `go test ./app/payments -run Fee`
-- [ ] P.2 Checkout service (re-price, snapshot, one transaction, order public ids)
+- [x] P.2 Checkout service (re-price, snapshot, one transaction, order public ids)
   → verify: `go test ./tests/checkout`
-- [ ] P.3 Stripe Connect Express onboarding (Accounts + Account Links, `account.updated` sync) behind an interface (upstream candidate, audit F5)
+- [x] P.3 Stripe Connect Express onboarding (Accounts + Account Links, `account.updated` sync) behind an interface (upstream candidate, audit F5)
   → verify: `go test ./app/payments/stripe` with stripe-mock or recorded fixtures
-- [ ] P.4 Card checkout session + webhook fulfilment + transfers + refunds + reversals (idempotency keys)
+- [x] P.4 Card checkout session + webhook fulfilment + transfers + refunds + reversals (idempotency keys)
   → verify: webhook forgery/replay/double-delivery tests; Stripe test card e2e (`4242…`, 3DS, decline)
-- [ ] P.5 AbacatePay PIX charge, QR page with SSE, webhook (secret + HMAC), expiry job, simulate-payment e2e
+- [x] P.5 AbacatePay PIX charge, QR page with SSE, webhook (secret + HMAC), expiry job, simulate-payment e2e
   → verify: `go test ./app/payments/abacatepay`; e2e `pix.spec.ts`
-- [ ] P.6 Seller balance from ledger, payout request, admin manual payout record
+- [x] P.6 Seller balance from ledger, payout request, admin manual payout record
   → verify: `go test ./tests/payouts`
 
 ### O — Orders, reviews, realtime
@@ -327,16 +327,16 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
   → verify: `go test ./tests/graphql`
 - [x] X.4 gRPC (`contrib/grpc`) on `GRPC_PORT`, API key interceptor
   → verify: `go test ./tests/api -run GRPC` (grpctest, connect-go, all four protocols)
-- [ ] X.5 Outgoing seller webhooks (signed, queued, retried, delivery log, SSRF-safe)
+- [x] X.5 Outgoing seller webhooks (signed, queued, retried, delivery log, SSRF-safe)
   → verify: `go test ./tests/webhooks`
 
 ### B — Background jobs and observability
 
-- [ ] B.1 Queue worker + scheduler processes (PIX expiry, cleanup of expired tokens/sessions, rating recalcs, transfer retries)
+- [x] B.1 Queue worker + scheduler processes (PIX expiry, cleanup of expired tokens/sessions, rating recalcs, transfer retries)
   → verify: `vukem schedule:list` shows tasks; job tests with fake clock
-- [ ] B.2 OpenTelemetry (`drivers/otel`) HTTP spans + manual DB/queue/client spans + metrics, OTLP to Railway
+- [ ] B.2 OpenTelemetry (traces done; metrics pending new dependencies) (`drivers/otel`) HTTP spans + manual DB/queue/client spans + metrics, OTLP to Railway
   → verify: local OTLP collector receives spans in integration test
-- [ ] B.3 Telegram: contact form + rate-limited 5xx alerts
+- [x] B.3 Telegram: contact form + rate-limited 5xx alerts
   → verify: `go test ./app/alerts` with httptest Telegram
 
 ### S — Security hardening and QA
@@ -378,6 +378,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 - 2026-10-17 — Owner secrets configured on Railway and GitHub Actions: Mailtrap (sandbox shared with another app: filter by unique recipient, never clean the inbox, email suites serialized), AbacatePay dev key + webhook secret, Google OAuth (localhost redirects 3000/3333/4444/5173; production URI pending), Telegram bot token (chat id pending). Stripe test endpoints exist (platform + Connect → `/webhooks/stripe`); Stripe test keys (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRETS` with platform + Connect whsec) set on Railway and GitHub Actions; Stripe integration tests run in CI when present. Google production redirect URIs and AbacatePay webhook URLs configured by the owner. Local `stripe listen` must be logged into the same Stripe account as the keys.
 
 - 2026-10-17 — Lead resumed: MONGO_DATABASE support, centralized catalog/commerce/API migrations, vukem v0.23.0. Parallel streams in worktrees (auth, catalog, checkout, apis, ops). Merged: apis (X.1–X.4; REST seller writes, `freight` and X.5 still open), auth (A.1b, A.3b, A.4, A.5, A.8; no active-sessions list: vukem cannot enumerate sessions). gRPC stays off in production until `GRPC_TLS_*` or `GRPC_INSECURE_PLAINTEXT=true` is set. Tests that need a logged-in user use `apifixture.ActingAs` (stamped session), not `vukemtest.ActingAs`.
+
+- 2026-10-17 — Merged catalog (C.1–C.5), checkout (K.1–K.3, P.1–P.6) and ops (B.1, B.3, X.5; B.2 traces only, metrics need new OTel dependencies; O.2 infrastructure: `/events` + `useEventStream`, checkout does not publish yet). Product page mounts add-to-cart and the freight quote. The image runs `migrate` + `reference:sync` on start; the queue worker and scheduler run inside the web process unless disabled. Open: O.1, O.2 wiring (publish on order status), O.3, M.*, REST seller writes + `freight`, S.*, axe accessibility scans in e2e (owner approved `@axe-core/playwright`).
 
 ## 9. Operations
 

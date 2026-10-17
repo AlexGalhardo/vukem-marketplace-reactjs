@@ -13,7 +13,8 @@ Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framewor
 - Go: `golangci-lint fmt`, `golangci-lint run ./...`, `go vet ./...`, `go test -race ./...`, `go tool govulncheck ./...`
 - Integration: `go test -tags integration ./tests/integration/...` with `TEST_DATABASE_URL`, `TEST_REDIS_URL`, `TEST_MONGO_URL`
 - Web: `bun run lint`, `bun run typecheck`, `bun run build`, `bun run test:e2e` (stack on :3200)
-- Stack: `docker compose up -d --build`; probes `curl localhost:3200/health` and `/ready`
+- Stack: `docker compose up -d --build`; probes `curl localhost:3200/health` and `/ready`; demo data `docker compose exec -T app /app/app db:seed` (Git Bash: prefix `MSYS_NO_PATHCONV=1`); reference data only: `reference:sync`
+- Tests that need a logged-in user: `internal/testing/authtest.ActingAs` / `SessionCookies` (sessions carry a password stamp; `vukemtest` `ActingAs` alone is logged out)
 
 ## Rules
 
