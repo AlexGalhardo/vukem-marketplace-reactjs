@@ -17,5 +17,6 @@ func All() []schema.Migration {
 		m20261017200200CreateAPITables(),
 		m20261017220000AddSessionVersionToUsers(),
 		m20261018100000CreateFeatureFlagsTables(),
+		m20261019200000ExtendReviews(),
 	}
 }
