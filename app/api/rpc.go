@@ -2,9 +2,10 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"net/http"
-	"strings"
+	"slices"
 	"time"
 
 	"connectrpc.com/connect"
@@ -22,75 +23,36 @@ import (
 )
 
 // RPC serves catalog.v1.CatalogService and orders.v1.OrderService
-// (connect-go: gRPC, gRPC-Web and Connect) on the gRPC listener only.
+// (connect-go: gRPC, gRPC-Web and Connect) on a router of their own, the
+// one the gRPC port serves, so RPC paths never reach the HTTP port.
 type RPC struct {
 	Svc Services
-	// Middleware runs on every RPC route after the listener check:
+	// Middleware runs on every service route before the scope check:
 	// authentication (API keys only) and rate limits.
 	Middleware []router.Middleware
 }
 
-// rpcPrefixes are the paths the gRPC listener serves.
-var rpcPrefixes = []string{ //nolint:gochecknoglobals // constant
-	"/" + catalogv1connect.CatalogServiceName + "/",
-	"/" + ordersv1connect.OrderServiceName + "/",
-	"/grpc.health.v1.Health/",
-	"/grpc.reflection.",
-}
+// Handler returns the RPC router: the vukem API middleware stack, the
+// services, health and (outside production) reflection.
+func (s *RPC) Handler(app *vukem.App) (http.Handler, error) {
+	r := router.New(app.Router.Services())
+	if err := vukem.APIMiddleware(app, r); err != nil {
+		return nil, fmt.Errorf("rpc middleware: %w", err)
+	}
 
-type grpcListenerKey struct{}
-
-// GRPCListener wraps the app handler for the gRPC port: it serves only the
-// RPC paths and marks requests so the RPC routes accept them. The same
-// routes answer 404 on the HTTP port.
-func GRPCListener(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for _, p := range rpcPrefixes {
-			if strings.HasPrefix(r.URL.Path, p) {
-				h.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), grpcListenerKey{}, true)))
-				return
-			}
-		}
-
-		http.NotFound(w, r)
-	})
-}
-
-func onlyGRPCListener(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if on, _ := r.Context().Value(grpcListenerKey{}).(bool); !on {
-			http.NotFound(w, r)
-			return
-		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
-// Register mounts the services, health and (outside production) reflection.
-func (s *RPC) Register(app *vukem.App, r *router.Router) {
 	opts := vgrpc.HandlerOptions(vgrpc.Options{Log: app.Log})
-	base := append([]router.Middleware{onlyGRPCListener}, s.Middleware...)
 
 	path, h := catalogv1connect.NewCatalogServiceHandler(&catalogRPC{svc: s.Svc}, opts...)
-	vgrpc.Mount(r, path, h).Use(append(base, Require(ScopeCatalogRead))...)
+	vgrpc.Mount(r, path, h).Use(append(slices.Clone(s.Middleware), Require(ScopeCatalogRead))...)
 
 	path, h = ordersv1connect.NewOrderServiceHandler(&ordersRPC{svc: s.Svc}, opts...)
-	vgrpc.Mount(r, path, h).Use(append(base, Require(ScopeOrdersRead))...)
+	vgrpc.Mount(r, path, h).Use(append(slices.Clone(s.Middleware), Require(ScopeOrdersRead))...)
 
 	vgrpc.Health(r, grpchealth.NewStaticChecker(catalogv1connect.CatalogServiceName,
-		ordersv1connect.OrderServiceName)).Use(onlyGRPCListener)
+		ordersv1connect.OrderServiceName))
+	vgrpc.Reflection(app, r, catalogv1connect.CatalogServiceName, ordersv1connect.OrderServiceName)
 
-	// Reflection routes are registered on r directly; GRPCListener already
-	// keeps them off the HTTP port's other paths, and production skips them.
-	vgrpc.Reflection(app, &listenerOnly{r}, catalogv1connect.CatalogServiceName, ordersv1connect.OrderServiceName)
-}
-
-// listenerOnly mounts handlers behind onlyGRPCListener.
-type listenerOnly struct{ r *router.Router }
-
-func (l *listenerOnly) Handle(pattern string, h http.Handler) *router.Route {
-	return l.r.Handle(pattern, h).Use(onlyGRPCListener)
+	return r, nil
 }
 
 type catalogRPC struct{ svc Services }

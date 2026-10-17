@@ -2,9 +2,8 @@ package routes
 
 import (
 	"context"
-	"crypto/tls"
+	"errors"
 	"fmt"
-	"net"
 	"net/http"
 	"strconv"
 	"time"
@@ -13,6 +12,7 @@ import (
 	vapi "github.com/AlexGalhardo/vukem/api"
 	"github.com/AlexGalhardo/vukem/apidocs"
 	"github.com/AlexGalhardo/vukem/auth"
+	vgrpc "github.com/AlexGalhardo/vukem/contrib/grpc"
 	"github.com/AlexGalhardo/vukem/middleware"
 	"github.com/AlexGalhardo/vukem/openapi"
 	"github.com/AlexGalhardo/vukem/ratelimit"
@@ -36,7 +36,7 @@ const (
 // document and Scalar reference at /docs/api, GraphQL /graphql, gRPC on
 // GRPC_PORT, and the account page that manages API keys.
 func API(r *router.Router, app *vukem.App) error {
-	acc, err := accounts.New(app)
+	st, err := newAPIStack(app)
 	if err != nil {
 		return err
 	}
@@ -46,38 +46,11 @@ func API(r *router.Router, app *vukem.App) error {
 		return err
 	}
 
-	// RATE_LIMIT_STORE=cache shares the buckets across instances (Redis).
-	limiters, err := app.RateLimiters()
-	if err != nil {
-		return err
-	}
-
-	perCaller := defaultAPIRateLimit
-	if v := app.Source.Get("API_RATE_LIMIT"); v != "" {
-		if perCaller, err = strconv.Atoi(v); err != nil || perCaller < 1 {
-			return fmt.Errorf("API_RATE_LIMIT must be a positive integer, got %q", v)
-		}
-	}
-
-	keys := api.NewKeys(acc.DB, app.Now)
-	svc := sqlstore.New(acc.DB, app.Now).Services()
-
-	authn := &api.Authenticator{Keys: keys, Log: app.Log, Session: func(c *web.Ctx) (int64, bool) {
-		u, err := acc.Web.User(c)
-		return u.ID, err == nil
-	}}
-	keysOnly := &api.Authenticator{Keys: keys, Log: app.Log}
-
-	// The IP limit runs before authentication so key guessing is throttled
-	// too; the per-caller limit runs after it (per key, user or IP).
-	ipLimit := ratelimit.Middleware(limiters("api-ip", apiIPRateLimit, time.Minute), ratelimit.ByIP)
-	callerLimit := ratelimit.Middleware(limiters("api", perCaller, time.Minute), api.RateKey)
 	idempotency := vapi.Idempotency(cache.Store(), vapi.IdempotencyOptions{Scope: api.IdempotencyScope})
-
-	rest := &api.REST{Svc: svc, Idempotency: idempotency}
+	rest := &api.REST{Svc: st.svc, Idempotency: idempotency}
 
 	r.Group("/api/v1", func(g *router.Group) {
-		g.Use(middleware.JSONOnly(), ipLimit, authn.Middleware, callerLimit)
+		g.Use(middleware.JSONOnly(), st.ipLimit, st.authn.Middleware, st.callerLimit)
 		rest.Register(g)
 	}).Name("api.v1.")
 
@@ -90,7 +63,7 @@ func API(r *router.Router, app *vukem.App) error {
 		Authentication: map[string]any{"preferredSecurityScheme": "bearer"},
 	})
 
-	schema, err := api.NewGraphQL(svc, app.Log)
+	schema, err := api.NewGraphQL(st.svc, app.Log)
 	if err != nil {
 		return err
 	}
@@ -100,18 +73,20 @@ func API(r *router.Router, app *vukem.App) error {
 		app.Source.Get("GRAPHQL_INSECURE_INTROSPECTION"),
 	)
 	r.Handle("/graphql", api.GraphQLHandler(schema, introspection)).
-		Use(ipLimit, authn.Middleware, callerLimit).Name("graphql").Doc(openapi.Skip{})
+		Use(st.ipLimit, st.authn.Middleware, st.callerLimit).Name("graphql").Doc(openapi.Skip{})
 
-	rpc := &api.RPC{Svc: svc, Middleware: []router.Middleware{ipLimit, keysOnly.Middleware, callerLimit}}
-	rpc.Register(app, r)
-
-	if err := grpcRunner(app); err != nil {
+	rpc, err := st.rpc().Handler(app)
+	if err != nil {
 		return err
 	}
 
-	pages := &apikeys.Handlers{Keys: keys, Now: app.Now}
-	required := auth.Required(acc.Web)
-	writes := ratelimit.Middleware(limiters("api-keys-page", 20, time.Minute), apiKeysPageKey)
+	if err := serveGRPC(app, rpc); err != nil {
+		return err
+	}
+
+	pages := &apikeys.Handlers{Keys: st.keys, Now: app.Now}
+	required := auth.Required(st.acc.Web)
+	writes := ratelimit.Middleware(st.limiters("api-keys-page", 20, time.Minute), apiKeysPageKey)
 
 	r.Get(apikeys.Path, pages.Show).Name("account.api-keys").Use(required)
 	r.Post(apikeys.Path, pages.Store).Name("account.api-keys.store").Use(required, writes)
@@ -130,73 +105,101 @@ func apiKeysPageKey(r *http.Request) string {
 	return "user:" + strconv.FormatInt(u.ID, 10)
 }
 
-// grpcRunner serves the RPC routes on GRPC_PORT (h2c, or TLS with
-// GRPC_TLS_CERT_FILE/GRPC_TLS_KEY_FILE), started and drained with the app.
-// API keys travel in metadata, so production refuses plaintext unless
-// GRPC_INSECURE_PLAINTEXT=true (TLS terminated in front of the app).
-func grpcRunner(app *vukem.App) error {
-	port := app.Source.Get("GRPC_PORT")
-	if app.Kind != vukem.KindWeb || port == "off" {
+// apiStack is what REST, GraphQL and gRPC share: services, API keys and
+// the rate limits (one budget per caller across the three APIs).
+type apiStack struct {
+	acc         *accounts.Accounts
+	limiters    ratelimit.Factory
+	keys        *api.Keys
+	svc         api.Services
+	authn       *api.Authenticator
+	keysOnly    *api.Authenticator
+	ipLimit     router.Middleware
+	callerLimit router.Middleware
+}
+
+func newAPIStack(app *vukem.App) (*apiStack, error) {
+	acc, err := accounts.New(app)
+	if err != nil {
+		return nil, err
+	}
+
+	// RATE_LIMIT_STORE=cache shares the buckets across instances (Redis).
+	limiters, err := app.RateLimiters()
+	if err != nil {
+		return nil, err
+	}
+
+	perCaller := defaultAPIRateLimit
+	if v := app.Source.Get("API_RATE_LIMIT"); v != "" {
+		if perCaller, err = strconv.Atoi(v); err != nil || perCaller < 1 {
+			return nil, fmt.Errorf("API_RATE_LIMIT must be a positive integer, got %q", v)
+		}
+	}
+
+	keys := api.NewKeys(acc.DB, app.Now)
+
+	return &apiStack{
+		acc:      acc,
+		limiters: limiters,
+		keys:     keys,
+		svc:      sqlstore.New(acc.DB, app.Now).Services(),
+		authn: &api.Authenticator{Keys: keys, Log: app.Log, Session: func(c *web.Ctx) (int64, bool) {
+			u, err := acc.Web.User(c)
+			return u.ID, err == nil
+		}},
+		keysOnly: &api.Authenticator{Keys: keys, Log: app.Log},
+		// The IP limit runs before authentication so key guessing is
+		// throttled too; the per-caller limit runs after it (per key, user
+		// or IP).
+		ipLimit:     ratelimit.Middleware(limiters("api-ip", apiIPRateLimit, time.Minute), ratelimit.ByIP),
+		callerLimit: ratelimit.Middleware(limiters("api", perCaller, time.Minute), api.RateKey),
+	}, nil
+}
+
+func (st *apiStack) rpc() *api.RPC {
+	return &api.RPC{Svc: st.svc, Middleware: []router.Middleware{st.ipLimit, st.keysOnly.Middleware, st.callerLimit}}
+}
+
+// RPCHandler builds the handler the gRPC port serves, with a stack of its
+// own (tests serve it in process; API wires the one it serves).
+func RPCHandler(app *vukem.App) (http.Handler, error) {
+	st, err := newAPIStack(app)
+	if err != nil {
+		return nil, err
+	}
+
+	return st.rpc().Handler(app)
+}
+
+// serveGRPC runs the RPC router on GRPC_PORT next to the HTTP server,
+// drained with the app.
+func serveGRPC(app *vukem.App, h http.Handler) error {
+	if app.Kind != vukem.KindWeb {
 		return nil
 	}
 
-	if port == "" {
-		port = "50051"
-	}
+	run, addr, err := api.GRPCPortFrom(app.Source).Runner(&app.Config, h)
 
-	certFile, keyFile := app.Source.Get("GRPC_TLS_CERT_FILE"), app.Source.Get("GRPC_TLS_KEY_FILE")
-	useTLS := certFile != "" && keyFile != ""
-
+	switch {
 	// Fail closed by not serving gRPC, rather than by refusing to boot: the
 	// web app must stay deployable while the gRPC certificate is pending.
-	if app.Config.IsProduction() && !useTLS && app.Source.Get("GRPC_INSECURE_PLAINTEXT") != "true" {
+	case errors.Is(err, vgrpc.ErrCleartextInProduction):
 		app.Log.Error("gRPC disabled: production needs GRPC_TLS_CERT_FILE and GRPC_TLS_KEY_FILE, " +
 			"or GRPC_INSECURE_PLAINTEXT=true when a proxy terminates TLS")
 
 		return nil
+	case err != nil:
+		return err
+	case run == nil:
+		return nil
 	}
 
-	host := app.Source.Get("HOST")
-	addr := net.JoinHostPort(host, port)
+	tls := app.Source.Get("GRPC_TLS_CERT_FILE") != "" && app.Source.Get("GRPC_TLS_KEY_FILE") != ""
 
 	app.AddRunner("grpc", vukem.RunnerFunc(func(ctx context.Context) error {
-		h, err := app.Handler()
-		if err != nil {
-			return err
-		}
-
-		srv := vukem.NewHTTPServer(addr, api.GRPCListener(h))
-		srv.ShutdownTimeout = app.Config.ShutdownTimeout
-
-		var protocols http.Protocols
-		protocols.SetHTTP1(true)
-		protocols.SetUnencryptedHTTP2(!useTLS)
-		protocols.SetHTTP2(useTLS)
-		srv.Server.Protocols = &protocols
-
-		if useTLS {
-			cert, err := tls.LoadX509KeyPair(certFile, keyFile)
-			if err != nil {
-				return fmt.Errorf("grpc tls: %w", err)
-			}
-
-			ln, err := tls.Listen("tcp", addr, &tls.Config{
-				Certificates: []tls.Certificate{
-					cert,
-				},
-				MinVersion: tls.VersionTLS12,
-				NextProtos: []string{"h2", "http/1.1"},
-			})
-			if err != nil {
-				return fmt.Errorf("grpc listen: %w", err)
-			}
-
-			srv.Listener = ln
-		}
-
-		app.Log.InfoContext(ctx, "grpc server starting", "addr", addr, "tls", useTLS)
-
-		return srv.Run(ctx)
+		app.Log.InfoContext(ctx, "grpc server starting", "addr", addr, "tls", tls)
+		return run.Run(ctx)
 	}))
 
 	return nil
