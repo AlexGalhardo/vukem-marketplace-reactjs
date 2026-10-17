@@ -67,6 +67,8 @@ test("account pages: profile, password change, 2FA and the login challenge", asy
 	await expect(page.getByText("Store these recovery codes somewhere safe.")).toBeVisible();
 
 	await page.getByRole("button", { name: "Log out" }).click();
+	// Wait for the logout visit to land before navigating, or it can race the next goto.
+	await expect(page.getByRole("link", { name: "Log in" })).toBeVisible();
 
 	// The password alone stops at the challenge; the next time step logs in
 	// (each step works once, and confirming used the current one).
