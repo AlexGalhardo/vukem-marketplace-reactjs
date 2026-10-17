@@ -23,7 +23,7 @@ func TestMakeAdminCommand(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	register(t, inertia(t, app), "boss@example.com")
+	register(t, app.Client(t).Inertia(""), "boss@example.com")
 
 	makeAdmin(t, app, "BOSS@example.com ")
 	vukemtest.AssertDatabaseHas(t, app, "users", map[string]any{"email": "boss@example.com", "role": "admin"})
@@ -42,7 +42,7 @@ func TestRegisteredUsersAreNotAdmins(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 
 	// A role smuggled into the registration body is ignored (mass assignment).
 	c.PostJSON("/register", map[string]any{
@@ -62,13 +62,13 @@ func TestAdminAreaRequiresAdminAndTwoFactor(t *testing.T) {
 	app.Client(t).Get("/admin").AssertNotFound()
 
 	// Admin without 2FA: sent to enable it.
-	noTwoFactor := inertia(t, app)
+	noTwoFactor := app.Client(t).Inertia("")
 	register(t, noTwoFactor, "admin1@example.com")
 	makeAdmin(t, app, "admin1@example.com")
 	noTwoFactor.Get("/admin").AssertRedirect("/user/two-factor")
 
 	// Admin with confirmed 2FA: allowed.
-	withTwoFactor := inertia(t, app)
+	withTwoFactor := app.Client(t).Inertia("")
 	enableTwoFactor(t, app, withTwoFactor, "admin2@example.com")
 	makeAdmin(t, app, "admin2@example.com")
 	withTwoFactor.Get("/admin").AssertOK().AssertInertia("Admin/Dashboard")

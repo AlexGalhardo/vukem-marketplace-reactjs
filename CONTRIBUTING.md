@@ -4,7 +4,7 @@ Thanks for helping. This project is also the battle test for the vukem framework
 
 ## Setup
 
-1. Install Go 1.27.2, Bun 1.4.3, Docker and the vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.21.1`).
+1. Install Go 1.27.2, Bun 1.4.3, Docker and the vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.22.0`).
 2. `cp .env.example .env && vukem key:generate`
 3. `bun install` (installs the lefthook git hooks) and `go mod download`
 4. `docker compose up -d --build`, then open <http://localhost:3200>

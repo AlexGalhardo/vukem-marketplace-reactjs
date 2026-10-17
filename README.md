@@ -10,7 +10,7 @@ Buyers browse shops, fill a multi-seller cart and pay with card (Stripe Connect 
 
 | Layer | Choice |
 | --- | --- |
-| Backend | Go 1.27, vukem v0.21.1 |
+| Backend | Go 1.27, vukem v0.22.0 |
 | Frontend | Inertia 3.9, React 19.3, TypeScript 7, Base UI 1.9, Tailwind 4.3, Vite 8 |
 | Data | PostgreSQL 18 (core), Redis 8 (sessions, cache, queues, rate limits), MongoDB 8 (audit, telemetry, history) |
 | Payments | Stripe Connect Express (card, 10% fee), AbacatePay PIX |
@@ -20,7 +20,7 @@ Buyers browse shops, fill a multi-seller cart and pay with card (Stripe Connect 
 
 ## Quick start
 
-Requirements: Go 1.27.2, Bun 1.4.3, Docker, and the vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.21.1`).
+Requirements: Go 1.27.2, Bun 1.4.3, Docker, and the vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.22.0`).
 
 ```sh
 cp .env.example .env

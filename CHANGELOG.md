@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
-- Foundation: vukem v0.21.1 app with Inertia v3, React 19, Base UI and Tailwind v4; home page with dark/light toggle and EN/PT-BR locale switch sharing one set of JSON catalogs with the server.
+- Foundation: vukem app with Inertia v3, React 19, Base UI and Tailwind v4; home page with dark/light toggle and EN/PT-BR locale switch sharing one set of JSON catalogs with the server.
 - Postgres, Redis (sessions, cache, queues) and MongoDB wiring; `/health` (liveness) and `/ready` (dependency checks) probes outside the session stack.
 - First migration enabling `citext` and `pg_trgm`.
 - Docker multi-stage image and `compose.yaml` (app, postgres, redis, mongo, rustfs, mailpit).
@@ -17,6 +17,10 @@ All notable changes to this project are documented here. The format follows [Kee
 - `users:make-admin` command, `role` column and an `/admin` area that requires the admin role and confirmed 2FA.
 - Mailtrap Email Sandbox test helper and an integration test that follows the real verification email.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
+
+### Changed
+
+- vukem bumped to v0.22.0: read-only visits no longer create sessions, and `vukemtest` sends the asset version from `Inertia("")` (local test helper removed).
 
 ### Security
 

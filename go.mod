@@ -3,7 +3,7 @@ module github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs
 go 1.27.2
 
 require (
-	github.com/AlexGalhardo/vukem v0.21.1
+	github.com/AlexGalhardo/vukem v0.22.0
 	github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.1.0

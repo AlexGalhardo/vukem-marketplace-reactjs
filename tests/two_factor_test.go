@@ -121,14 +121,14 @@ func TestTwoFactorLogin(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	owner := inertia(t, app)
+	owner := app.Client(t).Inertia("")
 	secret, _ := enableTwoFactor(t, app, owner, "ana2fa@example.com")
 
 	owner.PostJSON("/user/two-factor", nil).AssertStatus(409) // a confirmed setup is not replaced
 	owner.PostJSON("/logout", nil).AssertRedirect("/")
 
 	// The password alone does not log in.
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 	passwordStep(c, "ana2fa@example.com", true).AssertRedirect("/two-factor-challenge")
 	c.Get("/dashboard").AssertRedirect("/login")
 	c.Get("/two-factor-challenge").AssertInertia("Auth/TwoFactorChallenge").PropEquals("auth.user", nil)
@@ -146,7 +146,7 @@ func TestTwoFactorLogin(t *testing.T) {
 	}
 
 	// The same code cannot be used twice.
-	replay := inertia(t, app)
+	replay := app.Client(t).Inertia("")
 	passwordStep(replay, "ana2fa@example.com", false).AssertRedirect("/two-factor-challenge")
 	rejected(t, replay, "/two-factor-challenge", "/two-factor-challenge", "Auth/TwoFactorChallenge", "code",
 		map[string]any{"code": code, "recovery_code": ""})
@@ -157,10 +157,10 @@ func TestTwoFactorRecoveryCodes(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	owner := inertia(t, app)
+	owner := app.Client(t).Inertia("")
 	_, codes := enableTwoFactor(t, app, owner, "bob2fa@example.com")
 
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 	passwordStep(c, "bob2fa@example.com", false).AssertRedirect("/two-factor-challenge")
 	c.PostJSON("/two-factor-challenge", map[string]any{"code": "", "recovery_code": codes[0]}).
 		AssertRedirect("/dashboard")
@@ -194,9 +194,9 @@ func TestTwoFactorThrottle(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	secret, _ := enableTwoFactor(t, app, inertia(t, app), "cid2fa@example.com")
+	secret, _ := enableTwoFactor(t, app, app.Client(t).Inertia(""), "cid2fa@example.com")
 
-	attacker := inertia(t, app)
+	attacker := app.Client(t).Inertia("")
 	passwordStep(attacker, "cid2fa@example.com", false).AssertRedirect("/two-factor-challenge")
 
 	for range 5 {
@@ -206,7 +206,7 @@ func TestTwoFactorThrottle(t *testing.T) {
 	attacker.PostJSON("/two-factor-challenge", map[string]any{"code": totpCode(t, secret, 1)}).AssertStatus(429)
 
 	// Confirming a new setup is limited too.
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 	register(t, c, "dan2fa@example.com")
 	c.PostJSON("/user/two-factor", nil).AssertRedirect("/user/two-factor")
 
@@ -221,7 +221,7 @@ func TestTwoFactorDisableNeedsPassword(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 	enableTwoFactor(t, app, c, "eve2fa@example.com")
 
 	rejected(t, c, "/user/two-factor", "/user/two-factor/disable", "Auth/TwoFactor", "password",
@@ -240,7 +240,7 @@ func TestTwoFactorChallengeNeedsPasswordStep(t *testing.T) {
 	t.Parallel()
 
 	app := vukemtest.New(t, bootstrap.New)
-	c := inertia(t, app)
+	c := app.Client(t).Inertia("")
 
 	c.Get("/two-factor-challenge").AssertRedirect("/login")
 	c.PostJSON("/two-factor-challenge", map[string]any{"code": "123456"}).AssertRedirect("/login")

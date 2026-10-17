@@ -44,8 +44,9 @@ func Web(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 
 // shareProps adds the props every page receives (usePage().props).
 //
-// workaround(vukem): Inertia has no built-in locale sharing, so the active
-// locale is shared here and the pages import the same JSON catalogs.
+// The pages import the JSON catalogs at build time (typed keys, no
+// per-visit payload), so only locale and locales are shared; vukem's
+// inertia.I18n would also ship the messages as a prop.
 func shareProps(app *vukem.App) func(http.Handler) http.Handler {
 	locales := app.I18n.Locales()
 

@@ -15,7 +15,7 @@ func TestHome(t *testing.T) {
 
 	// First visit: HTML with the page object; Inertia visits: JSON.
 	app.Client(t).Get("/").AssertOK().AssertInertia("Home").HasProp("appName").PropEquals("locale", "en")
-	inertia(t, app).Get("/").AssertOK().AssertInertia("Home").HasProp("locales")
+	app.Client(t).Inertia("").Get("/").AssertOK().AssertInertia("Home").HasProp("locales")
 }
 
 func TestHomeLocaleFromAcceptLanguage(t *testing.T) {

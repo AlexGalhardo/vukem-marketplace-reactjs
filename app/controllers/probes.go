@@ -17,11 +17,9 @@ type Probes struct {
 	Version string
 }
 
-// Middleware serves the probes at the server level, before routing.
-//
-// workaround(vukem): route middleware (sessions, CSRF) is global, so a
-// probe registered as a route would create a session in Redis on every
-// hit; answering here keeps probes stateless.
+// Middleware serves the probes at the server level, before routing, so
+// probes skip sessions, CSRF, i18n and Inertia entirely: cheap and
+// stateless even under aggressive health checking.
 func (p Probes) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet && r.Method != http.MethodHead {

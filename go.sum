@@ -1,5 +1,5 @@
-github.com/AlexGalhardo/vukem v0.21.1 h1:pPYoknRUQR6Ggrf+OPQz0xtRRGZOGb/FATV/xVo1mPA=
-github.com/AlexGalhardo/vukem v0.21.1/go.mod h1:I1SNhde10HmdHxvnDHCRf7GOQ4POIM36pFYUGPkLlFI=
+github.com/AlexGalhardo/vukem v0.22.0 h1:nTz6u6l8oHDaGVUwGXNel6CsIIkKWkr4x9Kx/mEVHGU=
+github.com/AlexGalhardo/vukem v0.22.0/go.mod h1:I1SNhde10HmdHxvnDHCRf7GOQ4POIM36pFYUGPkLlFI=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0 h1:yzvnesRSb9PRhfyq8zqWDVXQFN1LaXfVS12XItSAJ3I=
 github.com/AlexGalhardo/vukem/drivers/mongo v0.1.0/go.mod h1:eODVAbEprXjx9GGoHvD4YIPEUfwvO5xN1v2Ef5twGpM=
 github.com/AlexGalhardo/vukem/drivers/postgres v0.3.0 h1:mjONUaIijD/OZooXiOSXZ42iO+L7zpr+3guw/QyaZRE=
