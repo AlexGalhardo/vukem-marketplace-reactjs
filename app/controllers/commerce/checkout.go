@@ -39,7 +39,7 @@ var PlaceOrderSchema = z.Struct[PlaceOrder](
 )
 
 // errProvider is shown when the provider refuses to start the payment.
-var errProvider = z.FieldError("method", "checkout.errors.provider")
+var errProvider = errs.NewValidation().Add("method", "checkout.errors.provider")
 
 // StartCheckout sends the buyer to the first step.
 func (*Handlers) StartCheckout(c *web.Ctx) error { return c.Redirect("/checkout/address") }
@@ -89,7 +89,7 @@ func (h *Handlers) SaveAddressStep(c *web.Ctx) error {
 
 	if _, err := h.Addresses.Get(c.Context(), h.Addresses.DB, u.ID, in.AddressID); err != nil {
 		if errors.Is(err, orm.ErrNotFound) {
-			return z.FieldError("addressId", "checkout.errors.address")
+			return errs.NewValidation().Add("addressId", "checkout.errors.address")
 		}
 
 		return err

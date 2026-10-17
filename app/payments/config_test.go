@@ -174,19 +174,19 @@ func TestAbacatePaySignature(t *testing.T) {
 	t.Parallel()
 
 	body := []byte(`{"id":"evt_1","event":"transparent.completed"}`)
-	sig := SignAbacatePayForTest(body, abacatePayPublicKey)
+	sig := SignAbacatePayForTest(body, AbacatePayPublicKey)
 
-	if !ValidAbacatePaySignature(body, sig, abacatePayPublicKey) {
+	if !ValidAbacatePaySignature(body, sig, AbacatePayPublicKey) {
 		t.Error("valid signature rejected")
 	}
 
 	for _, bad := range []string{"", sig + "x", SignAbacatePayForTest(body, "other")} {
-		if ValidAbacatePaySignature(body, bad, abacatePayPublicKey) {
+		if ValidAbacatePaySignature(body, bad, AbacatePayPublicKey) {
 			t.Errorf("signature %q accepted", bad)
 		}
 	}
 
-	if ValidAbacatePaySignature(append(body, ' '), sig, abacatePayPublicKey) {
+	if ValidAbacatePaySignature(append(body, ' '), sig, AbacatePayPublicKey) {
 		t.Error("tampered body accepted")
 	}
 }

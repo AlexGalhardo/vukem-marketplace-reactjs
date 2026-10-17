@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/z"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 )
@@ -40,12 +40,12 @@ const (
 
 // Validation errors shown next to the add-to-cart form.
 var (
-	ErrOwnShop           = z.FieldError("product", "cart.errors.own_shop")
-	ErrUnavailable       = z.FieldError("product", "cart.errors.unavailable")
-	ErrOutOfStock        = z.FieldError("quantity", "cart.errors.out_of_stock")
-	ErrTooManyLines      = z.FieldError("product", "cart.errors.cart_full")
-	ErrQuantityRange     = z.FieldError("quantity", "cart.errors.quantity_range")
-	ErrInsufficientStock = z.FieldError("quantity", "cart.errors.insufficient_stock")
+	ErrOwnShop           = errs.NewValidation().Add("product", "cart.errors.own_shop")
+	ErrUnavailable       = errs.NewValidation().Add("product", "cart.errors.unavailable")
+	ErrOutOfStock        = errs.NewValidation().Add("quantity", "cart.errors.out_of_stock")
+	ErrTooManyLines      = errs.NewValidation().Add("product", "cart.errors.cart_full")
+	ErrQuantityRange     = errs.NewValidation().Add("quantity", "cart.errors.quantity_range")
+	ErrInsufficientStock = errs.NewValidation().Add("quantity", "cart.errors.insufficient_stock")
 )
 
 // Line is one product in the cart, re-priced from the database.

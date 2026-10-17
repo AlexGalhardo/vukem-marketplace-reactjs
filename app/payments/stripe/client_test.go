@@ -3,6 +3,7 @@ package stripe_test
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/AlexGalhardo/vukem/config"
@@ -40,19 +41,9 @@ func TestClientNeverPrintsKey(t *testing.T) {
 	t.Parallel()
 
 	c, _ := newClient(t)
-	if s := fmt.Sprintf("%v %+v %s", c, c, c); contains(s, "sk_test_123") {
+	if s := fmt.Sprintf("%v %+v %s", c, c, c); strings.Contains(s, "sk_test_123") {
 		t.Errorf("client printed its key: %s", s)
 	}
-}
-
-func contains(s, sub string) bool {
-	for i := 0; i+len(sub) <= len(s); i++ {
-		if s[i:i+len(sub)] == sub {
-			return true
-		}
-	}
-
-	return false
 }
 
 func TestConnectOnboarding(t *testing.T) {

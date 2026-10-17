@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/z"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 )
@@ -29,11 +29,11 @@ const MinPayoutCents = 1000
 
 // Payout errors shown on the forms.
 var (
-	ErrPayoutTooSmall    = z.FieldError("amountCents", "checkout.payouts.errors.too_small")
-	ErrPayoutOverBalance = z.FieldError("amountCents", "checkout.payouts.errors.over_balance")
-	ErrPayoutNotPending  = z.FieldError("payout", "checkout.payouts.errors.not_pending")
-	ErrEndToEndID        = z.FieldError("endToEndId", "checkout.payouts.errors.e2e")
-	ErrEndToEndIDUsed    = z.FieldError("endToEndId", "checkout.payouts.errors.e2e_used")
+	ErrPayoutTooSmall    = errs.NewValidation().Add("amountCents", "checkout.payouts.errors.too_small")
+	ErrPayoutOverBalance = errs.NewValidation().Add("amountCents", "checkout.payouts.errors.over_balance")
+	ErrPayoutNotPending  = errs.NewValidation().Add("payout", "checkout.payouts.errors.not_pending")
+	ErrEndToEndID        = errs.NewValidation().Add("endToEndId", "checkout.payouts.errors.e2e")
+	ErrEndToEndIDUsed    = errs.NewValidation().Add("endToEndId", "checkout.payouts.errors.e2e_used")
 )
 
 // endToEndRe is the BCB end-to-end id: E, the payer's ISPB (8 digits), a

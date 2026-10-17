@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/z"
 
@@ -19,7 +20,7 @@ import (
 const MaxAddresses = 20
 
 // ErrTooManyAddresses is returned when the address book is full.
-var ErrTooManyAddresses = z.FieldError("recipient", "checkout.addresses.errors.too_many")
+var ErrTooManyAddresses = errs.NewValidation().Add("recipient", "checkout.addresses.errors.too_many")
 
 // Address is a delivery address in a user's address book.
 type Address struct {
@@ -158,7 +159,7 @@ func (a Addresses) Get(ctx context.Context, ex database.Executor, userID, id int
 func normalized(in AddressInput) (AddressInput, error) {
 	cep, err := NormalizeCEP(in.CEP)
 	if err != nil {
-		return in, z.FieldError("cep", "checkout.addresses.errors.cep")
+		return in, errs.NewValidation().Add("cep", "checkout.addresses.errors.cep")
 	}
 
 	in.CEP = cep

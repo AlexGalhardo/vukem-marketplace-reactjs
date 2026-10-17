@@ -8,15 +8,15 @@ import (
 	"strconv"
 
 	"github.com/AlexGalhardo/vukem/database"
+	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/z"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 )
 
 // ErrNotRefundable is returned for a seller order that is not paid,
 // shipped or delivered (pending, canceled or already refunded).
-var ErrNotRefundable = z.FieldError("refund", "checkout.errors.not_refundable")
+var ErrNotRefundable = errs.NewValidation().Add("refund", "checkout.errors.not_refundable")
 
 // RefundSellerOrder refunds one seller order in full (subtotal + shipping),
 // started by the seller who owns it; anyone else gets 404. Card: reverse

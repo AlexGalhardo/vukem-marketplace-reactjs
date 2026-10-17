@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/AlexGalhardo/vukem/database"
-	"github.com/AlexGalhardo/vukem/z"
+	"github.com/AlexGalhardo/vukem/errs"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/cart"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
@@ -26,12 +26,12 @@ import (
 
 // Checkout errors, shown on the checkout pages.
 var (
-	ErrCartEmpty       = z.FieldError("cart", "checkout.errors.cart_empty")
-	ErrCartUnavailable = z.FieldError("cart", "checkout.errors.cart_unavailable")
-	ErrMethod          = z.FieldError("method", "checkout.errors.method")
-	ErrCardDisabled    = z.FieldError("method", "checkout.errors.card_disabled")
-	ErrPixDisabled     = z.FieldError("method", "checkout.errors.pix_disabled")
-	ErrShopNoCard      = z.FieldError("method", "checkout.errors.shop_no_card")
+	ErrCartEmpty       = errs.NewValidation().Add("cart", "checkout.errors.cart_empty")
+	ErrCartUnavailable = errs.NewValidation().Add("cart", "checkout.errors.cart_unavailable")
+	ErrMethod          = errs.NewValidation().Add("method", "checkout.errors.method")
+	ErrCardDisabled    = errs.NewValidation().Add("method", "checkout.errors.card_disabled")
+	ErrPixDisabled     = errs.NewValidation().Add("method", "checkout.errors.pix_disabled")
+	ErrShopNoCard      = errs.NewValidation().Add("method", "checkout.errors.shop_no_card")
 )
 
 // Group is one seller's part of the checkout.

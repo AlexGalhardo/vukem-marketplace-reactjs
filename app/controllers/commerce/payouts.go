@@ -3,6 +3,7 @@ package commerce
 import (
 	"errors"
 
+	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/inertia"
 	"github.com/AlexGalhardo/vukem/web"
@@ -121,12 +122,12 @@ func (h *Handlers) OnboardStripe(c *web.Ctx) error {
 
 	url, err := h.Payments.Onboard(c.Context(), shop, u.Email)
 	if errors.Is(err, payments.ErrCardDisabled) {
-		return z.FieldError("stripe", "checkout.payouts.errors.stripe_disabled")
+		return errs.NewValidation().Add("stripe", "checkout.payouts.errors.stripe_disabled")
 	}
 
 	if err != nil {
 		c.Log().ErrorContext(c.Context(), "stripe onboarding failed", "shop", shop.ID, "err", err)
-		return z.FieldError("stripe", "checkout.payouts.errors.stripe_failed")
+		return errs.NewValidation().Add("stripe", "checkout.payouts.errors.stripe_failed")
 	}
 
 	return inertia.Location(c, url)
@@ -146,7 +147,7 @@ func (h *Handlers) RefundSellerOrder(c *web.Ctx) error {
 
 	if err := h.Payments.RefundSellerOrder(c.Context(), u.ID, id); err != nil {
 		if errors.Is(err, payments.ErrCardDisabled) {
-			return z.FieldError("refund", "checkout.errors.provider")
+			return errs.NewValidation().Add("refund", "checkout.errors.provider")
 		}
 
 		return err

@@ -63,7 +63,7 @@ func LoadConfig(get func(string) string, production, test bool) (Config, error) 
 		AppURL:            strings.TrimSuffix(strings.TrimSpace(get("APP_URL")), "/"),
 		Production:        production,
 		AbacatePayBaseURL: DefaultAbacatePayBaseURL,
-		AbacatePayHMACKey: config.NewSecret(abacatePayPublicKey),
+		AbacatePayHMACKey: config.NewSecret(AbacatePayPublicKey),
 	}
 
 	if raw := strings.TrimSpace(get("PLATFORM_FEE_BPS")); raw != "" {
@@ -191,10 +191,10 @@ func (c *Config) loadPix(get func(string) string) []string {
 	return problems
 }
 
-// abacatePayPublicKey is the HMAC key AbacatePay documents for checking
+// AbacatePayPublicKey is the HMAC key AbacatePay documents for checking
 // X-Webhook-Signature (https://docs.abacatepay.com/pages/webhooks). It is
 // public by design; override it with ABACATEPAY_WEBHOOK_PUBLIC_KEY if the
 // provider rotates it.
-const abacatePayPublicKey = "t9dXRhHHo3yDEj5pVDYz0frf7q6bMKyMRmxxCPIPp3RCplBfXRxqlC6ZpiWmOqj4L63qEaeUOtrCI8P0VMUgo6iIga2ri9" +
+const AbacatePayPublicKey = "t9dXRhHHo3yDEj5pVDYz0frf7q6bMKyMRmxxCPIPp3RCplBfXRxqlC6ZpiWmOqj4L63qEaeUOtrCI8P0VMUgo6iIga2ri9" +
 	"ogaHFs0WIIywSMg0q7RmBfybe1E5XJcfC4IW3alNqym0tXoAKkzvfEjZxV6bE0oG2zJrNNYmUCKZyV0KZ3JS8Votf9EAWWYdiDkMkpbMdPgg" +
 	"fh1EqHlVkMiTady6jOR3hyzGEHrIz2Ret0xHKMbiqkr9HS1JhNHDX9"
