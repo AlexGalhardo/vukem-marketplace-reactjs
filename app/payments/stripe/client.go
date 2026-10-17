@@ -1,5 +1,6 @@
 // Package stripe implements payments.StripeAPI over the Stripe REST API
-// with the standard library: Connect Express accounts and account links,
+// with the standard library: Connect accounts and account links (Accounts
+// v2, Express dashboard),
 // Checkout Sessions, PaymentIntents, transfers, refunds and transfer
 // reversals, each POST with a caller-chosen idempotency key.
 //
@@ -11,6 +12,7 @@
 package stripe
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -65,19 +67,52 @@ func New(key config.Secret, base string) (*Client, error) {
 // String never reveals the key.
 func (c *Client) String() string { return "stripe.Client{key: [redacted]}" }
 
+// call sends a v1 request (form-encoded body, or query on GET).
 func (c *Client) call(ctx context.Context, method, path string, form url.Values, idemKey string, out any) error {
 	target := c.base + path
 
-	var body io.Reader = http.NoBody
+	var (
+		body        io.Reader = http.NoBody
+		contentType string
+	)
 
 	if method == http.MethodGet {
 		if len(form) > 0 {
 			target += "?" + form.Encode()
 		}
 	} else {
-		body = strings.NewReader(form.Encode())
+		body, contentType = strings.NewReader(form.Encode()), "application/x-www-form-urlencoded"
 	}
 
+	return c.send(ctx, method, target, path, body, contentType, idemKey, out)
+}
+
+// callJSON sends a v2 request: v2 endpoints take JSON bodies.
+func (c *Client) callJSON(ctx context.Context, method, path string, in any, idemKey string, out any) error {
+	var (
+		body        io.Reader = http.NoBody
+		contentType string
+	)
+
+	if in != nil {
+		b, err := json.Marshal(in)
+		if err != nil {
+			return fmt.Errorf("stripe: encode %s: %w", path, err)
+		}
+
+		body, contentType = bytes.NewReader(b), "application/json"
+	}
+
+	return c.send(ctx, method, c.base+path, path, body, contentType, idemKey, out)
+}
+
+func (c *Client) send(
+	ctx context.Context,
+	method, target, path string,
+	body io.Reader,
+	contentType, idemKey string,
+	out any,
+) error {
 	req, err := http.NewRequestWithContext(ctx, method, target, body)
 	if err != nil {
 		return fmt.Errorf("stripe: %s %s: %w", method, path, err)
@@ -86,8 +121,8 @@ func (c *Client) call(ctx context.Context, method, path string, form url.Values,
 	req.Header.Set("Authorization", "Bearer "+c.key.Reveal())
 	req.Header.Set("Stripe-Version", vstripe.APIVersion)
 
-	if method != http.MethodGet {
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	if contentType != "" {
+		req.Header.Set("Content-Type", contentType)
 	}
 
 	if idemKey != "" {
@@ -128,36 +163,66 @@ func (c *Client) call(ctx context.Context, method, path string, form url.Values,
 	return nil
 }
 
+// account is an Accounts v2 connected account with its recipient
+// configuration included. New Connect platforms cannot create v1 accounts.
 type account struct {
-	ID           string `json:"id"`
-	Capabilities struct {
-		Transfers string `json:"transfers"`
-	} `json:"capabilities"`
+	ID            string `json:"id"`
+	Configuration struct {
+		Recipient *struct {
+			Capabilities struct {
+				StripeBalance struct {
+					StripeTransfers struct {
+						Status string `json:"status"`
+					} `json:"stripe_transfers"`
+				} `json:"stripe_balance"`
+			} `json:"capabilities"`
+		} `json:"recipient"`
+	} `json:"configuration"`
 }
 
+// toAccount: a seller can sell once the account can receive transfers.
 func (a account) toAccount() payments.StripeAccount {
-	return payments.StripeAccount{ID: a.ID, Ready: a.Capabilities.Transfers == "active"}
+	r := a.Configuration.Recipient
+
+	return payments.StripeAccount{
+		ID:    a.ID,
+		Ready: r != nil && r.Capabilities.StripeBalance.StripeTransfers.Status == "active",
+	}
 }
 
-// CreateExpressAccount implements payments.StripeAPI.
+// CreateExpressAccount implements payments.StripeAPI with Accounts v2: an
+// Express dashboard, the platform collecting fees and owning losses, and
+// the recipient configuration (separate charges and transfers).
 func (c *Client) CreateExpressAccount(
 	ctx context.Context,
 	p payments.ExpressAccountParams,
 	idemKey string,
 ) (payments.StripeAccount, error) {
-	form := url.Values{
-		"type":                                   {"express"},
-		"country":                                {p.Country},
-		"capabilities[transfers][requested]":     {"true"},
-		"capabilities[card_payments][requested]": {"true"},
-		"metadata[shop_id]":                      {strconv.FormatInt(p.ShopID, 10)},
+	body := map[string]any{
+		"dashboard": "express",
+		"identity":  map[string]any{"country": strings.ToLower(p.Country)},
+		"defaults": map[string]any{
+			"responsibilities": map[string]any{
+				"fees_collector":   "application",
+				"losses_collector": "application",
+			},
+		},
+		"configuration": map[string]any{
+			"recipient": map[string]any{
+				"capabilities": map[string]any{
+					"stripe_balance": map[string]any{"stripe_transfers": map[string]any{"requested": true}},
+				},
+			},
+		},
+		"include":  []string{"configuration.recipient"},
+		"metadata": map[string]string{"shop_id": strconv.FormatInt(p.ShopID, 10)},
 	}
 	if p.Email != "" {
-		form.Set("email", p.Email)
+		body["contact_email"] = p.Email
 	}
 
 	var a account
-	if err := c.call(ctx, http.MethodPost, "/v1/accounts", form, idemKey, &a); err != nil {
+	if err := c.callJSON(ctx, http.MethodPost, "/v2/core/accounts", body, idemKey, &a); err != nil {
 		return payments.StripeAccount{}, err
 	}
 
@@ -167,20 +232,28 @@ func (c *Client) CreateExpressAccount(
 // GetAccount implements payments.StripeAPI.
 func (c *Client) GetAccount(ctx context.Context, id string) (payments.StripeAccount, error) {
 	var a account
-	if err := c.call(ctx, http.MethodGet, "/v1/accounts/"+url.PathEscape(id), nil, "", &a); err != nil {
+
+	path := "/v2/core/accounts/" + url.PathEscape(id) + "?include=configuration.recipient"
+	if err := c.callJSON(ctx, http.MethodGet, path, nil, "", &a); err != nil {
 		return payments.StripeAccount{}, err
 	}
 
 	return a.toAccount(), nil
 }
 
-// CreateAccountLink implements payments.StripeAPI.
+// CreateAccountLink implements payments.StripeAPI (v2 onboarding link for
+// the recipient configuration).
 func (c *Client) CreateAccountLink(ctx context.Context, accountID, refreshURL, returnURL string) (string, error) {
-	form := url.Values{
-		"account":     {accountID},
-		"refresh_url": {refreshURL},
-		"return_url":  {returnURL},
-		"type":        {"account_onboarding"},
+	body := map[string]any{
+		"account": accountID,
+		"use_case": map[string]any{
+			"type": "account_onboarding",
+			"account_onboarding": map[string]any{
+				"configurations": []string{"recipient"},
+				"refresh_url":    refreshURL,
+				"return_url":     returnURL,
+			},
+		},
 	}
 
 	var link struct {
@@ -188,7 +261,7 @@ func (c *Client) CreateAccountLink(ctx context.Context, accountID, refreshURL, r
 	}
 
 	// Account links are single-use and short-lived: a fresh one each time.
-	if err := c.call(ctx, http.MethodPost, "/v1/account_links", form, "", &link); err != nil {
+	if err := c.callJSON(ctx, http.MethodPost, "/v2/core/account_links", body, "", &link); err != nil {
 		return "", err
 	}
 

@@ -24,6 +24,8 @@ type Request struct {
 	IdempotencyKey string
 	Authorization  string
 	StripeVersion  string
+	// JSON is the decoded body of v2 (JSON) requests.
+	JSON map[string]any
 }
 
 // Server is the fake.
@@ -82,9 +84,15 @@ func (s *Server) Requests(prefix string) []Request {
 }
 
 func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
-	_ = r.ParseForm()
+	var body map[string]any
+	if r.Header.Get("Content-Type") == "application/json" {
+		_ = json.NewDecoder(r.Body).Decode(&body)
+	} else {
+		_ = r.ParseForm()
+	}
 
 	req := Request{
+		JSON:   body,
 		Method: r.Method, Path: r.URL.Path, Form: r.Form, IdempotencyKey: r.Header.Get("Idempotency-Key"),
 		Authorization: r.Header.Get("Authorization"), StripeVersion: r.Header.Get("Stripe-Version"),
 	}
@@ -111,7 +119,7 @@ func (s *Server) serve(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	obj, status := s.object(r)
+	obj, status := s.object(r, body)
 	b, err := json.Marshal(obj)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -132,23 +140,23 @@ func (s *Server) id(prefix string) string {
 	return fmt.Sprintf("%s_test%d", prefix, s.seq)
 }
 
-func (s *Server) object(r *http.Request) (map[string]any, int) {
+func (s *Server) object(r *http.Request, body map[string]any) (map[string]any, int) {
 	p := r.URL.Path
 
 	switch {
-	case r.Method == http.MethodPost && p == "/v1/accounts":
-		return map[string]any{"id": s.id("acct"), "capabilities": map[string]string{"transfers": "inactive"}}, 200
-	case r.Method == http.MethodGet && strings.HasPrefix(p, "/v1/accounts/"):
-		id := strings.TrimPrefix(p, "/v1/accounts/")
-		status := "inactive"
+	case r.Method == http.MethodPost && p == "/v2/core/accounts":
+		return v2Account(s.id("acct"), "restricted"), 200
+	case r.Method == http.MethodGet && strings.HasPrefix(p, "/v2/core/accounts/"):
+		id := strings.TrimPrefix(p, "/v2/core/accounts/")
+		status := "restricted"
 
 		if s.ready[id] {
 			status = "active"
 		}
 
-		return map[string]any{"id": id, "capabilities": map[string]string{"transfers": status}}, 200
-	case r.Method == http.MethodPost && p == "/v1/account_links":
-		return map[string]any{"url": "https://connect.stripe.test/setup/" + r.Form.Get("account")}, 200
+		return v2Account(id, status), 200
+	case r.Method == http.MethodPost && p == "/v2/core/account_links":
+		return map[string]any{"url": "https://connect.stripe.test/setup/" + fmt.Sprint(body["account"])}, 200
 	case r.Method == http.MethodPost && p == "/v1/checkout/sessions":
 		id := s.id("cs")
 		return map[string]any{"id": id, "url": "https://checkout.stripe.test/c/pay/" + id}, 200
@@ -163,5 +171,15 @@ func (s *Server) object(r *http.Request) (map[string]any, int) {
 		return map[string]any{"id": s.id("trr")}, 200
 	default:
 		return map[string]any{"error": map[string]string{"type": "invalid_request_error", "message": "unknown"}}, 404
+	}
+}
+
+// v2Account is an Accounts v2 object with the recipient configuration.
+func v2Account(id, transfers string) map[string]any {
+	return map[string]any{
+		"id": id,
+		"configuration": map[string]any{"recipient": map[string]any{"capabilities": map[string]any{
+			"stripe_balance": map[string]any{"stripe_transfers": map[string]any{"status": transfers}},
+		}}},
 	}
 }

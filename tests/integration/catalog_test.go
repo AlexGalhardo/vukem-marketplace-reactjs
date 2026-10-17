@@ -5,10 +5,7 @@ package integration
 import (
 	"bytes"
 	"context"
-	"crypto/hmac"
 	"crypto/rand"
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"image"
@@ -31,6 +28,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/drivers/mongo"
+	"github.com/AlexGalhardo/vukem/drivers/s3"
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/storage"
 	"github.com/AlexGalhardo/vukem/vukemtest"
@@ -438,59 +436,12 @@ func ensureBucket(t *testing.T, disk storage.Disk, envs map[string]string) error
 	return nil
 }
 
-// createBucket sends a SigV4-signed PUT /<bucket> (path style).
+// createBucket creates the local bucket through the app's dev helper.
 func createBucket(ctx context.Context, envs map[string]string) error {
-	const emptySHA = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-
-	now := time.Now().UTC()
-	amzDate, day := now.Format("20060102T150405Z"), now.Format("20060102")
-	region := envs["S3_REGION"]
-
-	u, err := url.Parse(strings.TrimSuffix(envs["S3_ENDPOINT"], "/") + "/" + envs["S3_BUCKET"])
+	cfg, err := config.Load[s3.Config](config.MapSource(envs))
 	if err != nil {
 		return err
 	}
 
-	canonical := strings.Join([]string{
-		http.MethodPut, u.EscapedPath(), "",
-		"host:" + u.Host, "x-amz-content-sha256:" + emptySHA, "x-amz-date:" + amzDate, "",
-		"host;x-amz-content-sha256;x-amz-date", emptySHA,
-	}, "\n")
-	scope := day + "/" + region + "/s3/aws4_request"
-	sum := sha256.Sum256([]byte(canonical))
-	toSign := "AWS4-HMAC-SHA256\n" + amzDate + "\n" + scope + "\n" + hex.EncodeToString(sum[:])
-
-	key := []byte("AWS4" + envs["S3_SECRET_ACCESS_KEY"])
-	for _, part := range []string{day, region, "s3", "aws4_request"} {
-		key = hmacSHA256(key, part)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, u.String(), http.NoBody)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("X-Amz-Date", amzDate)
-	req.Header.Set("X-Amz-Content-Sha256", emptySHA)
-	req.Header.Set("Authorization", "AWS4-HMAC-SHA256 Credential="+envs["S3_ACCESS_KEY_ID"]+"/"+scope+
-		", SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature="+hex.EncodeToString(hmacSHA256(key, toSign)))
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusConflict {
-		return fmt.Errorf("create bucket: %s", res.Status)
-	}
-
-	return nil
-}
-
-func hmacSHA256(key []byte, data string) []byte {
-	m := hmac.New(sha256.New, key)
-	m.Write([]byte(data))
-
-	return m.Sum(nil)
+	return catalog.CreateBucket(ctx, cfg, config.Development)
 }

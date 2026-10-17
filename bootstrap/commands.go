@@ -6,14 +6,17 @@ import (
 	"flag"
 
 	vukem "github.com/AlexGalhardo/vukem"
+	"github.com/AlexGalhardo/vukem/config"
+	"github.com/AlexGalhardo/vukem/drivers/s3"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
 )
 
 // Commands lists the application commands; vukem make:command appends here.
 func Commands() []vukem.Command {
-	return []vukem.Command{makeAdmin{}, referenceSync{}}
+	return []vukem.Command{makeAdmin{}, referenceSync{}, mediaBucket{}}
 }
 
 var errEmailRequired = errors.New("usage: users:make-admin <email>")
@@ -75,4 +78,25 @@ func (referenceSync) Run(ctx context.Context, app *vukem.App, _ []string) error 
 	}
 
 	return nil
+}
+
+// mediaBucket creates the local S3 bucket (RustFS in compose and CI). It
+// refuses production, where the bucket comes with the platform.
+type mediaBucket struct{}
+
+func (mediaBucket) Name() string { return "media:bucket" }
+
+func (mediaBucket) Description() string {
+	return "Create the local S3_BUCKET (development and CI only)"
+}
+
+func (mediaBucket) Flags(*flag.FlagSet) {}
+
+func (mediaBucket) Run(ctx context.Context, app *vukem.App, _ []string) error {
+	cfg, err := config.Load[s3.Config](app.Source)
+	if err != nil {
+		return err
+	}
+
+	return catalog.CreateBucket(ctx, cfg, app.Config.Env)
 }

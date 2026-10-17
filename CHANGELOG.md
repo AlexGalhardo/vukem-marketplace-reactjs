@@ -29,6 +29,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Search with Postgres full text and trigram fallback, filters, sorting, a 45 s anonymous page cache and search/view history in MongoDB (90-day TTL).
 - Server-priced cart with availability flags and own-shop guard, address book with ViaCEP autofill, freight table by weight band and destination region; add-to-cart and freight quote on the product page.
 - Checkout split per seller (UUIDv7 order ids); Stripe Connect Express (onboarding, Checkout, transfers, refunds, reversals); AbacatePay PIX with QR page and expiry job; ledger-based seller balance and manual PIX payouts.
+- `media:bucket` command creating the local S3 bucket (refused in production).
 - `reference:sync` command (categories, freight table); the image runs `migrate` and `reference:sync` on every start.
 - Queue worker and scheduler in the web process by default (`QUEUE_WORKER_IN_PROCESS`, `SCHEDULER_IN_PROCESS`), plus `worker` and `scheduler` compose services; scheduled pruning of expired tokens and old provider events and webhook deliveries.
 - OpenTelemetry HTTP, SQL and queue spans over OTLP (off unless `OTEL_EXPORTER_OTLP_*` is set).
@@ -39,6 +40,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- Stripe connected accounts use Accounts v2 (Express dashboard, recipient configuration with `stripe_transfers`); new Connect platforms cannot create v1 accounts.
 - The locale menu closes after a language is picked.
 - vukem bumped to v0.23.0 and `drivers/postgres` to v0.4.0 (outgoing webhooks, `contrib/imaging`, shared rate limits via `RATE_LIMIT_STORE`, `key:generate`).
 - MongoDB database name comes from `MONGO_DATABASE`, else the `MONGO_URL` path, else `marketplace`, so Railway's plugin URL (no path) works unchanged.

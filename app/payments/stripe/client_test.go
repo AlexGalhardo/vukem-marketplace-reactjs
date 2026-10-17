@@ -66,9 +66,11 @@ func TestConnectOnboarding(t *testing.T) {
 		t.Fatalf("same idempotency key gave %q (%v), want %q", again.ID, err, acct.ID)
 	}
 
-	req := srv.Requests("/v1/accounts")[0]
-	if req.Form.Get("type") != "express" || req.Form.Get("country") != "BR" ||
-		req.Form.Get("capabilities[transfers][requested]") != "true" || req.Form.Get("metadata[shop_id]") != "7" ||
+	req := srv.Requests("/v2/core/accounts")[0]
+	identity, _ := req.JSON["identity"].(map[string]any)
+	metadata, _ := req.JSON["metadata"].(map[string]any)
+
+	if req.JSON["dashboard"] != "express" || identity["country"] != "br" || metadata["shop_id"] != "7" ||
 		req.IdempotencyKey != "account-7" || req.Authorization != "Bearer sk_test_123" ||
 		req.StripeVersion != vstripe.APIVersion {
 		t.Errorf("account request = %+v", req)
@@ -89,9 +91,12 @@ func TestConnectOnboarding(t *testing.T) {
 		t.Fatalf("CreateAccountLink = %q, %v", link, err)
 	}
 
-	lr := srv.Requests("/v1/account_links")[0]
-	if lr.Form.Get("type") != "account_onboarding" || lr.Form.Get("return_url") != "https://app/return" {
-		t.Errorf("account link request = %+v", lr.Form)
+	lr := srv.Requests("/v2/core/account_links")[0]
+	useCase, _ := lr.JSON["use_case"].(map[string]any)
+	onboarding, _ := useCase["account_onboarding"].(map[string]any)
+
+	if useCase["type"] != "account_onboarding" || onboarding["return_url"] != "https://app/return" {
+		t.Errorf("account link request = %+v", lr.JSON)
 	}
 }
 

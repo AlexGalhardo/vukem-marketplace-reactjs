@@ -137,7 +137,9 @@ jobs:
       - name: Start the stack
         run: docker compose up -d --build --wait --wait-timeout 300 app
       - name: Seed demo data
-        run: docker compose exec -T app /app/app db:seed
+        run: |
+          docker compose exec -T app /app/app media:bucket
+          docker compose exec -T app /app/app db:seed
       - run: bunx playwright install --with-deps chromium
       - run: bun run test:e2e
       - name: Stack logs
