@@ -245,18 +245,22 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - [x] A.2 Scaffold with `vukem install:auth --2fa --social google` into a scratch copy, port into the app (users, auth tables, social accounts, 2FA columns on Postgres), Base UI `Field`, header auth links; login/2FA/mail throttles moved to Redis (`platform.Deps.Limiter`); QR sent as a data URI instead of raw HTML; scaffold `evalOrder` bug fixed
   → verify: `go test ./tests/ -run 'Register|Login|Reset|TwoFactor|Social'`; `bunx playwright test e2e/auth.spec.ts` (register → verify notice → logout → login → dashboard)
-- [ ] A.1 `users:make-admin` command (CLI only), `role` column, seed demo users
-  → verify: `go test ./tests/accounts -run MakeAdmin`
-- [ ] A.3 Email verification (signed link, queued mail through SMTP → Mailtrap), `verified` middleware with redirect for Inertia
-  → verify: integration test reads the mail from the Mailtrap Sandbox API and follows the link
+- [x] A.1 `users:make-admin <email>` command (CLI only), `role` column (default `user`, mass-assignment safe), `/admin` behind `accounts.RequireAdmin` (404 for non-admins, redirect to `/user/two-factor` until 2FA is confirmed)
+  → verify: `go test ./tests/ -run 'MakeAdmin|NotAdmins|AdminArea'`
+- [ ] A.1b Demo seeders (buyer, seller, admin with 2FA secret printed once)
+  → verify: `vukem db:seed` on a fresh compose database
+- [x] A.3 Email verification over SMTP to the Mailtrap Sandbox, read back through the Sandbox API and followed (`tests/integration/email_test.go`, skips without `MAILTRAP_*`/`SMTP_*`; CI passes the repo secrets)
+  → verify: `go test -tags integration ./tests/integration -run Mailtrap -v` (PASS with secrets, SKIP without)
+- [ ] A.3b Queue the auth mails (off the request path) and a `verified` middleware that redirects Inertia visits to the notice
+  → verify: `go test ./tests/ -run Verified`
 - [ ] A.4 Password reset: generic response, async mail, token hashed, 1h, single use; invalidate other sessions on change
   → verify: `go test ./tests/accounts -run Reset`; abuse test for token reuse and user enumeration timing
 - [ ] A.5 Google sign-in (vukem social), link by verified email only, PKCE + state, replay-safe in Redis
   → verify: `go test ./tests/accounts -run Google` with fake provider
-- [ ] A.6 TOTP 2FA: enable (QR), confirm, 10 hashed recovery codes, challenge after password, replay protection; mandatory for admins (block `/admin` until enabled)
+- [x] A.6 TOTP 2FA: enable (QR as `data:` image, no raw HTML), confirm, 10 hashed recovery codes, challenge after password, replay protection, throttled in Redis; mandatory for admins (A.1)
   → verify: `go test ./tests/accounts -run TwoFactor`; abuse: reused code, skipped challenge, recovery code reuse
-- [ ] A.7 Mailtrap test helper (`internal/testing/mailtrap`: net/http client, poll by recipient, extract links/codes, clean inbox; skip without `MAILTRAP_API_TOKEN`; serial e2e project)
-  → verify: `go test -tags integration ./internal/testing/mailtrap`
+- [x] A.7 Mailtrap test helper (`internal/testing/mailtrap`: net/http client for `/api/sandboxes/{id}/messages`, `WaitFor` by recipient + subject, `HTML`/`Text`, `FindLink`, `Clean`; `FromEnv` skips without secrets)
+  → verify: `go test -race ./internal/testing/mailtrap` (httptest fake, no network)
 - [ ] A.8 Account pages: profile, password, 2FA, active sessions; i18n complete for auth strings
   → verify: e2e `auth.spec.ts` (register → verify mail → login → enable 2FA → logout → challenge)
 
@@ -364,12 +368,13 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 | Telegram bot token (BotFather) + chat id | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | |
 | Railway project: app, worker and scheduler services, Postgres, Redis, Mongo, bucket, TCP proxy on 50051, tracing enabled | Railway variables (`DATABASE_URL`, `REDIS_URL`, `MONGO_URL`, `S3_*`, `OTEL_*`, `APP_KEY`, `APP_URL`) | |
 | DNS: `marketplace.vukem.com` CNAME to Railway | DNS provider | |
-| GitHub: repo secrets for e2e/DAST (`MAILTRAP_*`), GHCR enabled, branch protection on `main` requiring CI | GitHub settings | |
+| GitHub: repo secrets `MAILTRAP_API_TOKEN`, `MAILTRAP_SANDBOX_ID`, `MAILTRAP_SMTP_USERNAME`, `MAILTRAP_SMTP_PASSWORD` (integration job), GHCR enabled, branch protection on `main` requiring CI | GitHub settings | the Mailtrap test skips until they exist |
 
 ## 8. Status log
 
 - 2026-10-17 — Foundation complete (F.1–F.11), CI green on first push.
-- 2026-10-17 — Auth started: A.2 done (scaffold ported, Redis throttles, e2e). Next: A.1 (make-admin), then A.3 (email verification via Mailtrap).
+- 2026-10-17 — Auth started: A.2 done (scaffold ported, Redis throttles, e2e).
+- 2026-10-17 — A.1, A.3, A.6, A.7 done (make-admin, admin 2FA gate, 10 recovery codes, Mailtrap helper + verification test). Open in Auth: A.1b seeders, A.3b queued mail + verified redirect, A.4 reset hardening, A.5 Google hardening, A.8 account pages/i18n.
 
 ## 9. Operations
 
