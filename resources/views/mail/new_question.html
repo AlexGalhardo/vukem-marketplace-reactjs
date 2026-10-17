@@ -1,0 +1,11 @@
+{{/* layout: none */}}
+<!doctype html>
+<html lang="{{locale}}">
+<body>
+	<p>{{t "qna.mail.hello" "name" .OwnerName}}</p>
+	<p>{{t "qna.mail.body" "product" .ProductTitle}}</p>
+	<blockquote>{{.Question}}</blockquote>
+	<p><a href="{{.Link}}">{{t "qna.mail.action"}}</a></p>
+	<p>{{t "qna.mail.footer"}}</p>
+</body>
+</html>
