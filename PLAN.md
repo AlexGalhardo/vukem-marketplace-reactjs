@@ -381,6 +381,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - 2026-10-17 — Merged catalog (C.1–C.5), checkout (K.1–K.3, P.1–P.6) and ops (B.1, B.3, X.5; B.2 traces only, metrics need new OTel dependencies; O.2 infrastructure: `/events` + `useEventStream`, checkout does not publish yet). Product page mounts add-to-cart and the freight quote. The image runs `migrate` + `reference:sync` on start; the queue worker and scheduler run inside the web process unless disabled. Open: O.1, O.2 wiring (publish on order status), O.3, M.*, REST seller writes + `freight`, S.*, axe accessibility scans in e2e (owner approved `@axe-core/playwright`).
 
+- 2026-10-17 — vukem v0.24.0 adopted (scheduler in serve, shared `Social.States`, sealed queued mail, `App.Stdout`); Stripe connected accounts moved to Accounts v2 (merchant `card_payments` + recipient `stripe_transfers`, real test-mode API green in CI); axe accessibility scans in e2e (all pages, both themes, both locales, desktop + mobile, buyer/seller/admin) with the violations fixed. All stream worktrees merged and removed. Next: O.1–O.3, M.*, REST seller writes + `freight`, drop `platform.RedisOptions` for `WithCacheStoreFunc`, adopt `OpenLazy`/`ReadyHandler`, `TRUSTED_PROXIES` for Railway, S.*.
+
 ## 9. Operations
 
 ### 9.1 Commands
