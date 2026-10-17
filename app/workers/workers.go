@@ -1,8 +1,8 @@
-// Package workers runs the queue worker and the scheduler inside the web
-// process, so a single-service deploy (one Railway service) still sends
-// queued mail and runs scheduled tasks. Deploys with dedicated
-// "queue:work" / "schedule:work" processes turn them off with
-// QUEUE_WORKER_IN_PROCESS=false and SCHEDULER_IN_PROCESS=false.
+// Package workers runs the queue worker inside the web process, so a
+// single-service deploy (one Railway service) still sends queued mail.
+// Deploys with a dedicated "queue:work" process turn it off with
+// QUEUE_WORKER_IN_PROCESS=false. The scheduler runs inside serve through
+// vukem itself (SCHEDULE_IN_SERVE, default true since v0.24.0).
 package workers
 
 import (
@@ -16,16 +16,15 @@ import (
 
 // Config is read from the environment.
 type Config struct {
-	Queue     bool `env:"QUEUE_WORKER_IN_PROCESS" default:"true"`
-	Scheduler bool `env:"SCHEDULER_IN_PROCESS"    default:"true"`
+	Queue bool `env:"QUEUE_WORKER_IN_PROCESS" default:"true"`
 }
 
-// Provider adds the runners to "serve" (web kind only: commands such as
-// queue:work and migrate never start them).
+// Provider adds the worker runner to "serve" (web kind only: commands
+// such as queue:work and migrate never start it).
 //
 // workaround(vukem): vukem only runs an in-process worker for
-// QUEUE_CONNECTION=memory and never runs the scheduler inside serve, so a
-// Redis queue needs a separate queue:work process.
+// QUEUE_CONNECTION=memory, so a Redis queue needs a separate queue:work
+// process.
 type Provider struct{}
 
 // Register implements vukem.Provider.
@@ -41,10 +40,6 @@ func (Provider) Register(app *vukem.App) error {
 
 	if cfg.Queue {
 		app.AddRunner("queue-worker", QueueRunner(app))
-	}
-
-	if cfg.Scheduler {
-		app.AddRunner("scheduler", SchedulerRunner(app))
 	}
 
 	return nil
@@ -76,20 +71,5 @@ func QueueRunner(app *vukem.App) vukem.Runner {
 		}
 
 		return q.Work(ctx, queue.WorkOptions{Queues: cfg.QueueNames(), Concurrency: cfg.Concurrency})
-	})
-}
-
-// SchedulerRunner runs due scheduled tasks every minute until ctx is done.
-// With several web instances every one runs the schedule: WithoutOverlapping
-// locks in the app cache (Redis) skip a task while another instance runs
-// it, and the tasks are idempotent for the rare double run.
-func SchedulerRunner(app *vukem.App) vukem.Runner {
-	return vukem.RunnerFunc(func(ctx context.Context) error {
-		s, err := app.Schedule()
-		if err != nil {
-			return err
-		}
-
-		return s.Work(ctx, app.Now)
 	})
 }

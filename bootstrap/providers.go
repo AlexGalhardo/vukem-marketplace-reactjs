@@ -21,7 +21,7 @@ func Providers() []vukem.Provider {
 		// vukem's Recover. Off unless TELEGRAM_BOT_TOKEN/CHAT_ID are set.
 		alerts.Provider{},
 		// In-process queue worker and scheduler for "serve"
-		// (QUEUE_WORKER_IN_PROCESS / SCHEDULER_IN_PROCESS, default on).
+		// (QUEUE_WORKER_IN_PROCESS, default on; the scheduler uses vukem SCHEDULE_IN_SERVE).
 		workers.Provider{},
 		// Registers the seller webhook delivery job (at Boot).
 		webhooks.Provider{},

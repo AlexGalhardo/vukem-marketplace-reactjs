@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"sync"
 	"testing"
+	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/router"
@@ -69,14 +70,12 @@ func (g *strictGoogle) User(context.Context, *http.Client, social.Token, string)
 }
 
 // pkceApp mounts the real callback handler under /pkce with strictGoogle.
-func pkceApp(t *testing.T, user social.User) (*vukemtest.App, *accounts.Accounts) {
+func pkceApp(t *testing.T, user social.User) *vukemtest.App {
 	t.Helper()
 
-	var acc *accounts.Accounts
-
 	routes := func(r *router.Router, app *vukem.App) error {
-		var err error
-		if acc, err = accounts.New(app); err != nil {
+		acc, err := accounts.New(app)
+		if err != nil {
 			return err
 		}
 
@@ -84,6 +83,13 @@ func pkceApp(t *testing.T, user social.User) (*vukemtest.App, *accounts.Accounts
 			callback: "/pkce/google/callback", user: user, challenges: map[string]string{},
 		})
 		s.InsecureCookies = true
+
+		states, err := app.Cache()
+		if err != nil {
+			return err
+		}
+
+		s.States = states.Store()
 
 		h := account.NewSocial(acc, s)
 		r.Get("/pkce/{provider}/redirect", h.Redirect)
@@ -94,7 +100,7 @@ func pkceApp(t *testing.T, user social.User) (*vukemtest.App, *accounts.Accounts
 
 	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{AppOptions: []vukem.Option{vukem.WithRoutes(routes)}})
 
-	return app, acc
+	return app
 }
 
 // startGoogle follows the redirect and returns the callback URL with the
@@ -110,7 +116,7 @@ func startGoogle(t *testing.T, c *vukemtest.Client) (callback, cookie string) {
 func TestGoogleUsesPKCEAndSingleUseState(t *testing.T) {
 	t.Parallel()
 
-	app, _ := pkceApp(t, social.User{ID: "g-1", Email: "gina@example.com", EmailVerified: true, Name: "Gina"})
+	app := pkceApp(t, social.User{ID: "g-1", Email: "gina@example.com", EmailVerified: true, Name: "Gina"})
 
 	c := app.Client(t).Inertia("")
 	callback, cookie := startGoogle(t, c)
@@ -140,7 +146,7 @@ func TestGoogleUsesPKCEAndSingleUseState(t *testing.T) {
 func TestGoogleStateIsSingleUseAcrossInstances(t *testing.T) {
 	t.Parallel()
 
-	app, acc := pkceApp(t, social.User{ID: "g-2", Email: "hugo@example.com", EmailVerified: true, Name: "Hugo"})
+	app := pkceApp(t, social.User{ID: "g-2", Email: "hugo@example.com", EmailVerified: true, Name: "Hugo"})
 
 	c := app.Client(t)
 	callback, _ := startGoogle(t, c)
@@ -151,9 +157,17 @@ func TestGoogleStateIsSingleUseAcrossInstances(t *testing.T) {
 	}
 
 	// Another instance already completed this sign-in: the shared store
-	// knows the state even though this process never saw it.
-	if fresh, err := acc.ConsumeSocialState(t.Context(), "google", u.Query().Get("state")); err != nil || !fresh {
-		t.Fatalf("consume = %v, %v", fresh, err)
+	// (vukem social.States, key "social:state:<state>") knows the state
+	// even though this process never saw it.
+	states, err := app.Cache()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if fresh, err := states.Store().
+		Add(t.Context(), "social:state:"+u.Query().Get("state"), []byte("1"), time.Minute); err != nil ||
+		!fresh {
+		t.Fatalf("mark state used = %v, %v", fresh, err)
 	}
 
 	c.Get(callback).AssertStatus(http.StatusBadRequest)

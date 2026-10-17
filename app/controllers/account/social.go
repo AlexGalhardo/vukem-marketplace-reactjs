@@ -1,8 +1,6 @@
 package account
 
 import (
-	"net/http"
-
 	"github.com/AlexGalhardo/vukem/social"
 	"github.com/AlexGalhardo/vukem/web"
 
@@ -33,21 +31,6 @@ func (h *SocialHandlers) Callback(c *web.Ctx) error {
 	su, err := h.s.User(c, provider)
 	if err != nil {
 		return err
-	}
-
-	state := c.Query("state")
-	if c.Method() == http.MethodPost {
-		state = c.Request().PostFormValue("state")
-	}
-
-	fresh, err := h.a.ConsumeSocialState(c.Context(), provider, state)
-	if err != nil {
-		return err
-	}
-
-	if !fresh {
-		web.SecurityEvent(c.Request(), "social.state_replayed", "provider", provider)
-		return social.ErrState
 	}
 
 	u, err := h.a.FindOrCreateFromSocial(c.Context(), su)

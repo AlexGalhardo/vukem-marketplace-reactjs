@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"flag"
+	"fmt"
 
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/config"
@@ -45,11 +46,9 @@ func (makeAdmin) Run(ctx context.Context, app *vukem.App, args []string) error {
 		return err
 	}
 
-	// workaround(vukem): commands cannot reach the app's stdout writer
-	// (WithStdout is private state), so the confirmation goes to the log.
-	app.Log.InfoContext(ctx, "user is now an admin; 2FA is required before using /admin", "email", args[0])
+	_, err = fmt.Fprintf(app.Stdout(), "%s is now an admin; 2FA is required before using /admin\n", args[0])
 
-	return nil
+	return err
 }
 
 // referenceSync upserts the reference data the app needs in every

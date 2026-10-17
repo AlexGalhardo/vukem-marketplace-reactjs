@@ -20,10 +20,18 @@ import (
 // NewSocial configures the providers listed in names from
 // SOCIAL_<NAME>_CLIENT_ID and SOCIAL_<NAME>_CLIENT_SECRET; the callback is
 // APP_URL/auth/<name>/callback. Providers without credentials are skipped.
-func NewSocial(app *vukem.App, names ...string) *social.Social {
+// Used states live in the app cache (Redis in production), so a replayed
+// callback fails on every instance.
+func NewSocial(app *vukem.App, names ...string) (*social.Social, error) {
+	states, err := app.Cache()
+	if err != nil {
+		return nil, err
+	}
+
 	s := social.New(app.Key.Derive("social.state", 32))
 	s.InsecureCookies = !app.Config.IsProduction() && !strings.HasPrefix(app.Config.URL, "https://")
 	s.StateTTL = SocialStateTTL
+	s.States = states.Store()
 
 	base := strings.TrimSuffix(app.Config.URL, "/")
 
@@ -90,7 +98,7 @@ func NewSocial(app *vukem.App, names ...string) *social.Social {
 		}
 	}
 
-	return s
+	return s, nil
 }
 
 // FindOrCreateFromSocial returns the user linked to su, linking by email
@@ -200,17 +208,6 @@ func (a *Accounts) lockOutUnverifiedOwner(ctx context.Context, tx database.Execu
 	u.Password = h
 
 	return revokeCredentials(ctx, tx, *u)
-}
-
-// ConsumeSocialState marks a sign-in state as used in the shared cache
-// (Redis in production) and reports whether it was fresh, so a replayed
-// callback fails on every instance. Call it after social.User accepted
-// the state, so only genuine states are stored.
-//
-// workaround(vukem): social.Social keeps used states in process memory,
-// which only stops replays on the instance that saw the first callback.
-func (a *Accounts) ConsumeSocialState(ctx context.Context, provider, state string) (bool, error) {
-	return a.cache.Add(ctx, "social-state:"+provider+":"+digest(state), []byte("1"), SocialStateTTL)
 }
 
 // SocialStateTTL is how long a used sign-in state is remembered; it

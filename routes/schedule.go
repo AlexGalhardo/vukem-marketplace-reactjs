@@ -11,7 +11,7 @@ import (
 )
 
 // Schedule declares the scheduled tasks. Run them with "vukem schedule:work"
-// (the compose "scheduler" service, or in process with SCHEDULER_IN_PROCESS)
+// (the compose "scheduler" service, or inside serve with SCHEDULE_IN_SERVE)
 // or a cron entry calling "vukem schedule:run" every minute; list them with
 // "vukem schedule:list". WithoutOverlapping locks live in the app cache
 // (Redis when REDIS_URL is set), so several schedulers never run the same

@@ -40,6 +40,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- vukem bumped to v0.24.0 (`drivers/s3` v0.2.0, `drivers/mongo` v0.2.0, `drivers/redis` v0.2.0): the scheduler runs inside serve through vukem (`SCHEDULE_IN_SERVE`, replaces `SCHEDULER_IN_PROCESS`), queued mail payloads are sealed with `APP_KEY`, Google sign-in states use vukem's shared `Social.States` store (Redis), and `users:make-admin` prints to stdout.
 - Stripe connected accounts use Accounts v2 (Express dashboard, recipient configuration with `stripe_transfers`); new Connect platforms cannot create v1 accounts.
 - The locale menu closes after a language is picked.
 - vukem bumped to v0.23.0 and `drivers/postgres` to v0.4.0 (outgoing webhooks, `contrib/imaging`, shared rate limits via `RATE_LIMIT_STORE`, `key:generate`).

@@ -1,13 +1,10 @@
 package tests
 
 import (
-	"encoding/json"
-	"slices"
 	"strings"
 	"testing"
 
 	vukem "github.com/AlexGalhardo/vukem"
-	"github.com/AlexGalhardo/vukem/mail"
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/vukemtest"
@@ -37,11 +34,13 @@ func queuedApp(
 	return vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: env, AppOptions: opts}), fake
 }
 
-// queuedMailTo returns the mails queued (not yet sent) to email.
-func queuedMailTo(t *testing.T, fake *queue.Fake, email string) []mail.Message {
+// queuedMailJobs counts the queued (not yet sent) mail jobs. Since vukem
+// v0.24.0 their payload is sealed with APP_KEY, so the recipient must not
+// appear in clear text.
+func queuedMailJobs(t *testing.T, fake *queue.Fake, email string) int {
 	t.Helper()
 
-	var out []mail.Message
+	n := 0
 
 	msgs := fake.Messages()
 	for i := range msgs {
@@ -50,20 +49,14 @@ func queuedMailTo(t *testing.T, fake *queue.Fake, email string) []mail.Message {
 			continue
 		}
 
-		var msg mail.Message
-		if err := json.Unmarshal(m.Payload, &msg); err != nil {
-			t.Fatal(err)
+		if strings.Contains(string(m.Payload), email) {
+			t.Fatalf("queued mail payload shows %s in clear text", email)
 		}
 
-		if slices.ContainsFunc(
-			msg.To,
-			func(to string) bool { return strings.Contains(to, "<"+email+">") || to == email },
-		) {
-			out = append(out, msg)
-		}
+		n++
 	}
 
-	return out
+	return n
 }
 
 // runQueued runs every job the fake recorded, like a worker would.
@@ -129,8 +122,8 @@ func TestVerifiedMiddleware(t *testing.T) {
 		t.Fatal("verification mail was sent on the request path")
 	}
 
-	if got := queuedMailTo(t, fake, "vera@example.com"); len(got) != 1 {
-		t.Fatalf("queued verification mails = %d, want 1", len(got))
+	if got := queuedMailJobs(t, fake, "vera@example.com"); got != 1 {
+		t.Fatalf("queued verification mails = %d, want 1", got)
 	}
 
 	// Unverified users are sent to the notice: Inertia visits, form posts
@@ -145,8 +138,8 @@ func TestVerifiedMiddleware(t *testing.T) {
 	// The resend button queues another mail.
 	c.PostJSON("/email/verification-notification", nil).AssertRedirect("/email/verify")
 
-	if got := queuedMailTo(t, fake, "vera@example.com"); len(got) != 2 {
-		t.Fatalf("queued verification mails after resend = %d, want 2", len(got))
+	if got := queuedMailJobs(t, fake, "vera@example.com"); got != 2 {
+		t.Fatalf("queued verification mails after resend = %d, want 2", got)
 	}
 
 	runQueued(t, app, fake)

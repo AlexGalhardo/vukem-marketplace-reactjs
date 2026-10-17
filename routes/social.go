@@ -17,7 +17,12 @@ func Social(r *router.Router, app *vukem.App) error {
 	}
 
 	L := account.Localized
-	h := account.NewSocial(acc, accounts.NewSocial(app, "google"))
+	s, err := accounts.NewSocial(app, "google")
+	if err != nil {
+		return err
+	}
+
+	h := account.NewSocial(acc, s)
 
 	r.Get("/auth/{provider}/redirect", L(h.Redirect)).Name("social.redirect").Use(auth.Guest(acc.Web))
 	r.Get("/auth/{provider}/callback", L(h.Callback)).Name("social.callback")

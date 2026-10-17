@@ -32,7 +32,7 @@ services:
       # The worker and scheduler services below do this work, so serve
       # does not run them in process (the single-service default).
       QUEUE_WORKER_IN_PROCESS: "false"
-      SCHEDULER_IN_PROCESS: "false"
+      SCHEDULE_IN_SERVE: "false"
     command: ["sh", "-c", "/app/app migrate && /app/app reference:sync && exec /app/app"]
     ports:
       - "${MKT_APP_PORT:-3200}:3000"
