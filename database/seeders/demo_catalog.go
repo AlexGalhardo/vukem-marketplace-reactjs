@@ -10,6 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
+	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -25,6 +27,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
 )
 
 // DemoSellerDomain is the email domain of every demo catalog seller; it
@@ -56,14 +59,29 @@ const sellerChunk = 25
 const placeholdersPerCategory = 3
 
 // DemoCatalog seeds demo sellers, one shop each, and their published
-// products with shared placeholder images. It is deterministic (Seed) and
-// idempotent: sellers whose email exists are skipped. The sellers get
-// random passwords nobody knows; they are not meant to log in.
+// products with shared placeholder images, then demo buyers who bought
+// from those shops over the last six months (orders, reviews with votes
+// and seller replies) and asked them questions. It is deterministic (Seed)
+// and idempotent: sellers and buyers whose email exists are skipped, and
+// so is the activity of buyers who already have some. Sellers and buyers
+// get random passwords nobody knows; they are not meant to log in.
 type DemoCatalog struct {
 	Sellers     int    // default DefaultDemoSellers
 	MinProducts int    // default DefaultDemoMinProducts
 	MaxProducts int    // default DefaultDemoMaxProducts
 	Seed        uint64 // default DemoCatalogSeed
+	// Buyers is the number of demo buyers (default DefaultDemoBuyers);
+	// negative seeds none.
+	Buyers int
+	// MaxOrders: each buyer places 1..MaxOrders orders (default
+	// DefaultDemoMaxOrders).
+	MaxOrders int
+	// MaxQuestions: each buyer asks 0..MaxQuestions questions (default
+	// DefaultDemoMaxQuestions).
+	MaxQuestions int
+	// FeeBPS is the platform fee of the simulated orders; zero uses
+	// PLATFORM_FEE_BPS (RunApp) or payments.DefaultFeeBPS.
+	FeeBPS int64
 	// AllowProduction is the explicit opt-in for APP_ENV=production.
 	AllowProduction bool
 	// Env overrides the app's environment (tests); empty uses the app's.
@@ -74,9 +92,13 @@ type DemoCatalog struct {
 
 // DemoCatalogResult reports what one run created.
 type DemoCatalogResult struct {
-	Sellers  int
-	Products int
-	Elapsed  time.Duration
+	Sellers   int
+	Products  int
+	Buyers    int
+	Orders    int
+	Reviews   int
+	Questions int
+	Elapsed   time.Duration
 }
 
 // Name implements the db:seed name hook.
@@ -90,7 +112,8 @@ func (d DemoCatalog) SeedApp(ctx context.Context, app *vukem.App) error {
 	}
 
 	app.Log.InfoContext(ctx, "demo catalog seeded",
-		"sellers", res.Sellers, "products", res.Products, "elapsed", res.Elapsed.Round(time.Millisecond))
+		"sellers", res.Sellers, "products", res.Products, "buyers", res.Buyers, "orders", res.Orders,
+		"reviews", res.Reviews, "questions", res.Questions, "elapsed", res.Elapsed.Round(time.Millisecond))
 
 	return nil
 }
@@ -104,6 +127,17 @@ func (d DemoCatalog) RunApp(ctx context.Context, app *vukem.App) (DemoCatalogRes
 
 	if err := d.allowed(); err != nil {
 		return DemoCatalogResult{}, err
+	}
+
+	if d.FeeBPS == 0 {
+		if raw := strings.TrimSpace(app.Source.Get("PLATFORM_FEE_BPS")); raw != "" {
+			bps, err := strconv.ParseInt(raw, 10, 64)
+			if err != nil || payments.ValidateFeeBPS(bps) != nil {
+				return DemoCatalogResult{}, fmt.Errorf("seed demo catalog: %w", payments.ErrInvalidFeeBPS)
+			}
+
+			d.FeeBPS = bps
+		}
 	}
 
 	db, err := app.DB()
@@ -144,6 +178,22 @@ func (d DemoCatalog) withDefaults() DemoCatalog {
 		d.Seed = DemoCatalogSeed
 	}
 
+	if d.Buyers == 0 {
+		d.Buyers = DefaultDemoBuyers
+	}
+
+	if d.MaxOrders <= 0 {
+		d.MaxOrders = DefaultDemoMaxOrders
+	}
+
+	if d.MaxQuestions <= 0 {
+		d.MaxQuestions = DefaultDemoMaxQuestions
+	}
+
+	if d.FeeBPS <= 0 {
+		d.FeeBPS = payments.DefaultFeeBPS
+	}
+
 	if d.Hasher == nil {
 		d.Hasher = hash.Default()
 	}
@@ -171,14 +221,20 @@ func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk
 		return DemoCatalogResult{}, err
 	}
 
-	plan := d.plan(catIDs, images, time.Now().UTC())
+	now := time.Now().UTC()
+	plan := d.plan(catIDs, images, now)
 
 	todo, err := missingSellers(ctx, db, plan)
 	if err != nil {
 		return DemoCatalogResult{}, err
 	}
 
-	if err := d.hashPasswords(todo); err != nil {
+	users := make([]*models.User, len(todo))
+	for i := range todo {
+		users[i] = &todo[i].user
+	}
+
+	if err := d.hashPasswords(users); err != nil {
 		return DemoCatalogResult{}, err
 	}
 
@@ -199,30 +255,100 @@ func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk
 		}
 	}
 
+	if d.Buyers > 0 {
+		act, err := d.seedActivity(ctx, db, now)
+		if err != nil {
+			return DemoCatalogResult{}, err
+		}
+
+		res.Buyers, res.Orders, res.Reviews, res.Questions = act.Buyers, act.Orders, act.Reviews, act.Questions
+	}
+
 	res.Elapsed = time.Since(start)
 
 	return res, nil
 }
 
-// Purge deletes every demo catalog seller with its shop, products and
-// images (cascades). Shops with orders cannot be deleted (the orders keep
-// them); Purge then fails and changes nothing.
+// ErrDemoPurgeBlocked stops DemoCatalog.Purge (demo:catalog --fresh) when
+// rows of real users hang off the demo catalog: deleting the demo rows
+// would delete or change them. Nothing is deleted then.
+var ErrDemoPurgeBlocked = errors.New("seeders: real data references the demo catalog; nothing was deleted")
+
+// Subqueries selecting the demo users (sellers and buyers, by their email
+// domain), the demo shops and the demo products. Each "?" pair takes
+// demoPatterns().
+const (
+	demoUsersSQL    = `SELECT id FROM users WHERE email LIKE ? OR email LIKE ?`
+	demoShopsSQL    = `SELECT id FROM shops WHERE owner_id IN (` + demoUsersSQL + `)`
+	demoProductsSQL = `SELECT id FROM products WHERE shop_id IN (` + demoShopsSQL + `)`
+	demoOrdersSQL   = `SELECT id FROM orders WHERE buyer_id IN (` + demoUsersSQL + `)`
+	demoReviewsSQL  = `SELECT id FROM reviews WHERE product_id IN (` + demoProductsSQL + `)`
+)
+
+func demoPatterns() []any { return []any{"%@" + DemoSellerDomain, "%@" + DemoBuyerDomain} }
+
+// purgeBlockers are the real-user rows Purge refuses to touch, each a
+// COUNT query whose placeholders are all demoPatterns() pairs.
+var purgeBlockers = []struct {
+	what, sql string
+}{
+	{"orders of real buyers at demo shops", `SELECT COUNT(*) FROM seller_orders WHERE shop_id IN (` + demoShopsSQL +
+		`) AND order_id NOT IN (` + demoOrdersSQL + `)`},
+	{"sales of real shops to demo buyers", `SELECT COUNT(*) FROM seller_orders WHERE order_id IN (` + demoOrdersSQL +
+		`) AND shop_id NOT IN (` + demoShopsSQL + `)`},
+	{"ledger entries of demo shops or orders", `SELECT COUNT(*) FROM ledger_entries WHERE shop_id IN (` +
+		demoShopsSQL + `) OR order_id IN (` + demoOrdersSQL + `)`},
+	{"payouts of demo shops", `SELECT COUNT(*) FROM payouts WHERE shop_id IN (` + demoShopsSQL + `)`},
+	{"reviews by real users of demo products", `SELECT COUNT(*) FROM reviews WHERE product_id IN (` +
+		demoProductsSQL + `) AND buyer_id NOT IN (` + demoUsersSQL + `)`},
+	{"real users' votes on demo reviews", `SELECT COUNT(*) FROM review_votes WHERE review_id IN (` +
+		demoReviewsSQL + `) AND user_id NOT IN (` + demoUsersSQL + `)`},
+	{"demo users' votes on real reviews", `SELECT COUNT(*) FROM review_votes WHERE user_id IN (` + demoUsersSQL +
+		`) AND review_id NOT IN (` + demoReviewsSQL + `)`},
+	{"questions by real users on demo products", `SELECT COUNT(*) FROM product_questions WHERE shop_id IN (` +
+		demoShopsSQL + `) AND asker_id NOT IN (` + demoUsersSQL + `)`},
+	{"real users' cart items with demo products", `SELECT COUNT(*) FROM cart_items WHERE product_id IN (` +
+		demoProductsSQL + `) AND user_id NOT IN (` + demoUsersSQL + `)`},
+}
+
+// Purge deletes the demo catalog: the demo buyers' orders (with their
+// seller orders, lines, reviews and votes), the demo shops (products,
+// images, questions) and the demo users (addresses, questions, votes), in
+// that order. It never deletes or changes a real user's row: when one
+// references the demo catalog (a real order at a demo shop, a real review,
+// question, vote or cart item, a ledger entry or payout) it fails with
+// ErrDemoPurgeBlocked, listing them, and deletes nothing.
 func (DemoCatalog) Purge(ctx context.Context, db *database.DB) error {
 	return database.RunInTx(ctx, db, func(tx *database.Tx) error {
-		pattern := "%@" + DemoSellerDomain
 		d := tx.Dialect()
 
-		if _, err := tx.ExecContext(ctx, database.Rebind(d,
-			`DELETE FROM shops WHERE owner_id IN (SELECT id FROM users WHERE email LIKE ?)`), pattern); err != nil {
-			return fmt.Errorf("purge demo shops: %w", err)
+		var blocked []string
+
+		for _, b := range purgeBlockers {
+			var n int64
+
+			args := slices.Repeat(demoPatterns(), strings.Count(b.sql, "?")/2)
+			if err := tx.QueryRowContext(ctx, database.Rebind(d, b.sql), args...).Scan(&n); err != nil {
+				return fmt.Errorf("purge demo catalog: count %s: %w", b.what, err)
+			}
+
+			if n > 0 {
+				blocked = append(blocked, fmt.Sprintf("%d %s", n, b.what))
+			}
 		}
 
-		if _, err := tx.ExecContext(
-			ctx,
-			database.Rebind(d, `DELETE FROM users WHERE email LIKE ?`),
-			pattern,
-		); err != nil {
-			return fmt.Errorf("purge demo sellers: %w", err)
+		if len(blocked) > 0 {
+			return fmt.Errorf("%w: %s", ErrDemoPurgeBlocked, strings.Join(blocked, ", "))
+		}
+
+		for _, step := range []struct{ what, sql string }{
+			{"orders", `DELETE FROM orders WHERE id IN (` + demoOrdersSQL + `)`},
+			{"shops", `DELETE FROM shops WHERE id IN (` + demoShopsSQL + `)`},
+			{"users", `DELETE FROM users WHERE id IN (` + demoUsersSQL + `)`},
+		} {
+			if _, err := tx.ExecContext(ctx, database.Rebind(d, step.sql), demoPatterns()...); err != nil {
+				return fmt.Errorf("purge demo %s: %w", step.what, err)
+			}
 		}
 
 		return nil
@@ -446,9 +572,10 @@ func missingSellers(ctx context.Context, db *database.DB, plan []plannedSeller) 
 	return out, nil
 }
 
-// hashPasswords gives each seller a random 192-bit password that is never
-// stored or printed, hashed on a few goroutines (argon2id is the slow part).
-func (d DemoCatalog) hashPasswords(sellers []plannedSeller) error {
+// hashPasswords gives each user a random 192-bit password that is never
+// stored or printed, hashed on one goroutine per CPU (argon2id is the slow
+// part).
+func (d DemoCatalog) hashPasswords(users []*models.User) error {
 	var (
 		wg   sync.WaitGroup
 		mu   sync.Mutex
@@ -457,7 +584,7 @@ func (d DemoCatalog) hashPasswords(sellers []plannedSeller) error {
 
 	work := make(chan int)
 
-	for range 4 {
+	for range runtime.NumCPU() {
 		wg.Go(func() {
 			for i := range work {
 				h, err := d.Hasher.Make(rand.Text())
@@ -469,12 +596,12 @@ func (d DemoCatalog) hashPasswords(sellers []plannedSeller) error {
 					continue
 				}
 
-				sellers[i].user.Password = h
+				users[i].Password = h
 			}
 		})
 	}
 
-	for i := range sellers {
+	for i := range users {
 		work <- i
 	}
 
@@ -482,7 +609,7 @@ func (d DemoCatalog) hashPasswords(sellers []plannedSeller) error {
 	wg.Wait()
 
 	if err := errors.Join(errs...); err != nil {
-		return fmt.Errorf("hash demo seller passwords: %w", err)
+		return fmt.Errorf("hash demo passwords: %w", err)
 	}
 
 	return nil
