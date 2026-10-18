@@ -48,10 +48,12 @@ All notable changes to this project are documented here. The format follows [Kee
 - Product questions and answers: buyers ask on product pages (10–500 characters, no contact data, 5 per 10 minutes), sellers answer at `/seller/questions` with a realtime and email notice, admins hide/unhide at `/admin/questions` (audited); `product_questions` flag.
 - Product reviews: buyers of paid/shipped/delivered order lines review once (1–5 stars, title, text, recommend); the product page shows the average, count, 5→1 distribution, newest/most-helpful sort, verified-purchase badge, the seller's reply and helpful votes; admins hide/unhide at `/admin/reviews` (audited); `reviews` flag; `reviews:recalculate` command and a daily recalculation task.
 - `app/moderation.ContainsContact` shared by questions, answers, reviews and replies (links, emails, handles, phone numbers; CEPs allowed).
+- `demo:catalog` simulates activity: 300 demo buyers, about 1,500 orders over six months (card/PIX, multi-item and multi-shop, delivered/shipped/paid/canceled), about 1,200 reviews (votes, seller replies, ratings recalculated) and about 1,200 questions (mostly answered); no provider calls, mails, jobs or ledger rows.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
 
+- `demo:catalog --fresh` deletes only demo-owned rows and refuses (nothing deleted) when real users' orders, reviews, questions, votes or cart items reference the demo catalog.
 - Email verification is off by default (`email_verification` flag); sign-up lands on the dashboard.
 - Names must be 4–24 characters with whitespace collapsed and the first letter capitalized (server `z` rule mirrored by zod in the forms).
 - vukem bumped to v0.26.0 (`contrib/graphql` v0.3.0, `contrib/grpc` v0.3.0, `contrib/stripe` v0.3.0, `drivers/redis` v0.4.0): Stripe Accounts v2 calls use contrib/stripe's typed helpers (our JSON client removed), SQL built from pieces goes through `database.RebindChecked`, and production mail is documented as `MAIL_MAILER=mailtrap` (Railway blocks SMTP; Mailpit stays local).
