@@ -1,12 +1,12 @@
 // Package flags holds the feature flags admins switch at /admin/flags.
-// Each flag is typed, has a default and gates real code; the stored
-// overrides are cached (the app cache, Redis in production) for TTL, and
-// any cache or database error falls back to the defaults.
+// Each flag has a default and gates real code. Values live in vukem's
+// flags package (stored in feature_flags, cached in the app cache, Redis
+// in production; read errors fall back to the defaults); this package
+// adds the typed keys, the admin audit log and the 404 gate.
 package flags
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -15,8 +15,8 @@ import (
 	"time"
 
 	vukem "github.com/AlexGalhardo/vukem"
-	"github.com/AlexGalhardo/vukem/cache"
 	"github.com/AlexGalhardo/vukem/database"
+	vflags "github.com/AlexGalhardo/vukem/flags"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
 )
@@ -101,57 +101,70 @@ var (
 	ErrLocked  = errors.New("flags: flag is locked")
 )
 
-// TTL is how long the stored overrides stay cached; Set forgets them, so
-// a change shows at once on every instance sharing the cache.
-const TTL = 30 * time.Second
+// Registered returns the flags for vukem.WithFlags: vukem stores the
+// values (feature_flags), caches them in the app cache (Redis in
+// production) and falls back to the defaults on any read error.
+func Registered() []vflags.AnyFlag {
+	out := make([]vflags.AnyFlag, 0, len(Definitions()))
+	for _, d := range Definitions() {
+		out = append(out, flagOf(d))
+	}
 
-const cacheKey = "flags:overrides:v1"
-
-// Flags reads and changes the feature flags.
-type Flags struct {
-	db    *database.DB
-	cache *cache.Cache
-	log   *slog.Logger
-	now   func() time.Time
+	return out
 }
 
-// New builds Flags from the app database and cache.
+func flagOf(d Definition) vflags.Flag[bool] {
+	f := vflags.Bool(string(d.Key), d.Default)
+	if d.Locked {
+		f = f.Lock()
+	}
+
+	return f
+}
+
+// Flags reads and changes the feature flags (vukem flags) and keeps the
+// admin audit log of changes.
+type Flags struct {
+	vf  *vflags.Flags
+	db  *database.DB
+	log *slog.Logger
+	now func() time.Time
+}
+
+// New builds Flags from the app's vukem flags and database.
 func New(app *vukem.App) (*Flags, error) {
+	vf, err := app.Flags()
+	if err != nil {
+		return nil, err
+	}
+
 	db, err := app.DB()
 	if err != nil {
 		return nil, err
 	}
 
-	c, err := app.Cache()
-	if err != nil {
-		return nil, err
-	}
-
-	return &Flags{db: db, cache: c, log: app.Log, now: app.Now}, nil
+	return &Flags{vf: vf, db: db, log: app.Log, now: app.Now}, nil
 }
 
-// All returns every flag's current value. It never fails: when the cache
-// or the database errors, every flag has its default (fail closed).
+// All returns every flag's current value (defaults on read errors).
 func (f *Flags) All(ctx context.Context) map[Key]bool {
-	stored, err := cache.Remember(ctx, f.cache, cacheKey, TTL, f.load)
-	if err != nil {
-		f.log.WarnContext(ctx, "flags: using defaults", "err", err)
-		return Defaults()
-	}
-
-	out := Defaults()
-
+	out := make(map[Key]bool, len(Definitions()))
 	for _, d := range Definitions() {
-		if v, ok := stored[d.Key]; ok && !d.Locked {
-			out[d.Key] = v
-		}
+		out[d.Key] = f.vf.Enabled(ctx, flagOf(d))
 	}
 
 	return out
 }
 
 // Enabled reports whether k is on (its default when it cannot be read).
-func (f *Flags) Enabled(ctx context.Context, k Key) bool { return f.All(ctx)[k] }
+func (f *Flags) Enabled(ctx context.Context, k Key) bool {
+	d, ok := Lookup(k)
+	if !ok {
+		return false
+	}
+
+	return f.vf.Enabled(ctx, flagOf(d))
+}
 
 // Require serves next only while k is on; otherwise 404, as if the route
 // did not exist.
@@ -168,39 +181,15 @@ func (f *Flags) Require(k Key) func(http.Handler) http.Handler {
 	}
 }
 
-func (f *Flags) load(ctx context.Context) (map[Key]bool, error) {
-	rows, err := f.db.QueryContext(ctx, "SELECT name, enabled FROM feature_flags")
-	if err != nil {
-		return nil, fmt.Errorf("load flags: %w", err)
-	}
-	defer rows.Close()
-
-	out := map[Key]bool{}
-
-	for rows.Next() {
-		var (
-			name    string
-			enabled bool
-		)
-
-		if err := rows.Scan(&name, &enabled); err != nil {
-			return nil, fmt.Errorf("scan flag: %w", err)
-		}
-
-		out[Key(name)] = enabled
-	}
-
-	return out, rows.Err()
-}
-
 // Actor is who changes a flag.
 type Actor struct {
 	ID    int64
 	Email string
 }
 
-// Set turns k on or off and logs the change (who, when, old and new
-// value) in the same transaction. Setting the current value is a no-op.
+// Set turns k on or off through vukem flags (which refreshes the shared
+// cache) and logs the change (who, when, old and new value). Setting the
+// current value is a no-op.
 func (f *Flags) Set(ctx context.Context, k Key, enabled bool, by Actor) error {
 	d, ok := Lookup(k)
 	if !ok {
@@ -211,46 +200,26 @@ func (f *Flags) Set(ctx context.Context, k Key, enabled bool, by Actor) error {
 		return ErrLocked
 	}
 
-	now := f.now().UTC()
+	old := f.Enabled(ctx, k)
+	if old == enabled {
+		return nil
+	}
 
-	err := f.db.Tx(ctx, func(tx *database.Tx) error {
-		old := d.Default
-
-		err := dbx.QueryRow(ctx, tx, "SELECT enabled FROM feature_flags WHERE name = ?"+dbx.ForUpdate(tx.Dialect()), string(k)).
-			Scan(&old)
-		if err != nil && !errors.Is(err, sql.ErrNoRows) {
-			return err
-		}
-
-		if old == enabled {
-			return nil
-		}
-
-		if _, err := dbx.Exec(ctx, tx, `INSERT INTO feature_flags (name, enabled, created_at, updated_at)
-			VALUES (?, ?, ?, ?)
-			ON CONFLICT (name) DO UPDATE SET enabled = excluded.enabled, updated_at = excluded.updated_at`,
-			string(k), enabled, now, now); err != nil {
-			return err
-		}
-
-		var userID *int64
-		if by.ID != 0 {
-			userID = &by.ID
-		}
-
-		_, err = dbx.Exec(ctx, tx, `INSERT INTO feature_flag_changes
-			(flag, old_enabled, new_enabled, user_id, user_email, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
-			string(k), old, enabled, userID, by.Email, now)
-
-		return err
-	})
-	if err != nil {
+	if _, err := vflags.Put(ctx, f.vf, vflags.Global, flagOf(d), enabled); err != nil {
 		return fmt.Errorf("set flag %s: %w", k, err)
 	}
 
-	// The TTL bounds staleness if this fails.
-	if err := f.cache.Forget(ctx, cacheKey); err != nil {
-		f.log.WarnContext(ctx, "flags: forget cached overrides", "err", err)
+	var userID *int64
+	if by.ID != 0 {
+		userID = &by.ID
+	}
+
+	// Logged after the value is stored: a failure here loses one log line,
+	// never the change.
+	if _, err := dbx.Exec(ctx, f.db, `INSERT INTO feature_flag_changes
+		(flag, old_enabled, new_enabled, user_id, user_email, created_at) VALUES (?, ?, ?, ?, ?, ?)`,
+		string(k), old, enabled, userID, by.Email, f.now().UTC()); err != nil {
+		return fmt.Errorf("log flag change %s: %w", k, err)
 	}
 
 	return nil

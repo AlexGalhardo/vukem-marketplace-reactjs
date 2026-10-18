@@ -67,7 +67,7 @@ func TestFlagsShareTheRedisCache(t *testing.T) {
 	}
 
 	// A write behind the app's back is not seen until the cached entry expires.
-	if _, err := db.ExecContext(ctx, "UPDATE feature_flags SET enabled = true WHERE name = $1",
+	if _, err := db.ExecContext(ctx, "UPDATE feature_flags SET value = 'true' WHERE name = $1 AND scope = ''",
 		string(flags.GoogleLogin)); err != nil {
 		t.Fatal(err)
 	}

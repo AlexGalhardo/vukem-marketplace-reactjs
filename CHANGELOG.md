@@ -53,6 +53,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 
+- vukem bumped to v0.27.0 (`contrib/grpc` v0.4.0, `drivers/otel` v0.3.0): feature flags use vukem `flags` (values migrated from the old `feature_flags` table, admin 2FA locked, audit log kept); `GRPC_INSECURE_CLEARTEXT` replaces `GRPC_INSECURE_PLAINTEXT` (still read); API routes use `auth.ProblemJSON`; Inertia error pages come from vukem's hook (full page loads also render the Error page); Redis stores are built lazily after the config loads (`vukem.ErrUseDefault` without `REDIS_URL` outside production); OTel metrics follow the generic endpoint, so production sets `OTEL_METRICS_EXPORTER=none` (Railway's receiver is traces-only).
 - `demo:catalog --fresh` deletes only demo-owned rows and refuses (nothing deleted) when real users' orders, reviews, questions, votes or cart items reference the demo catalog.
 - Email verification is off by default (`email_verification` flag); sign-up lands on the dashboard.
 - Names must be 4–24 characters with whitespace collapsed and the first letter capitalized (server `z` rule mirrored by zod in the forms).

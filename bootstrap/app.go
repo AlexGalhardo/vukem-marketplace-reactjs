@@ -7,6 +7,7 @@ import (
 	"github.com/AlexGalhardo/vukem/drivers/postgres"
 	"github.com/AlexGalhardo/vukem/inertia"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/jobs"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/listeners"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
@@ -33,6 +34,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		vukem.WithVite(resources.Public()),
 		vukem.WithTranslations(resources.Lang()),
 		vukem.WithInertia(inertia.Config{}),
+		vukem.WithFlags(flags.Registered()...),
 	}
 	base = append(base, platform.RedisOptions(deps)...)
 

@@ -112,8 +112,8 @@ func TestLockedAndUnknownFlagsRefuseChanges(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := db.ExecContext(ctx, `INSERT INTO feature_flags (name, enabled, created_at, updated_at)
-		VALUES ('admin_two_factor', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`); err != nil {
+	if _, err := db.ExecContext(ctx, `INSERT INTO feature_flags (name, scope, value, updated_at)
+		VALUES ('admin_two_factor', '', 'false', CURRENT_TIMESTAMP)`); err != nil {
 		t.Fatal(err)
 	}
 

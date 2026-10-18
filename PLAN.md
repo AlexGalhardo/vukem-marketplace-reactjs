@@ -14,7 +14,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 
 | # | Decision | Why |
 | --- | --- | --- |
-| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.26.0`), no `replace` | Battle-test the released framework, like any user |
+| D1 | Backend vukem (Go), pinned by tag (started at `v0.21.1`, now `v0.27.0`), no `replace` | Battle-test the released framework, like any user |
 | D2 | Frontend Inertia **v3** (stable: `@inertiajs/react` 3.9.1 is `latest` on npm, 2026-10-17) + React 19 + TypeScript strict | Server-driven pages, no client router or API layer for pages |
 | D3 | Base UI (`@base-ui/react` 1.9.0, headless) styled with pure Tailwind v4; no shadcn | Accessible behaviour, our own look |
 | D4 | i18n EN + PT-BR from one set of JSON catalogs (`resources/lang`) read by vukem i18n and imported by React | No drift between server and client strings |
@@ -44,7 +44,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | Layer | Version |
 | --- | --- |
 | Go toolchain | 1.27.2 |
-| vukem | v0.26.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.4.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.3.0, `drivers/otel` v0.2.0, `contrib/graphql` v0.3.0, `contrib/grpc` v0.3.0, `contrib/stripe` v0.3.0, `contrib/imaging` v0.1.0) |
+| vukem | v0.27.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.4.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.3.0, `drivers/otel` v0.3.0, `contrib/graphql` v0.3.0, `contrib/grpc` v0.4.0, `contrib/stripe` v0.3.0, `contrib/imaging` v0.1.0) |
 | pgx / go-redis / mongo-driver | v5.11.0 / v9.23.0 / v2.9.2 |
 | stripe-go | v87.0.0 (`github.com/stripe/stripe-go/v87`, Payments phase) |
 | Bun | 1.4.3 |
@@ -388,6 +388,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 - 2026-10-17 — Railway: `TRUSTED_PROXIES=100.64.0.0/10` (edge peers seen in the `peer` log field), `CLIENT_IP_HEADER=X-Real-IP`, `TRUST_FORWARDED_PROTO=true` (HSTS now sent; client IPs resolved), `TELEGRAM_LOG=false`. Open: queued mail to Mailtrap SMTP (`sandbox.smtp.mailtrap.io:2525`) times out from Railway (outbound SMTP blocked on the plan); needs an HTTP mail API transport or a plan that allows SMTP.
 
 - 2026-10-17 — vukem v0.26.0 (typed Stripe Accounts v2, Mailtrap API mailer documented). Owner items done: Google login/sign-up, name rules, email verification off by default, admin feature flags (`/admin/flags`), storefront redesign, demo catalog (100 sellers / 2000 products) and documented dev accounts. Not available without new data: free-shipping badge, product condition, cart line images.
+
+- 2026-10-18 — vukem v0.27.0: vukem flags (data migrated), cleartext gRPC opt-in renamed, ProblemJSON, Inertia error page hook, lazy Redis stores. Railway sets `OTEL_METRICS_EXPORTER=none` (traces-only receiver). Demo activity (buyers, orders, reviews, Q&A) in `demo:catalog`.
 
 ## 9. Operations
 
