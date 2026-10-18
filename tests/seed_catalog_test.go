@@ -27,7 +27,7 @@ import (
 func smallCatalog() seeders.DemoCatalog {
 	return seeders.DemoCatalog{
 		Sellers: 7, MinProducts: 2, MaxProducts: 6, Buyers: 5, MaxOrders: 3, MaxQuestions: 2,
-		Hasher: hash.Fake(),
+		Hasher: hash.Fake(), PlaceholderSize: 8,
 	}
 }
 

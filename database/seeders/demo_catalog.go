@@ -2,6 +2,7 @@ package seeders
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
@@ -88,6 +89,10 @@ type DemoCatalog struct {
 	Env config.Env
 	// Hasher hashes the random passwords; nil uses hash.Default().
 	Hasher hash.Hasher
+	// PlaceholderSize caps the side of the generated placeholder images
+	// (default 900); unit tests use a few pixels, since encoding the large
+	// images dominates their run time under the race detector.
+	PlaceholderSize int
 }
 
 // DemoCatalogResult reports what one run created.
@@ -216,7 +221,7 @@ func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk
 		return DemoCatalogResult{}, err
 	}
 
-	images, err := storePlaceholders(ctx, disk)
+	images, err := storePlaceholders(ctx, disk, cmp.Or(d.PlaceholderSize, placeholderSize))
 	if err != nil {
 		return DemoCatalogResult{}, err
 	}
@@ -675,7 +680,7 @@ func insertSellers(ctx context.Context, tx *database.Tx, chunk []plannedSeller) 
 // (already processed: every width variant is drawn directly, so no
 // thumbnail job runs) and returns, per category, image rows pointing at
 // them.
-func storePlaceholders(ctx context.Context, disk storage.Disk) (map[string][]catalog.ProductImage, error) {
+func storePlaceholders(ctx context.Context, disk storage.Disk, size int) (map[string][]catalog.ProductImage, error) {
 	out := make(map[string][]catalog.ProductImage, len(demoCategories))
 
 	for _, cat := range demoCategories {
@@ -683,7 +688,7 @@ func storePlaceholders(ctx context.Context, disk storage.Disk) (map[string][]cat
 
 		for n := range placeholdersPerCategory {
 			key := sharedKey(cat.slug, n)
-			largest := min(catalog.Widths[0], placeholderSize)
+			largest := min(catalog.Widths[0], size)
 
 			for _, w := range catalog.Widths {
 				obj := catalog.VariantKey(key, w)
@@ -697,7 +702,7 @@ func storePlaceholders(ctx context.Context, disk storage.Disk) (map[string][]cat
 					continue
 				}
 
-				img, err := placeholder(min(w, placeholderSize), from, to, n*5+len(cat.slug))
+				img, err := placeholder(min(w, size), from, to, n*5+len(cat.slug))
 				if err != nil {
 					return nil, err
 				}

@@ -23,7 +23,7 @@ import (
 func activityCatalog(buyers int) seeders.DemoCatalog {
 	return seeders.DemoCatalog{
 		Sellers: 8, MinProducts: 3, MaxProducts: 7, Buyers: buyers, MaxOrders: 9, MaxQuestions: 6,
-		Hasher: hash.Fake(),
+		Hasher: hash.Fake(), PlaceholderSize: 8,
 	}
 }
 
