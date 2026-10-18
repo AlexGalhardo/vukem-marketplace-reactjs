@@ -15,6 +15,9 @@ func All() []vukem.AppSeeder {
 		DemoShop{},
 		DemoCatalog{},
 		db("FreightRates", FreightRates{}),
+		// After DemoCatalog: conversations between its demo sellers and
+		// the demo buyers.
+		DemoChat{},
 	}
 }
 
