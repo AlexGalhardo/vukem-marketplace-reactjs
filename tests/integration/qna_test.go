@@ -46,6 +46,9 @@ func TestQuestionsOnPostgres(t *testing.T) {
 		Password: "x",
 		Role:     models.RoleUser,
 	}
+	// Verified: other integration tests may switch the email_verification
+	// flag on in this shared database.
+	asker.EmailVerifiedAt = orm.NullTime{V: time.Now().UTC(), Valid: true}
 	if err := orm.Create(t.Context(), db, &asker); err != nil {
 		t.Fatal(err)
 	}
