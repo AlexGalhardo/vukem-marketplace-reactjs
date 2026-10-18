@@ -278,7 +278,7 @@ func NewGraphQL(svc Services, log *slog.Logger) (*graphql.Schema, error) {
 // GraphQLHandler serves schema over HTTP. Introspection is off unless
 // allowed (see GraphQLIntrospection).
 func GraphQLHandler(schema *graphql.Schema, introspection bool) http.Handler {
-	return schema.Handler(graphql.HandlerConfig{MaxBodyBytes: 64 << 10, DisableIntrospection: !introspection})
+	return schema.Handler(graphql.HandlerConfig{MaxBodyBytes: 64 << 10, Introspection: introspection})
 }
 
 // GraphQLIntrospection is on outside production; production needs

@@ -55,6 +55,12 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		return nil, err
 	}
 
+	// workaround(vukem): App.OpenAPI maps web routes without OPENAPI_PREFIX.
+	// Web route names (cart.update) then collide with API operation ids.
+	if app.Config.OpenAPIPrefix == "" {
+		app.Config.OpenAPIPrefix = "/api/v1"
+	}
+
 	jobBinding.Bind(app)
 	deps.Bind(app)
 

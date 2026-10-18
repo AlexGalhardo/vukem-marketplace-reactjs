@@ -218,6 +218,11 @@ type Provider struct {
 // Register implements vukem.Provider.
 func (p Provider) Register(app *vukem.App) error {
 	tg := app.Telegram
+	// Since vukem v0.28 app.Telegram is a disabled handler, never nil, when
+	// TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is missing.
+	if tg != nil && !tg.Configured() {
+		tg = nil
+	}
 
 	q, err := app.Queue()
 	if err != nil {
