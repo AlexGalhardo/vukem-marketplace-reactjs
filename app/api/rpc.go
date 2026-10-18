@@ -16,10 +16,10 @@ import (
 	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/router"
 
-	catalogv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1/catalogv1connect"
-	ordersv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1/ordersv1connect"
+	catalogv1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1/catalogv1connect"
+	ordersv1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1/ordersv1connect"
 )
 
 // RPC serves catalog.v1.CatalogService and orders.v1.OrderService

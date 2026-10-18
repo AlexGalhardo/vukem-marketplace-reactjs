@@ -7,8 +7,8 @@ import (
 	"github.com/AlexGalhardo/vukem/social"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
 )
 
 // SocialHandlers serve "sign in with" (vukem install:auth --social).

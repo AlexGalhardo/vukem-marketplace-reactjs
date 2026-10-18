@@ -9,7 +9,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // Summary is a product's rating: the stored average and count (the same

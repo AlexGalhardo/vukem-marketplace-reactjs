@@ -7,8 +7,8 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/maintenance"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/maintenance"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 func setup(t *testing.T) (*database.DB, *vukemtest.FakeClock) {

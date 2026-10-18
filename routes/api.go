@@ -19,12 +19,12 @@ import (
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api/sqlstore"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/apikeys"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api/sqlstore"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/apikeys"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // Rate limits per minute; API_RATE_LIMIT tunes the per-caller one.

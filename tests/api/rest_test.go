@@ -7,8 +7,8 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/apifixture"
 )
 
 func TestRESTCatalogShowsOnlyPublicProducts(t *testing.T) {

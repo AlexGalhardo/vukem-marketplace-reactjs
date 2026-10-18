@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/chat"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/chat"
 )
 
 func TestSocketDeliversMessagesBetweenParticipants(t *testing.T) {

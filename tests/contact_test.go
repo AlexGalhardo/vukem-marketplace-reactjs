@@ -13,7 +13,7 @@ import (
 	"github.com/AlexGalhardo/vukem/logging/telegram"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 const telegramToken = "999:contact-test-token"

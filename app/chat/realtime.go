@@ -10,7 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem/broadcast"
 	"github.com/AlexGalhardo/vukem/sse"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // MemberInfo is what the presence channel shows about a participant.

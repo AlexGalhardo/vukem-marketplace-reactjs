@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package orders.v1;
 
-option go_package = "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1;ordersv1";
+option go_package = "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1;ordersv1";
 
 // OrderService reads the caller's own orders (as a buyer). Calls need an
 // API key with the orders:read scope; other users' orders are NotFound.

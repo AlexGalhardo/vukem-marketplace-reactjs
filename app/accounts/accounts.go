@@ -18,8 +18,8 @@ import (
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/signed"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // Accounts holds the authentication services.

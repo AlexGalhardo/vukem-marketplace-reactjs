@@ -19,8 +19,8 @@ import (
 	"github.com/AlexGalhardo/vukem/vukemtest"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/alerts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/alerts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 const token = "123456:SECRET-bot-token"

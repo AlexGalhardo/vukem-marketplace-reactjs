@@ -6,7 +6,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
 )
 
 // Items implements api.Cart. Every line is re-priced from products;

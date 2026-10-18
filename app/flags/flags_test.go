@@ -8,8 +8,8 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 func newFlags(t *testing.T) (*vukemtest.App, *flags.Flags) {

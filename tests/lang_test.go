@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/resources"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/resources"
 )
 
 // TestCatalogsHaveSameKeys keeps en.json and pt-BR.json in sync: the React

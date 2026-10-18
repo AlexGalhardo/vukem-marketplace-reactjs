@@ -17,9 +17,9 @@ import (
 	"github.com/AlexGalhardo/vukem/social"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/account"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/account"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 // strictGoogle is a fake Google that, like the real one, only hands out a

@@ -10,9 +10,9 @@ import (
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/alerts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/alerts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 // Contact handles the public contact form.

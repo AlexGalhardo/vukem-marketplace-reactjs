@@ -10,8 +10,8 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 // Message keys of the account errors (translated by the handlers).

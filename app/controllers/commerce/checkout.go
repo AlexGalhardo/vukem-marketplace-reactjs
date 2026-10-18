@@ -12,8 +12,8 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/checkout"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/checkout"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
 )
 
 // addressSessionKey remembers the address chosen in the first step.

@@ -9,7 +9,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/orm"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // Shop is the payments view of a seller's shop.

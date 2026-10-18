@@ -4,12 +4,12 @@ import (
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/seller"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/storefront"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/jobs"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/seller"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/storefront"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/jobs"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
 )
 
 // Catalog registers the storefront (home, search, category, product, shop,

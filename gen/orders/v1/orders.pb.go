@@ -703,7 +703,7 @@ const file_orders_v1_orders_proto_rawDesc = "" +
 	"ListOrders\x12\x1c.orders.v1.ListOrdersRequest\x1a\x1d.orders.v1.ListOrdersResponse\x12C\n" +
 	"\bGetOrder\x12\x1a.orders.v1.GetOrderRequest\x1a\x1b.orders.v1.GetOrderResponse\x12K\n" +
 	"\n" +
-	"WatchOrder\x12\x1c.orders.v1.WatchOrderRequest\x1a\x1d.orders.v1.WatchOrderResponse0\x01BQZOgithub.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1;ordersv1b\x06proto3"
+	"WatchOrder\x12\x1c.orders.v1.WatchOrderRequest\x1a\x1d.orders.v1.WatchOrderResponse0\x01BJZHgithub.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1;ordersv1b\x06proto3"
 
 var (
 	file_orders_v1_orders_proto_rawDescOnce sync.Once

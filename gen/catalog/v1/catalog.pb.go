@@ -617,7 +617,7 @@ const file_catalog_v1_catalog_proto_rawDesc = "" +
 	"\x0eCatalogService\x12Q\n" +
 	"\fListProducts\x12\x1f.catalog.v1.ListProductsRequest\x1a .catalog.v1.ListProductsResponse\x12K\n" +
 	"\n" +
-	"GetProduct\x12\x1d.catalog.v1.GetProductRequest\x1a\x1e.catalog.v1.GetProductResponseBSZQgithub.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1;catalogv1b\x06proto3"
+	"GetProduct\x12\x1d.catalog.v1.GetProductRequest\x1a\x1e.catalog.v1.GetProductResponseBLZJgithub.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1;catalogv1b\x06proto3"
 
 var (
 	file_catalog_v1_catalog_proto_rawDescOnce sync.Once

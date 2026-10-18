@@ -8,9 +8,9 @@ import (
 
 	"github.com/AlexGalhardo/vukem/config"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/abacatepay"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/abacatepay/abacatepaytest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/abacatepay"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/abacatepay/abacatepaytest"
 )
 
 func TestCreatePixChargeAndSimulate(t *testing.T) {

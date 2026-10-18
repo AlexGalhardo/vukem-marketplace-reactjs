@@ -7,9 +7,9 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
 )
 
 func makeAdmin(t *testing.T, app *vukemtest.App, email string) {

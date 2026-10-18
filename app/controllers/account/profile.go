@@ -7,9 +7,9 @@ import (
 	"github.com/AlexGalhardo/vukem/inertia"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 // PasswordThrottleKey limits current-password checks per user and IP, so

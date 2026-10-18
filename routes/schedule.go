@@ -7,8 +7,8 @@ import (
 	"github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/schedule"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/maintenance"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/maintenance"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
 )
 
 // Schedule declares the scheduled tasks. Run them with "vukem schedule:work"

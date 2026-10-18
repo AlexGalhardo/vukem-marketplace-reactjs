@@ -11,7 +11,7 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/shipping"
 )
 
 // AddToCart is the add-to-cart form. Prices are not part of it: any

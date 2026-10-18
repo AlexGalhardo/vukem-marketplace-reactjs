@@ -11,7 +11,7 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // ErrUserNotFound is returned when no account has the given email.

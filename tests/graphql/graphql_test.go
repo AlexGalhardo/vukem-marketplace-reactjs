@@ -11,11 +11,11 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api/sqlstore"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api/sqlstore"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
 )
 
 func gql(c *vukemtest.Client, query string, vars map[string]any) *vukemtest.Response {

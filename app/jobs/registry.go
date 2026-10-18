@@ -10,7 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/queue"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
 )
 
 // Binding hands the app to the job handlers. Registrations are passed to

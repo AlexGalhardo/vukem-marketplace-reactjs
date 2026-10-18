@@ -12,7 +12,7 @@ import (
 	"github.com/AlexGalhardo/vukem/drivers/mongo"
 	"github.com/AlexGalhardo/vukem/drivers/redis"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/realtime"
 )
 
 // Deps holds the infrastructure clients. Fields stay nil when the

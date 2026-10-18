@@ -10,7 +10,7 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // Product is what the cart and checkout need to know about a product and

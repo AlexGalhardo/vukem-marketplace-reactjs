@@ -9,7 +9,7 @@ import (
 
 	vukem "github.com/AlexGalhardo/vukem"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
 )
 
 // reviewsRecalculate rebuilds products.rating_avg_x100 and rating_count

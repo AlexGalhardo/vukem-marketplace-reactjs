@@ -9,9 +9,9 @@ import (
 	"github.com/AlexGalhardo/vukem/i18n"
 	"github.com/AlexGalhardo/vukem/orm"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // NotifyJob checks, NotifyAfter after a message, whether its recipient is

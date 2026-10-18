@@ -9,10 +9,10 @@ import (
 	"github.com/AlexGalhardo/vukem/ratelimit"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/webhooks"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/webhooks"
 )
 
 // Ops registers the contact form, the seller webhook pages and the

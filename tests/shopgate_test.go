@@ -7,7 +7,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 func TestSellerRoutesSendUsersWithoutAShopToSell(t *testing.T) {

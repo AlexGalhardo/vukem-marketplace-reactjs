@@ -13,13 +13,13 @@ import (
 	"github.com/AlexGalhardo/vukem/contrib/grpc/grpctest"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	catalogv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1/catalogv1connect"
-	ordersv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/orders/v1/ordersv1connect"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/routes"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	catalogv1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1/catalogv1connect"
+	ordersv1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/orders/v1/ordersv1connect"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/routes"
 )
 
 // grpcServer serves the handler of the GRPC_PORT server on an in-process

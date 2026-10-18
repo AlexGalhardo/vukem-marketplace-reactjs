@@ -5,8 +5,8 @@ import (
 	"github.com/AlexGalhardo/vukem/sse"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/realtime"
 )
 
 // Events streams the signed-in user's realtime events (GET /events). The

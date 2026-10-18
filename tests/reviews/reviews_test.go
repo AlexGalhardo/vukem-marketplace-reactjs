@@ -16,12 +16,12 @@ import (
 	"github.com/AlexGalhardo/vukem/events"
 	"github.com/AlexGalhardo/vukem/security"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 // shop is a seller with one published product.

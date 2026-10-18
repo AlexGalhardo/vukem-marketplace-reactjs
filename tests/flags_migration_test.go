@@ -8,9 +8,9 @@ import (
 	"github.com/AlexGalhardo/vukem/schema"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/migrations"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/migrations"
 )
 
 // TestFlagValuesSurviveTheMoveToVukemFlags rolls the flags table back to

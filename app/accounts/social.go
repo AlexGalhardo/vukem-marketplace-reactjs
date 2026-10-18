@@ -15,9 +15,9 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/social"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 // NewSocial configures the providers listed in names from

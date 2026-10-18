@@ -7,7 +7,7 @@ import (
 	"github.com/AlexGalhardo/vukem/auth/totp"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 // Abuse cases for the two-factor login (PLAN A07) not covered by

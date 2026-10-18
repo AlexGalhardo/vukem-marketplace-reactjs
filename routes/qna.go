@@ -7,9 +7,9 @@ import (
 	"github.com/AlexGalhardo/vukem/ratelimit"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/questions"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/questions"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
 )
 
 // Questions registers product questions: asking on the product page

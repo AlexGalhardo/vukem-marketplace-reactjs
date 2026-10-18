@@ -3,7 +3,7 @@ package moderation_test
 import (
 	"testing"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/moderation"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/moderation"
 )
 
 func TestContainsContact(t *testing.T) {

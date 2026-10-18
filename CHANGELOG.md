@@ -90,4 +90,4 @@ All notable changes to this project are documented here. The format follows [Kee
 - Seller webhook URLs are checked against internal networks at creation and at send time (`httpclient.Safe`); their secrets are encrypted at rest; alerts and contact jobs carry no request data.
 - New accounts always get the `user` role; a `role` sent in the registration body is ignored.
 
-[Unreleased]: https://github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/commits/main
+[Unreleased]: https://github.com/AlexGalhardo/vukem-marketplace-reactjs/commits/main

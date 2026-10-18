@@ -14,10 +14,10 @@ import (
 	"github.com/AlexGalhardo/vukem/drivers/postgres/pgtest"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/abacatepay"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/stripe"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/abacatepay"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/stripe"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 // commerceOnPostgres boots the commerce stack on a throwaway Postgres

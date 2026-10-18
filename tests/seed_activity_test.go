@@ -10,12 +10,12 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/storage"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/qna"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/seedtest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/qna"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/seedtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 // activityCatalog is a small catalog with enough buyers for every kind of

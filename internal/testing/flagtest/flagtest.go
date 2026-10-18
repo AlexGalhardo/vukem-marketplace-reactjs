@@ -6,7 +6,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
 )
 
 // Set turns flag k on or off in app, as an admin would.

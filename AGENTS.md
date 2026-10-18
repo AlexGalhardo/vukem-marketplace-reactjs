@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framework (Inertia v3 + React + Base UI + Tailwind v4). Module `github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs`.
+Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framework (Inertia v3 + React + Base UI + Tailwind v4). Module `github.com/AlexGalhardo/vukem-marketplace-reactjs`.
 
 ## Start here
 

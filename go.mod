@@ -1,4 +1,4 @@
-module github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs
+module github.com/AlexGalhardo/vukem-marketplace-reactjs
 
 go 1.27.2
 

@@ -20,7 +20,7 @@ import (
 	"github.com/AlexGalhardo/vukem/config"
 	vstripe "github.com/AlexGalhardo/vukem/contrib/stripe"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
 )
 
 // APIHost is Stripe's API.

@@ -18,10 +18,10 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/errs"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/cart"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/cart"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/shipping"
 )
 
 // Checkout errors, shown on the checkout pages.

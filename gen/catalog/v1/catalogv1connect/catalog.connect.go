@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	v1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1"
+	v1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1"
 	http "net/http"
 	strings "strings"
 )

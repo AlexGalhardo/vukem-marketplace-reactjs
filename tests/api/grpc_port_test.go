@@ -24,7 +24,7 @@ import (
 	"github.com/AlexGalhardo/vukem/config"
 	vgrpc "github.com/AlexGalhardo/vukem/contrib/grpc"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
 )
 
 func TestGRPCPortProductionRule(t *testing.T) {

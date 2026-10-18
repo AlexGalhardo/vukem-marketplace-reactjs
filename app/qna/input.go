@@ -3,7 +3,7 @@ package qna
 import (
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/moderation"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/moderation"
 )
 
 // Limits, in characters after trimming. resources/js/lib/qna.ts mirrors

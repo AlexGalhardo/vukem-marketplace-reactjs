@@ -19,11 +19,11 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/chat"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/authtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/chat"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/authtest"
 )
 
 // chatInstance is one app instance served over real HTTP; every instance

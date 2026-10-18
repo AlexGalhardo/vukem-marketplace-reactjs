@@ -11,7 +11,7 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
 )
 
 func images(t *testing.T, app *vukemtest.App, productID int64) []catalog.ProductImage {

@@ -16,8 +16,8 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // Categories seeds the top-level categories (EN/PT names). It upserts by

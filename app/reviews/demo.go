@@ -10,8 +10,8 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
 )
 
 // ErrDemoTarget: DemoPurchase found no such buyer or product, or the buyer

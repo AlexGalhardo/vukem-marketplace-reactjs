@@ -9,7 +9,7 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
 )
 
 // PayoutForm is a seller's payout request.

@@ -4,8 +4,8 @@ import (
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/drivers/otel"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/alerts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/webhooks"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/alerts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/webhooks"
 )
 
 // Providers lists the application providers in registration order;

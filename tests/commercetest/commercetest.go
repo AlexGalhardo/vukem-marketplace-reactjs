@@ -20,14 +20,14 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/abacatepay/abacatepaytest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/stripe/stripetest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/authtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/abacatepay/abacatepaytest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/stripe/stripetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/shipping"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/authtest"
 )
 
 // Webhook secrets and keys the fakes are configured with (test values).

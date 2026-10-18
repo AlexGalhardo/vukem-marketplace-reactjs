@@ -10,7 +10,7 @@ import (
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/queue"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/chat"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/chat"
 )
 
 func (e *env) jobs(kind string) []queue.Message {

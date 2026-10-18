@@ -11,9 +11,9 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/queue"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/mail"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/mail"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 // Register creates a user (unique email, hashed password) and, while the

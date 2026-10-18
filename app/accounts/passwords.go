@@ -16,8 +16,8 @@ import (
 	"github.com/AlexGalhardo/vukem/errs"
 	"github.com/AlexGalhardo/vukem/i18n"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/mail"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/mail"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // PasswordResetJob sends a password reset link from the queue. Every

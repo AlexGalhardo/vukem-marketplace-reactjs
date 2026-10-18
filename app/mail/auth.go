@@ -3,7 +3,7 @@ package mail
 import (
 	"github.com/AlexGalhardo/vukem/mail"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // VerifyEmail asks a new user to confirm their address.

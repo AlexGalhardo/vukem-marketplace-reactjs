@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 // TestReviewsOnPostgres runs the review SQL on the production dialect:

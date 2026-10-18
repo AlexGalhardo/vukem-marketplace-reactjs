@@ -12,7 +12,7 @@ import (
 	"github.com/AlexGalhardo/vukem/queue"
 	"github.com/AlexGalhardo/vukem/session"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/realtime"
 )
 
 // RedisConfig is read from the app's configuration (REDIS_URL from the

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package catalog.v1;
 
-option go_package = "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1;catalogv1";
+option go_package = "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1;catalogv1";
 
 // CatalogService reads the public catalog: published products of active
 // shops. Calls need an API key with the catalog:read scope.

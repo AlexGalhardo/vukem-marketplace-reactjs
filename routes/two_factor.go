@@ -8,9 +8,9 @@ import (
 	"github.com/AlexGalhardo/vukem/ratelimit"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/account"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/account"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
 )
 
 // TwoFactor registers the two-factor settings page and the login

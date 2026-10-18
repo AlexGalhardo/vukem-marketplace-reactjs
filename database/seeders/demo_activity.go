@@ -16,12 +16,12 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/uuid"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/qna"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/qna"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/shipping"
 )
 
 // DemoBuyerDomain is the email domain of every demo buyer; with

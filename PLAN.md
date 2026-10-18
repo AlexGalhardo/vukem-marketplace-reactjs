@@ -1,4 +1,4 @@
-# PLAN — vukem-micro-mercadolivre-reactjs
+# PLAN — vukem-marketplace-reactjs
 
 Main onboarding file for every session and agent. Read this first, then `AGENTS.md`. Pick the first unchecked task of the current phase, do it test-first, run its `→ verify:` line, tick it, commit.
 
@@ -218,7 +218,7 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 ### F — Foundation
 
-- [x] F.1 Repo: `git init -b main`, origin `git@github.com:AlexGalhardo/vukem-micro-mercadolivre-reactjs.git`, MIT LICENSE, README, AGENTS, CLAUDE, CONTRIBUTING, SECURITY, CHANGELOG
+- [x] F.1 Repo: `git init -b main`, origin `git@github.com:AlexGalhardo/vukem-marketplace-reactjs.git`, MIT LICENSE, README, AGENTS, CLAUDE, CONTRIBUTING, SECURITY, CHANGELOG
   → verify: `git remote -v` shows origin; `bun run lint:md` passes
 - [x] F.2 Tooling: `.editorconfig` (tabs 4), `.gitattributes` (LF), `.golangci.yml`, `biome.json`, `.markdownlint-cli2.jsonc`, commitlint, lefthook (pre-commit fmt/lint, commit-msg commitlint, pre-push vet/test/typecheck/govulncheck)
   → verify: `golangci-lint run ./...` = 0 issues; `bun run lint` clean; a bad commit message is rejected

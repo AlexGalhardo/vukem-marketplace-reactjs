@@ -18,7 +18,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/config"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
 )
 
 // Client calls AbacatePay. It never logs or prints its key.

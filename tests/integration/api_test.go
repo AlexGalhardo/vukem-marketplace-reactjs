@@ -13,12 +13,12 @@ import (
 	"github.com/AlexGalhardo/vukem/contrib/grpc/grpctest"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	catalogv1 "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/gen/catalog/v1/catalogv1connect"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/apifixture"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/routes"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	catalogv1 "github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/gen/catalog/v1/catalogv1connect"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/apifixture"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/routes"
 )
 
 // TestAPIsAgainstPostgres runs the hand-written API SQL (upserts,

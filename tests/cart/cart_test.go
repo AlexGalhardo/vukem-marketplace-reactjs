@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 func TestCartRequiresLogin(t *testing.T) {

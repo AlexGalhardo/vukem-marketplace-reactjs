@@ -14,8 +14,8 @@ import (
 	"github.com/AlexGalhardo/vukem/web"
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/api"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/api"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 )
 
 // Path of the page.

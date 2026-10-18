@@ -3,7 +3,7 @@ package chat
 import (
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/moderation"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/moderation"
 )
 
 // Message limits, in characters after trimming. resources/js/lib/chat.ts

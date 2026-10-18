@@ -13,13 +13,13 @@ formatters:
     - golines
   settings:
     gofumpt:
-      module-path: github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs
+      module-path: github.com/AlexGalhardo/vukem-marketplace-reactjs
     gci:
       sections:
         - standard
         - default
         - prefix(github.com/AlexGalhardo/vukem)
-        - prefix(github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs)
+        - prefix(github.com/AlexGalhardo/vukem-marketplace-reactjs)
     golines:
       max-len: 120
       tab-len: 4

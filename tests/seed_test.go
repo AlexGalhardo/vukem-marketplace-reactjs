@@ -11,8 +11,8 @@ import (
 	"github.com/AlexGalhardo/vukem/auth/totp"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/seeders"
 )
 
 func demoUsers(env map[string]string, log *bytes.Buffer) seeders.Users {

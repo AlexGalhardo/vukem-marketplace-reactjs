@@ -13,8 +13,8 @@ import (
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/resources"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/resources"
 )
 
 // Web registers the browser routes and the probes. vukem route:list shows them.

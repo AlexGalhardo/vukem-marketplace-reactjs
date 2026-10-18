@@ -9,7 +9,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // Rate is one row of the freight table: up to MaxWeightGrams to Region

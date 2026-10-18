@@ -8,7 +8,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // payment describes a confirmed payment from a provider webhook.

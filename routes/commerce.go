@@ -10,15 +10,15 @@ import (
 	"github.com/AlexGalhardo/vukem/ratelimit"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/cart"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/checkout"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/commerce"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/abacatepay"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/stripe"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/shipping"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/cart"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/checkout"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/commerce"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/abacatepay"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/stripe"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/shipping"
 )
 
 // Commerce registers the cart, address book, freight, checkout, provider

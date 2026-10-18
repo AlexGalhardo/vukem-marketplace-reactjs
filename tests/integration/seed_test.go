@@ -13,11 +13,11 @@ import (
 	"github.com/AlexGalhardo/vukem/storage"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/seedtest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/seedtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/tests/commercetest"
 )
 
 // demoStats reads, per demo seller, how many published products its shop

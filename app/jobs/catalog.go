@@ -3,7 +3,7 @@ package jobs
 import (
 	"github.com/AlexGalhardo/vukem/queue"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/catalog"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
 )
 
 // Catalog lists the catalog jobs (image thumbnails). Their handlers need

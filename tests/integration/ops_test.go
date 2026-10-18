@@ -16,11 +16,11 @@ import (
 	"github.com/AlexGalhardo/vukem/vukemtest"
 	"github.com/AlexGalhardo/vukem/webhook"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/maintenance"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/webhooks"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/maintenance"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/realtime"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/webhooks"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 // TestRealtimeRelaysAcrossInstances publishes on one hub (a worker) and

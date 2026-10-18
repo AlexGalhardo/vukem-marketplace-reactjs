@@ -10,9 +10,9 @@ import (
 	"github.com/AlexGalhardo/vukem/orm"
 	"github.com/AlexGalhardo/vukem/web"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/models"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/webhooks"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/webhooks"
 )
 
 // webhookSecretFlash carries a new endpoint's secret to the next page

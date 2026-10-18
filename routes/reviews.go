@@ -8,10 +8,10 @@ import (
 	"github.com/AlexGalhardo/vukem/ratelimit"
 	"github.com/AlexGalhardo/vukem/router"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	reviewsctl "github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/reviews"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	reviewsctl "github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/reviews"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
 )
 
 // reviewHandlers builds the review controllers on the app database.

@@ -12,9 +12,9 @@ import (
 
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/moderation"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/moderation"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/seeders"
 )
 
 const (

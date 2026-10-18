@@ -9,9 +9,9 @@ import (
 	"github.com/AlexGalhardo/vukem/config"
 	vstripe "github.com/AlexGalhardo/vukem/contrib/stripe"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/stripe"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/payments/stripe/stripetest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/stripe"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/payments/stripe/stripetest"
 )
 
 func newClient(t *testing.T) (*stripe.Client, *stripetest.Server) {

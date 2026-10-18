@@ -6,7 +6,7 @@ import (
 
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/requests"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/requests"
 )
 
 func TestNameSchema(t *testing.T) {

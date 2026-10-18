@@ -9,9 +9,9 @@ import (
 	"github.com/AlexGalhardo/vukem/router"
 	"github.com/AlexGalhardo/vukem/sse"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/accounts"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers/messages"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/accounts"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/controllers/messages"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
 )
 
 // Chat registers the buyer ↔ seller chat behind the chat flag: inboxes,

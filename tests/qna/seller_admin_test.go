@@ -16,8 +16,8 @@ import (
 	"github.com/AlexGalhardo/vukem/security"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/qna"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/qna"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/realtime"
 )
 
 type published struct {

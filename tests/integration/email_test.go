@@ -11,9 +11,9 @@ import (
 
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/mailtrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/mailtrap"
 )
 
 // TestVerificationEmailThroughMailtrap sends the real verification email

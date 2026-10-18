@@ -20,7 +20,7 @@ import (
 	"github.com/AlexGalhardo/vukem/drivers/otel"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 // receiver is an in-process OTLP/HTTP collector that keeps the spans and

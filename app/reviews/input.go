@@ -3,7 +3,7 @@ package reviews
 import (
 	"github.com/AlexGalhardo/vukem/z"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/moderation"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/moderation"
 )
 
 // MsgContact is the error for text carrying a link, an email address or a

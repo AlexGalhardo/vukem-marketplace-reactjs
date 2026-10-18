@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/flagtest"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
 )
 
 func TestAccountMessagesFollowTheLocale(t *testing.T) {

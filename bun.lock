@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "vukem-micro-mercadolivre-reactjs",
+      "name": "vukem-marketplace-reactjs",
       "dependencies": {
         "@base-ui/react": "1.9.0",
         "@inertiajs/react": "3.9.1",

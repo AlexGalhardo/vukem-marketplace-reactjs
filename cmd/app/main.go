@@ -7,7 +7,7 @@ import (
 
 	vukem "github.com/AlexGalhardo/vukem"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/bootstrap"
 )
 
 func main() { os.Exit(vukem.Main(bootstrap.New)) }

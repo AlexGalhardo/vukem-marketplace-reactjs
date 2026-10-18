@@ -7,14 +7,14 @@ import (
 	"github.com/AlexGalhardo/vukem/drivers/postgres"
 	"github.com/AlexGalhardo/vukem/inertia"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/flags"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/jobs"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/listeners"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/platform"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/migrations"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/resources"
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/routes"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/flags"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/jobs"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/listeners"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/platform"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/migrations"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/resources"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/routes"
 )
 
 // New builds the application; cmd/app and the tests call it.

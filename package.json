@@ -1,5 +1,5 @@
 {
-	"name": "vukem-micro-mercadolivre-reactjs",
+	"name": "vukem-marketplace-reactjs",
 	"private": true,
 	"type": "module",
 	"packageManager": "bun@1.4.3",

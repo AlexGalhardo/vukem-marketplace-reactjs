@@ -9,7 +9,7 @@ import (
 	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/database"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/chat"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/chat"
 )
 
 // Demo account domains: demo buyers come from the demo users seeder, demo

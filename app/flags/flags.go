@@ -18,7 +18,7 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	vflags "github.com/AlexGalhardo/vukem/flags"
 
-	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/dbx"
+	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/dbx"
 )
 
 // Key names a feature flag.
