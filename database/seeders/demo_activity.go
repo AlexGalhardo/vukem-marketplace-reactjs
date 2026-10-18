@@ -849,6 +849,8 @@ func (p *activityPlanner) question(f *factory.Faker, b int) (qna.Question, bool)
 	return q, true
 }
 
+// workaround(vukem): uuid has no NewV7At(time) for back-dated rows
+//
 // publicIDAt is a UUIDv7 (payments.NewPublicID) whose timestamp is the
 // simulated order time instead of the seeding time.
 func publicIDAt(t time.Time) string {
