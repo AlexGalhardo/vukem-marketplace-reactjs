@@ -3,7 +3,7 @@ import type { JSX } from "react";
 import { formatCep, useSavedCep } from "../../lib/cep";
 import { useT } from "../../lib/i18n";
 import type { SharedProps } from "../../types";
-import { CartIcon, PinIcon, SearchIcon, UserIcon } from "../icons";
+import { CartIcon, ChatIcon, PinIcon, SearchIcon, UserIcon } from "../icons";
 import LocaleMenu from "../LocaleMenu";
 import ThemeToggle from "../ThemeToggle";
 import Logo from "./Logo";
@@ -64,6 +64,7 @@ export default function SiteHeader(): JSX.Element {
 	const user = page.props.auth?.user ?? null;
 	const hasShop = page.props.auth?.hasShop ?? false;
 	const cartCount = page.props.cartCount ?? 0;
+	const chat = page.props.chat;
 	const q = typeof window === "undefined" ? "" : (new URLSearchParams(window.location.search).get("q") ?? "");
 
 	return (
@@ -140,6 +141,26 @@ export default function SiteHeader(): JSX.Element {
 									<UserIcon className="size-4.5" />
 									<span className="max-w-40 truncate">{user.name}</span>
 								</Link>
+								{chat?.enabled && (
+									<Link href="/messages" className={`${pill} flex items-center gap-1.5`}>
+										<ChatIcon className="size-4.5" />
+										<span aria-hidden={chat.unread > 0 ? true : undefined}>{t("chat.nav")}</span>
+										{chat.unread > 0 && (
+											<>
+												<span className="sr-only">
+													{t("chat.nav_unread", { count: chat.unread })}
+												</span>
+												<span
+													aria-hidden="true"
+													data-testid="chat-unread"
+													className="min-w-4.5 rounded-full bg-action-500 px-1 text-center text-[0.7rem] leading-4.5 font-semibold text-on-action tabular-nums"
+												>
+													{chat.unread > 99 ? "99+" : chat.unread}
+												</span>
+											</>
+										)}
+									</Link>
+								)}
 								<Link href="/account" className={pill}>
 									{t("account.nav.account")}
 								</Link>

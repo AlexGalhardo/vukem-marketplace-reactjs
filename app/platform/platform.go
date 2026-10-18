@@ -32,6 +32,10 @@ type Deps struct {
 	pending map[string]Check
 }
 
+// RedisPrefix is the prefix of the app's Redis keys and channels (""
+// without Redis).
+func (d *Deps) RedisPrefix() string { return d.redisPrefix }
+
 // Check reports whether one dependency is usable.
 type Check func(ctx context.Context) error
 

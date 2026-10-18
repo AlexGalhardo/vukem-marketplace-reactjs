@@ -19,6 +19,7 @@ func All(deps *platform.Deps) []func(r *router.Router, app *vukem.App) error {
 		Commerce(deps),
 		Ops(deps),
 		Reviews,
+		Chat(deps),
 	}
 }
 

@@ -95,6 +95,10 @@
 				"reviews": {
 					"label": "Product reviews",
 					"description": "Buyers review what they bought, vote reviews helpful and shops reply. Off: writing, voting and replying answer 404; published reviews stay visible."
+				},
+				"chat": {
+					"label": "Buyer and seller chat",
+					"description": "Buyers message shops in real time from product pages and orders. Off: chat pages, sends and realtime sockets answer 404 and the links disappear; stored messages are kept."
 				}
 			}
 		}
@@ -981,5 +985,81 @@
 			"hide": "Hide",
 			"unhide": "Show again"
 		}
+	},
+	"chat": {
+		"nav": "Messages",
+		"nav_unread": "Messages ({count} unread)",
+		"cta": "Chat with the seller",
+		"cta_hint": "Ask about stock, shipping or details. Replies arrive in real time.",
+		"cta_login": "Log in to chat with the seller",
+		"order_cta": "Chat with {shop}",
+		"inbox": {
+			"title_buyer": "My messages",
+			"title_seller": "Buyer messages",
+			"intro_buyer": "Your conversations with sellers. Replies arrive here in real time.",
+			"intro_seller": "Conversations buyers started with your shop. Quick replies help them decide.",
+			"empty_buyer": "No conversations yet. Open a product and choose \"Chat with the seller\".",
+			"empty_seller": "No buyer messages yet.",
+			"general": "General conversation",
+			"about": "About {product}",
+			"you": "You: {text}",
+			"unread": "{count} new",
+			"list_label": "Conversations",
+			"pagination": "Conversation pages",
+			"previous": "Newer conversations",
+			"next": "Older conversations",
+			"page_of": "Page {page} of {last}",
+			"live": "New message received. The list was updated."
+		},
+		"show": {
+			"back": "All messages",
+			"title": "Chat with {name}",
+			"about": "About {product}",
+			"shop_link": "Visit the shop",
+			"online": "Online",
+			"offline": "Offline",
+			"typing": "{name} is typing…",
+			"seen": "Seen",
+			"sent": "Sent",
+			"you": "You",
+			"log_label": "Messages with {name}",
+			"empty": "No messages yet. Say hello and ask your question.",
+			"composer_label": "Your message",
+			"composer_hint": "Plain text, up to {max} characters. Links, emails and phone numbers are not allowed.",
+			"send": "Send",
+			"sending": "Sending…",
+			"chars": "{count}/{max}",
+			"failed": "Your message was not sent. Try again.",
+			"status_live": "Live",
+			"status_connecting": "Connecting…",
+			"status_reconnecting": "Connection lost. Reconnecting…",
+			"status_fallback": "Live updates are limited. New messages are checked every few seconds."
+		},
+		"errors": {
+			"no_contact": "For your safety, keep the conversation on the platform: links, emails, social handles and phone numbers are not allowed.",
+			"own_shop": "You cannot chat with your own shop.",
+			"empty": "Write a message.",
+			"too_long": "Use at most {max} characters.",
+			"rate_limited": "You are sending messages too fast. Wait a moment and try again."
+		},
+		"mail": {
+			"subject": "{from} sent you a message",
+			"hello": "Hello, {name}.",
+			"body": "{from} wrote to you while you were away ({count} unread):",
+			"action": "Open the conversation",
+			"footer": "For your safety, keep the conversation and the payment on the platform."
+		},
+		"admin": {
+			"link": "Read buyer and seller chats",
+			"title": "Conversations",
+			"intro": "Read-only view for moderation. Opening a conversation is recorded in the audit log.",
+			"empty": "No conversations yet.",
+			"between": "{buyer} and {shop}",
+			"read_only": "Read-only: admins cannot post in conversations.",
+			"back": "All conversations",
+			"buyer": "Buyer",
+			"seller": "Seller"
+		},
+		"seller_nav": "Messages"
 	}
 }
