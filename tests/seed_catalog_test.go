@@ -25,7 +25,10 @@ import (
 )
 
 func smallCatalog() seeders.DemoCatalog {
-	return seeders.DemoCatalog{Sellers: 7, MinProducts: 2, MaxProducts: 6, Hasher: hash.Fake()}
+	return seeders.DemoCatalog{
+		Sellers: 7, MinProducts: 2, MaxProducts: 6, Buyers: 5, MaxOrders: 3, MaxQuestions: 2,
+		Hasher: hash.Fake(),
+	}
 }
 
 func seedDB(t *testing.T, app *vukemtest.App) *database.DB {
@@ -70,12 +73,12 @@ func TestDemoCatalogSeedsSellersShopsAndProducts(t *testing.T) {
 	}
 
 	// 7 sellers: three mirrored pairs averaging 4 plus one seller with 4.
-	if diff := cmp.Diff(seeders.DemoCatalogResult{Sellers: 7, Products: 28}, res,
-		cmp.FilterPath(func(p cmp.Path) bool { return p.String() == "Elapsed" }, cmp.Ignore())); diff != "" {
+	got := seeders.DemoCatalogResult{Sellers: res.Sellers, Products: res.Products, Buyers: res.Buyers}
+	if diff := cmp.Diff(seeders.DemoCatalogResult{Sellers: 7, Products: 28, Buyers: 5}, got); diff != "" {
 		t.Fatalf("result (-want +got):\n%s", diff)
 	}
 
-	users, err := orm.QueryOf[models.User](db).Get(ctx)
+	users, err := orm.QueryOf[models.User](db).Where("email", "LIKE", "%@"+seeders.DemoSellerDomain).Get(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +195,7 @@ func TestDemoCatalogIsIdempotentAndDeterministic(t *testing.T) {
 		t.Fatalf("second run created %+v, want nothing", res)
 	}
 
-	vukemtest.AssertDatabaseCount(t, app, "users", 7)
+	vukemtest.AssertDatabaseCount(t, app, "users", 12)
 	vukemtest.AssertDatabaseCount(t, app, "products", int64(len(first)))
 
 	// The same seed on another database plans the same catalog.
@@ -220,6 +223,8 @@ func TestDemoCatalogIsIdempotentAndDeterministic(t *testing.T) {
 	vukemtest.AssertDatabaseCount(t, app, "users", 3)
 	vukemtest.AssertDatabaseCount(t, app, "products", 0)
 	vukemtest.AssertDatabaseCount(t, app, "product_images", 0)
+	vukemtest.AssertDatabaseCount(t, app, "orders", 0)
+	vukemtest.AssertDatabaseCount(t, app, "product_questions", 0)
 
 	if _, err := smallCatalog().Run(ctx, db, disk); err != nil {
 		t.Fatal(err)
@@ -249,7 +254,7 @@ func TestDemoCatalogRefusesProductionWithoutOptIn(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	vukemtest.AssertDatabaseCount(t, app, "users", 7)
+	vukemtest.AssertDatabaseCount(t, app, "users", 12)
 	vukemtest.AssertDatabaseMissing(t, app, "users", map[string]any{"email": "seller@example.com"})
 }
 

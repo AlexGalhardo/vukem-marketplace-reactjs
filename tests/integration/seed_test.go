@@ -4,15 +4,20 @@ package integration
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/AlexGalhardo/vukem/auth/hash"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/storage"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/reviews"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/bootstrap"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/database/seeders"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/internal/testing/seedtest"
+	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/tests/commercetest"
 )
 
 // demoStats reads, per demo seller, how many published products its shop
@@ -50,68 +55,149 @@ func demoStats(t *testing.T, db *database.DB) (sellers, products, lo, hi int) {
 }
 
 func TestDemoCatalogFullSizeOnPostgres(t *testing.T) {
-	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: map[string]string{
-		"DATABASE_URL": env(t, "TEST_DATABASE_URL"),
-	}})
-
-	db, err := app.DB()
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	e := commerceOnPostgres(t, commercetest.Options{})
 	ctx := t.Context()
 	disk := storage.NewMemory("")
 
-	if err := (seeders.DemoCatalog{}).Purge(ctx, db); err != nil {
-		t.Fatal(err)
-	}
-
 	start := time.Now()
 
-	res, err := seeders.DemoCatalog{}.Run(ctx, db, disk)
+	res, err := seeders.DemoCatalog{}.Run(ctx, e.DB, disk)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	elapsed := time.Since(start)
-	t.Logf("demo catalog: %d sellers, %d products in %s", res.Sellers, res.Products, elapsed.Round(time.Millisecond))
+	t.Logf("cold seed: %+v in %s", res, elapsed.Round(time.Millisecond))
 
-	if res.Sellers != 100 || res.Products != 2000 {
-		t.Fatalf("result = %+v, want 100 sellers and 2000 products", res)
+	if res.Sellers != 100 || res.Products != 2000 || res.Buyers != 300 || res.Orders < 1200 ||
+		res.Reviews < 500 || res.Questions < 900 {
+		t.Fatalf("result = %+v, want 100 sellers, 2000 products, 300 buyers, ~1500 orders, reviews, ~1200 questions",
+			res)
 	}
 
 	if elapsed > time.Minute {
 		t.Fatalf("seeding took %s, want well under a minute", elapsed)
 	}
 
-	sellers, products, lo, hi := demoStats(t, db)
+	sellers, products, lo, hi := demoStats(t, e.DB)
 	if sellers != 100 || products != 2000 || lo < 10 || hi > 30 {
 		t.Fatalf("stored %d sellers, %d products, per seller %d..%d; want 100, 2000, within 10..30",
 			sellers, products, lo, hi)
 	}
 
+	seedtest.AssertConsistent(t, e.DB)
+
+	for table, want := range map[string]int{
+		"orders": res.Orders, "reviews": res.Reviews, "product_questions": res.Questions, "addresses": res.Buyers,
+	} {
+		if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM `+table); n != int64(want) {
+			t.Errorf("%s = %d, want %d", table, n, want)
+		}
+	}
+
 	// Idempotent: a second run creates nothing and is fast.
 	start = time.Now()
 
-	again, err := seeders.DemoCatalog{}.Run(ctx, db, disk)
+	again, err := seeders.DemoCatalog{}.Run(ctx, e.DB, disk)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Logf("second run: %+v in %s", again, time.Since(start).Round(time.Millisecond))
+	t.Logf("re-run: %+v in %s", again, time.Since(start).Round(time.Millisecond))
 
-	if again.Sellers != 0 || again.Products != 0 {
+	if again.Sellers+again.Products+again.Buyers+again.Orders+again.Reviews+again.Questions != 0 {
 		t.Fatalf("second run created %+v, want nothing", again)
 	}
 
-	if s, p, _, _ := demoStats(t, db); s != 100 || p != 2000 {
+	if s, p, _, _ := demoStats(t, e.DB); s != 100 || p != 2000 {
 		t.Fatalf("after the second run: %d sellers, %d products", s, p)
 	}
 
+	// The showcase product of e2e/demo-catalog.spec.ts (the head of the
+	// sales skew: first demo product in slug order) has reviews and
+	// answered questions.
+	showcase := e.String(t, `SELECT p.slug FROM products p JOIN shops s ON s.id = p.shop_id
+		JOIN users u ON u.id = s.owner_id WHERE u.email LIKE ? ORDER BY p.slug COLLATE "C" LIMIT 1`,
+		"%@"+seeders.DemoSellerDomain)
+	reviewsOf := seedtest.Count(t, e.DB, `SELECT rating_count FROM products WHERE slug = ?`, showcase)
+	answered := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM product_questions q JOIN products p ON p.id = q.product_id
+		WHERE p.slug = ? AND q.answer IS NOT NULL`, showcase)
+	t.Logf("showcase /p/%s: %d reviews, %d answered questions", showcase, reviewsOf, answered)
+
+	if reviewsOf == 0 || answered == 0 {
+		t.Fatalf(
+			"showcase %s has %d reviews and %d answered questions, want some of each",
+			showcase,
+			reviewsOf,
+			answered,
+		)
+	}
+
 	// The products are searchable (Postgres full-text search).
-	res2 := app.Client(t).Get("/search?q=smartphone").AssertOK().AssertInertia("Catalog/Search")
+	res2 := e.App.Client(t).Get("/search?q=smartphone").AssertOK().AssertInertia("Catalog/Search")
 	if raw, _ := res2.Prop("results.data"); len(raw.([]any)) == 0 {
 		t.Fatal("search for smartphone found no demo product")
+	}
+}
+
+// TestDemoPurgeOnPostgres: --fresh deletes the demo rows only, under the
+// Postgres foreign keys, and refuses (deleting nothing) once a real order
+// references a demo shop.
+func TestDemoPurgeOnPostgres(t *testing.T) {
+	e := commerceOnPostgres(t, commercetest.Options{})
+	ctx := t.Context()
+	small := seeders.DemoCatalog{Sellers: 6, MinProducts: 2, MaxProducts: 6, Buyers: 12, Hasher: hash.Fake()}
+
+	seller := e.User(t, true)
+	shop := e.Shop(t, seller.ID, commercetest.ShopOptions{})
+	slug, _ := e.Product(t, shop, commercetest.Product{PriceCents: 4990, Stock: 5, WeightGrams: 300})
+	buyer := e.User(t, true)
+
+	if _, err := reviews.DemoPurchase(ctx, e.DB, buyer.Email, slug, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := small.Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+		t.Fatal(err)
+	}
+
+	seedtest.AssertConsistent(t, e.DB)
+
+	if err := (seeders.DemoCatalog{}).Purge(ctx, e.DB); err != nil {
+		t.Fatal(err)
+	}
+
+	for table, want := range map[string]int64{
+		"users": 2, "shops": 1, "products": 1, "orders": 1, "seller_orders": 1, "order_items": 1,
+		"reviews": 0, "product_questions": 0, "addresses": 0,
+	} {
+		if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM `+table); n != want {
+			t.Errorf("%s = %d after the purge, want %d", table, n, want)
+		}
+	}
+
+	// A real order of a demo product: the purge refuses and keeps everything.
+	if _, err := small.Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+		t.Fatal(err)
+	}
+
+	demoSlug := e.String(t, `SELECT p.slug FROM products p JOIN shops s ON s.id = p.shop_id
+		JOIN users u ON u.id = s.owner_id WHERE u.email LIKE ? ORDER BY p.id LIMIT 1`, "%@"+seeders.DemoSellerDomain)
+	if _, err := reviews.DemoPurchase(ctx, e.DB, buyer.Email, demoSlug, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+
+	users := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users`)
+	orders := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders`)
+
+	err := (seeders.DemoCatalog{}).Purge(ctx, e.DB)
+	if !errors.Is(err, seeders.ErrDemoPurgeBlocked) || !strings.Contains(err.Error(), "1 orders of real buyers") {
+		t.Fatalf("err = %v, want ErrDemoPurgeBlocked naming the real order", err)
+	}
+
+	if u, o := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users`), seedtest.Count(t, e.DB,
+		`SELECT COUNT(*) FROM orders`); u != users || o != orders {
+		t.Fatalf("refused purge changed rows: users %d→%d, orders %d→%d", users, u, orders, o)
 	}
 }
 
