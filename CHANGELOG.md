@@ -49,6 +49,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Product reviews: buyers of paid/shipped/delivered order lines review once (1–5 stars, title, text, recommend); the product page shows the average, count, 5→1 distribution, newest/most-helpful sort, verified-purchase badge, the seller's reply and helpful votes; admins hide/unhide at `/admin/reviews` (audited); `reviews` flag; `reviews:recalculate` command and a daily recalculation task.
 - `app/moderation.ContainsContact` shared by questions, answers, reviews and replies (links, emails, handles, phone numbers; CEPs allowed).
 - `demo:catalog` simulates activity: 300 demo buyers, about 1,500 orders over six months (card/PIX, multi-item and multi-shop, delivered/shipped/paid/canceled), about 1,200 reviews (votes, seller replies, ratings recalculated) and about 1,200 questions (mostly answered); no provider calls, mails, jobs or ledger rows.
+- Buyer ↔ seller chat: conversations per buyer, shop and optional product (`/messages`, `/seller/messages`, header unread badge), realtime over vukem broadcast + drivers/websocket with SSE and polling fallbacks, Redis fan-out across instances, presence and typing, read receipts, catch-up by last message id, contact-data filter, per-user rate limits, queued email when the recipient stays offline (`CHAT_NOTIFY_AFTER`), admin read-only view (audited), `chat` flag and demo conversations.
 - PLAN.md with architecture, data model, money flows, OWASP Top 10:2025 checklist and roadmap.
 
 ### Changed
@@ -73,6 +74,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Security
 
+- Chat sockets: same-origin upgrade only, session auth, private channels authorized for the two participants, 4 KiB frames, 5 sockets per user per instance, 30-minute lifetime; broadcast Redis channels carry the app prefix so environments sharing Redis never cross-deliver.
 - Linking Google to an unverified local account also clears its 2FA, API keys, pending reset links, the shop's payout destinations and webhooks; sign-up is rate limited per IP.
 - The demo shop seeder refuses `APP_ENV=production` and uses `SEED_PASSWORD` (it could create `seller@example.com` with a fixed password).
 - API authentication failures (401/403) are always problem+json, even for `Accept: text/html`; `HTTP_H2C` alone never opens the gRPC port in production.

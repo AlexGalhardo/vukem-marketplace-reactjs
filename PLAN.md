@@ -391,6 +391,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 
 - 2026-10-18 — vukem v0.27.0: vukem flags (data migrated), cleartext gRPC opt-in renamed, ProblemJSON, Inertia error page hook, lazy Redis stores. Railway sets `OTEL_METRICS_EXPORTER=none` (traces-only receiver). Demo activity (buyers, orders, reviews, Q&A) in `demo:catalog`.
 
+- 2026-10-18 — Buyer ↔ seller chat (vukem broadcast + drivers/websocket v0.1.1, Redis fan-out, SSE/polling fallback). Verify: `go test ./tests/chat/`, integration two-instance test, `e2e/chat.spec.ts`. Production check: WebSocket through Railway's proxy with two sessions.
+
 ## 9. Operations
 
 ### 9.1 Commands
