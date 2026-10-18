@@ -75,8 +75,10 @@ func TestDemoCatalogFullSizeOnPostgres(t *testing.T) {
 			res)
 	}
 
-	if elapsed > time.Minute {
-		t.Fatalf("seeding took %s, want well under a minute", elapsed)
+	// About 10 s locally; CI runs the suite with -race on two cores, so
+	// the bound only catches a regression by an order of magnitude.
+	if elapsed > 4*time.Minute {
+		t.Fatalf("seeding took %s, want a few seconds (minutes under -race)", elapsed)
 	}
 
 	sellers, products, lo, hi := demoStats(t, e.DB)
