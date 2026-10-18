@@ -7,6 +7,7 @@ import ProductImage from "../../components/catalog/ProductImage";
 import ProductQuestions from "../../components/catalog/ProductQuestions";
 import Rating from "../../components/catalog/Rating";
 import Shelf from "../../components/catalog/Shelf";
+import ChatWithSeller from "../../components/chat/ChatWithSeller";
 import AddToCartButton from "../../components/commerce/AddToCartButton";
 import FreightBox from "../../components/commerce/FreightBox";
 import { ChevronRightIcon, StoreIcon, TruckIcon } from "../../components/icons";
@@ -166,6 +167,9 @@ export default function Product({ product, more, questions, qna, reviews }: Prop
 						</div>
 						<p className="mt-2 text-muted">{t("catalog.product.seller_since", { year: since })}</p>
 						<p className="text-muted">{t("catalog.card.ships_from", { uf: product.shop.ship_from_uf })}</p>
+						<div className="mt-3">
+							<ChatWithSeller slug={product.slug} own={qna.own_product} />
+						</div>
 					</section>
 				</aside>
 

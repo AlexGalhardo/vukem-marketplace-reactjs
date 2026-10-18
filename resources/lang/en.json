@@ -1009,7 +1009,7 @@
 			"previous": "Newer conversations",
 			"next": "Older conversations",
 			"page_of": "Page {page} of {last}",
-			"live": "New message from {name}."
+			"live": "New message received. The list was updated."
 		},
 		"show": {
 			"back": "All messages",

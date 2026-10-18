@@ -133,14 +133,10 @@ func (s *Service) summaries(ctx context.Context, q string, viewer int64, role st
 			return nil, fmt.Errorf("scan conversation: %w", err)
 		}
 
-		r := role
-		if r == "" { // admin view: named from the buyer's side
-			r = RoleBuyer
-		}
+		// The admin view (role "") names the buyer, like the seller's.
+		sum.Role = role
 
-		sum.Role = r
-
-		if r == RoleBuyer {
+		if role == RoleBuyer {
 			sum.With = sum.Shop.Name
 		} else {
 			sum.With = FirstName(buyerName)

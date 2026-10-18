@@ -1009,7 +1009,7 @@
 			"previous": "Conversas mais recentes",
 			"next": "Conversas mais antigas",
 			"page_of": "Página {page} de {last}",
-			"live": "Nova mensagem de {name}."
+			"live": "Nova mensagem recebida. A lista foi atualizada."
 		},
 		"show": {
 			"back": "Todas as mensagens",

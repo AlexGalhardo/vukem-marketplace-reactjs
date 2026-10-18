@@ -27,6 +27,11 @@ export default function AdminDashboard(): JSX.Element {
 					{t("reviews.admin.link")}
 				</Link>
 			</p>
+			<p className="mt-2">
+				<Link href="/admin/messages" className={link}>
+					{t("chat.admin.link")}
+				</Link>
+			</p>
 		</>
 	);
 }

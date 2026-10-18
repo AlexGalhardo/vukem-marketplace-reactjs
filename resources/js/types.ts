@@ -18,6 +18,8 @@ export interface SharedProps {
 	auth?: { user: User | null; hasShop?: boolean };
 	// Units in the signed-in user's cart (header badge).
 	cartCount?: number;
+	// Chat flag and the signed-in user's unread messages (header badge).
+	chat?: { enabled: boolean; unread: number };
 	[key: string]: unknown;
 }
 
@@ -339,4 +341,43 @@ export interface AdminReview {
 	created_at: string;
 	hidden_at: string | null;
 	hidden_reason: string;
+}
+
+// Chat (app/chat, controllers/messages).
+
+export type ChatRole = "buyer" | "seller";
+
+export interface ChatMessage {
+	id: number;
+	conversation_id: number;
+	sender_id: number;
+	body: string;
+	created_at: string;
+}
+
+export interface ConversationSummary {
+	id: number;
+	// "" on the admin page, where with is the buyer.
+	role: ChatRole | "";
+	// How the viewer sees the other side: the shop for buyers, the buyer's
+	// first name for sellers.
+	with: string;
+	shop: { slug: string; name: string };
+	product: { slug: string; title: string } | null;
+	last_message: string;
+	last_from_me: boolean;
+	last_message_at: string | null;
+	unread: number;
+}
+
+export interface ConversationDetail {
+	id: number;
+	role: ChatRole;
+	with: string;
+	with_id: number;
+	shop: { slug: string; name: string };
+	product: { slug: string; title: string } | null;
+	my_last_read_id: number;
+	their_last_read_id: number;
+	buyer: string;
 }
