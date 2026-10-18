@@ -120,6 +120,23 @@ test.describe("a11y buyer", () => {
 			await expect(page.locator("[data-invalid]").first()).toBeVisible();
 			await scan(page, `${combo.theme}/${combo.locale} question form error`);
 
+			// Chat: the inbox, a conversation and its error state.
+			await scanAll(page, combo, ["/messages"]);
+			await page.goto(product);
+			await page
+				.getByRole("button", {
+					name: combo.locale === "en" ? "Chat with the seller" : "Perguntar ao vendedor por chat",
+				})
+				.click();
+			await expect(page).toHaveURL(/\/messages\/\d+$/);
+			await expect(page.getByTestId("chat-status")).toHaveAttribute("data-status", "live");
+			await scan(page, `${combo.theme}/${combo.locale} conversation`);
+			await page.locator("#chat-body").fill("whatsapp 11 98765 4321");
+			await page.locator('main form button[type="submit"]').click();
+			await expect(page.locator("#chat-error")).toBeVisible();
+			await scan(page, `${combo.theme}/${combo.locale} conversation error`);
+			await scanAll(page, combo, ["/messages"]);
+
 			await page.goto(product);
 			await page.locator('main form button[type="submit"]').first().click();
 			await scanAll(page, combo, ["/cart", "/checkout/address"]);
@@ -176,10 +193,20 @@ test.describe("a11y seller", () => {
 				"/seller/webhooks",
 				"/seller/questions",
 				"/seller/questions?filter=answered",
+				"/seller/messages",
 				// The demo seller owns the drill: a notice instead of the question
 				// form, and reply forms under its reviews.
 				product,
 			]);
+
+			// A conversation from the seller's side, when one exists.
+			await page.goto("/seller/messages");
+			const thread = page.locator('main a[href^="/messages/"]').first();
+			if ((await thread.count()) > 0) {
+				await thread.click();
+				await expect(page.getByTestId("chat-status")).toHaveAttribute("data-status", "live");
+				await scan(page, `${combo.theme}/${combo.locale} seller conversation`);
+			}
 
 			await page.goto("/seller/products");
 			const edit = page.locator('a[href^="/seller/products/"][href$="/edit"]').first();
@@ -215,7 +242,14 @@ test.describe("a11y admin", () => {
 				"/admin/questions?filter=hidden",
 				"/admin/reviews",
 				"/admin/reviews?filter=hidden",
+				"/admin/messages",
 			]);
+
+			const thread = page.locator('main a[href^="/admin/messages/"]').first();
+			if ((await thread.count()) > 0) {
+				await thread.click();
+				await scan(page, `${combo.theme}/${combo.locale} admin conversation`);
+			}
 		});
 	}
 });
