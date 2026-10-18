@@ -24,6 +24,8 @@ type Deps struct {
 	Realtime *realtime.Hub
 
 	redisPrefix string
+	redisOnce   sync.Once
+	redisErr    error
 
 	mu      sync.Mutex
 	app     *vukem.App

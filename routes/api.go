@@ -51,7 +51,7 @@ func API(r *router.Router, app *vukem.App) error {
 	rest := &api.REST{Svc: st.svc, Idempotency: idempotency}
 
 	r.Group("/api/v1", func(g *router.Group) {
-		g.Use(middleware.JSONOnly(), st.ipLimit, st.authn.Middleware, st.callerLimit)
+		g.Use(auth.ProblemJSON, middleware.JSONOnly(), st.ipLimit, st.authn.Middleware, st.callerLimit)
 		rest.Register(g)
 	}).Name("api.v1.")
 
@@ -74,7 +74,7 @@ func API(r *router.Router, app *vukem.App) error {
 		app.Source.Get("GRAPHQL_INSECURE_INTROSPECTION"),
 	)
 	r.Handle("/graphql", api.GraphQLHandler(schema, introspection)).
-		Use(st.acc.Flags.Require(flags.GraphQLAPI), st.ipLimit, st.authn.Middleware, st.callerLimit).
+		Use(auth.ProblemJSON, st.acc.Flags.Require(flags.GraphQLAPI), st.ipLimit, st.authn.Middleware, st.callerLimit).
 		Name("graphql").Doc(openapi.Skip{})
 
 	rpc, err := st.rpc().Handler(app)
@@ -188,7 +188,7 @@ func serveGRPC(app *vukem.App, h http.Handler) error {
 	// web app must stay deployable while the gRPC certificate is pending.
 	case errors.Is(err, vgrpc.ErrCleartextInProduction):
 		app.Log.Error("gRPC disabled: production needs GRPC_TLS_CERT_FILE and GRPC_TLS_KEY_FILE, " +
-			"or GRPC_INSECURE_PLAINTEXT=true when a proxy terminates TLS")
+			"or GRPC_INSECURE_CLEARTEXT=true when a proxy terminates TLS")
 
 		return nil
 	case err != nil:

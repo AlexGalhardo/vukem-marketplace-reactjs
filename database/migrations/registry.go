@@ -20,5 +20,6 @@ func All() []schema.Migration {
 		m20261019100000CreateProductQuestionsTable(),
 		m20261019200000ExtendReviews(),
 		m20261019400000CreateChatTables(),
+		m20261019500000AdoptVukemFeatureFlags(),
 	}
 }

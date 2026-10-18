@@ -26,11 +26,10 @@ import (
 // and idempotency store on the real services.
 func TestAPIsAgainstPostgres(t *testing.T) {
 	dbURL := env(t, "TEST_DATABASE_URL")
-	t.Setenv("REDIS_URL", env(t, "TEST_REDIS_URL"))
-
 	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: map[string]string{
 		"DATABASE_URL": dbURL,
 		"MONGO_URL":    env(t, "TEST_MONGO_URL"),
+		"REDIS_URL":    env(t, "TEST_REDIS_URL"),
 	}})
 	app.RefreshDatabase(t)
 

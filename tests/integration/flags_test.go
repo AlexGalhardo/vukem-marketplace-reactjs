@@ -19,11 +19,14 @@ import (
 // shared cache entry), and reads come from Redis, not the database.
 func TestFlagsShareTheRedisCache(t *testing.T) {
 	dbURL := env(t, "TEST_DATABASE_URL")
-	t.Setenv("REDIS_URL", env(t, "TEST_REDIS_URL"))
-	t.Setenv("REDIS_PREFIX", fmt.Sprintf("mkt-flags-%d:", time.Now().UnixNano()))
+	redisEnv := map[string]string{
+		"DATABASE_URL": dbURL,
+		"REDIS_URL":    env(t, "TEST_REDIS_URL"),
+		"REDIS_PREFIX": fmt.Sprintf("mkt-flags-%d:", time.Now().UnixNano()),
+	}
 
 	instance := func() (*vukemtest.App, *flags.Flags) {
-		app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: map[string]string{"DATABASE_URL": dbURL}})
+		app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: redisEnv})
 
 		f, err := flags.New(app.App)
 		if err != nil {
@@ -64,7 +67,7 @@ func TestFlagsShareTheRedisCache(t *testing.T) {
 	}
 
 	// A write behind the app's back is not seen until the cached entry expires.
-	if _, err := db.ExecContext(ctx, "UPDATE feature_flags SET enabled = true WHERE name = $1",
+	if _, err := db.ExecContext(ctx, "UPDATE feature_flags SET value = 'true' WHERE name = $1 AND scope = ''",
 		string(flags.GoogleLogin)); err != nil {
 		t.Fatal(err)
 	}

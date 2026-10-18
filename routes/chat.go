@@ -44,6 +44,9 @@ func ChatHandlers(r *router.Router, app *vukem.App, deps *platform.Deps) (*messa
 		}
 	}
 
+	// accounts.New opened the app cache above, which opens Redis
+	// (platform.RedisOptions resolves the stores lazily), so deps.Redis is
+	// set by now when REDIS_URL is.
 	var broker sse.Broker
 	if deps.Redis != nil {
 		broker = deps.Redis

@@ -38,16 +38,16 @@ func chatInstances(t *testing.T, n int) []chatInstance {
 	t.Helper()
 
 	dbURL := env(t, "TEST_DATABASE_URL")
-	// Redis is resolved before vukem.New reads the app source (see
-	// platform.RedisOptions), so it comes from the process environment. A
-	// fresh prefix keeps this run's channels and keys apart.
-	t.Setenv("REDIS_URL", env(t, "TEST_REDIS_URL"))
-	t.Setenv("REDIS_PREFIX", "it-chat-"+strings.ToLower(rand.Text()[:8])+":")
+	redisURL := env(t, "TEST_REDIS_URL")
+	// A fresh prefix keeps this run's channels and keys apart.
+	prefix := "it-chat-" + strings.ToLower(rand.Text()[:8]) + ":"
 
 	out := make([]chatInstance, n)
 	for i := range out {
 		app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: map[string]string{
 			"DATABASE_URL":     dbURL,
+			"REDIS_URL":        redisURL,
+			"REDIS_PREFIX":     prefix,
 			"RATE_LIMIT_STORE": "cache",
 		}})
 

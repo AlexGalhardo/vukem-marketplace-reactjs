@@ -23,9 +23,10 @@ type GRPCPort struct {
 	// CertFile and KeyFile (GRPC_TLS_CERT_FILE, GRPC_TLS_KEY_FILE) serve
 	// HTTP/2 over TLS; without both the port speaks h2c.
 	CertFile, KeyFile string
-	// InsecurePlaintext (GRPC_INSECURE_PLAINTEXT=true) allows h2c in
-	// production, for a proxy that terminates TLS in front of the app.
-	InsecurePlaintext bool
+	// InsecureCleartext (GRPC_INSECURE_CLEARTEXT=true, vukem's name; the
+	// older GRPC_INSECURE_PLAINTEXT is still read) allows h2c in production,
+	// for a private network or a proxy that terminates TLS.
+	InsecureCleartext bool
 	// Ready, when set, receives the bound address once listening.
 	Ready chan<- string
 }
@@ -37,13 +38,13 @@ func GRPCPortFrom(src *config.Source) GRPCPort {
 		Port:              src.Get("GRPC_PORT"),
 		CertFile:          src.Get("GRPC_TLS_CERT_FILE"),
 		KeyFile:           src.Get("GRPC_TLS_KEY_FILE"),
-		InsecurePlaintext: src.Get("GRPC_INSECURE_PLAINTEXT") == "true",
+		InsecureCleartext: src.Get("GRPC_INSECURE_CLEARTEXT") == "true" || src.Get("GRPC_INSECURE_PLAINTEXT") == "true",
 	}
 }
 
 // Runner returns the runner serving h and its address, or a nil runner
 // when the port is off. API keys travel in metadata, so production
-// without TLS files or InsecurePlaintext returns
+// without TLS files or InsecureCleartext returns
 // vgrpc.ErrCleartextInProduction.
 func (p GRPCPort) Runner(cfg *vukem.Config, h http.Handler) (vukem.Runner, string, error) {
 	if p.Port == "off" {
@@ -51,7 +52,11 @@ func (p GRPCPort) Runner(cfg *vukem.Config, h http.Handler) (vukem.Runner, strin
 	}
 
 	addr := net.JoinHostPort(p.Host, cmp.Or(p.Port, DefaultGRPCPort))
-	opts := vgrpc.ServerOptions{ShutdownTimeout: cfg.ShutdownTimeout, Ready: p.Ready}
+	opts := vgrpc.ServerOptions{
+		ShutdownTimeout:   cfg.ShutdownTimeout,
+		Ready:             p.Ready,
+		InsecureCleartext: p.InsecureCleartext,
+	}
 
 	if p.CertFile != "" && p.KeyFile != "" {
 		cert, err := tls.LoadX509KeyPair(p.CertFile, p.KeyFile)
@@ -62,12 +67,7 @@ func (p GRPCPort) Runner(cfg *vukem.Config, h http.Handler) (vukem.Runner, strin
 		opts.TLS = &tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}
 	}
 
-	// contrib/grpc allows cleartext in production with HTTP_H2C, which also
-	// opens h2c on the HTTP port; the gRPC port takes its own opt-in only.
-	scoped := *cfg
-	scoped.H2C = p.InsecurePlaintext
-
-	run, err := vgrpc.Server(&scoped, addr, h, opts)
+	run, err := vgrpc.Server(cfg, addr, h, opts)
 	if err != nil {
 		return nil, addr, fmt.Errorf("grpc port %s: %w", addr, err)
 	}
