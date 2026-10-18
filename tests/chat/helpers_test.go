@@ -350,3 +350,22 @@ func (s *socket) expectSubscribed(channel string) {
 }
 
 func itoa(v int64) string { return strconv.FormatInt(v, 10) }
+
+// events reads event frames until one of each name arrived (frames of
+// different channels may interleave in any order).
+func (s *socket) events(names ...string) map[string]frame {
+	s.t.Helper()
+
+	out := map[string]frame{}
+
+	for len(out) < len(names) {
+		f := s.next("event", "")
+		for _, n := range names {
+			if f.Event == n {
+				out[n] = f
+			}
+		}
+	}
+
+	return out
+}

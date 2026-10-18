@@ -28,9 +28,9 @@ func TestSocketDeliversMessagesBetweenParticipants(t *testing.T) {
 
 	msg := e.send(t, buyer, id, "Oi! Ainda tem em estoque?")
 
-	for name, sock := range map[string]*socket{"seller": s, "buyer": b} {
-		f := sock.next("event", chat.EventMessage)
+	sellerGot := s.events(chat.EventMessage, chat.EventInbox)
 
+	for name, f := range map[string]frame{"seller": sellerGot[chat.EventMessage], "buyer": b.next("event", chat.EventMessage)} {
 		var got chat.MessageView
 		if err := json.Unmarshal(f.Data, &got); err != nil {
 			t.Fatal(err)
@@ -41,10 +41,8 @@ func TestSocketDeliversMessagesBetweenParticipants(t *testing.T) {
 		}
 	}
 
-	inbox := s.next("event", chat.EventInbox)
-
 	var ev chat.InboxEvent
-	if err := json.Unmarshal(inbox.Data, &ev); err != nil {
+	if err := json.Unmarshal(sellerGot[chat.EventInbox].Data, &ev); err != nil {
 		t.Fatal(err)
 	}
 

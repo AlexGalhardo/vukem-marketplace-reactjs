@@ -238,13 +238,20 @@ func TestChatAcrossInstances(t *testing.T) {
 		PostJSON("/messages/"+strconv.FormatInt(id, 10), map[string]any{"body": "Oi, vale a pena?"}).
 		AssertCreated()
 
-	f, ok := onB.next("event", chat.EventMessage)
-	if !ok || !strings.Contains(string(f.Data), "Oi, vale a pena?") {
-		t.Fatalf("seller on B: %+v ok=%v", f, ok)
+	// The message and inbox channels interleave in any order.
+	got := map[string]string{}
+	for len(got) < 2 {
+		f, ok := onB.next("event", "")
+		if !ok {
+			t.Fatalf("seller on B got only %v", got)
+		}
+
+		got[f.Event] = string(f.Data)
 	}
 
-	if f, ok := onB.next("event", chat.EventInbox); !ok || !strings.Contains(string(f.Data), `"unread":1`) {
-		t.Fatalf("seller inbox on B: %+v ok=%v", f, ok)
+	if !strings.Contains(got[chat.EventMessage], "Oi, vale a pena?") ||
+		!strings.Contains(got[chat.EventInbox], `"unread":1`) {
+		t.Fatalf("seller on B: %v", got)
 	}
 
 	authtest.ActingAs(t, b.app, b.app.Client(t).AcceptJSON(), owner).
