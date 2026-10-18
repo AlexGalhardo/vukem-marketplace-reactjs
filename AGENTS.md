@@ -6,7 +6,7 @@ Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framewor
 
 1. Read [PLAN.md](PLAN.md): briefing, decisions, architecture; pick the first unchecked task of the current phase.
 2. Read the `.claude/rules/*` that match the files you touch.
-3. Test first; tick the task only when its `→ verify:` line passes; add a `CHANGELOG.md` line under `[Unreleased]`.
+3. Test first; tick the task only when its `→ verify:` line passes; the commit message feeds `CHANGELOG.md` (git-cliff, never edited by hand).
 
 ## Commands
 
