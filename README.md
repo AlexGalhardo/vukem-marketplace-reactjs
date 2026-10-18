@@ -1,4 +1,4 @@
-# Vukem Marketplace
+<h1 align="center">Vukem Marketplace</h1>
 
 <p align="center">
   <a href="https://github.com/AlexGalhardo/vukem-marketplace-reactjs/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/AlexGalhardo/vukem-marketplace-reactjs/ci.yml?branch=main&label=tests" alt="Tests"></a>
@@ -71,28 +71,6 @@ vukem serve                     # http://localhost:3000, Vite HMR
 | Mailpit | <http://localhost:8035> |
 | RustFS console | <http://localhost:9201> |
 | Postgres / Redis / Mongo | `localhost:5442` / `6389` / `27027` |
-
-## Development accounts
-
-`docker compose up -d --build` runs a one-shot `seed` service after `app` is healthy (`media:bucket` + `db:seed`); on the host run `vukem db:seed` after `vukem migrate`. Seeding is idempotent (re-runs create nothing new) and refuses `APP_ENV=production`, even with `--force`: known-password accounts never exist there.
-
-| Role | Email | Password (default) | Notes |
-| --- | --- | --- | --- |
-| Buyer | `buyer@example.com` | `marketplace-demo-password` | |
-| Seller | `seller@example.com` | `marketplace-demo-password` | owns "Loja Demo Vukem" (12 products) |
-| Admin | `admin@example.com` | `marketplace-demo-password` | 2FA (TOTP) is mandatory and already confirmed |
-
-- The password is `SEED_PASSWORD` from `.env` (at least 12 characters) when set.
-- Admin 2FA: the seeder logs the TOTP secret and the recovery codes once, when it creates the admin. Read them with `docker compose logs seed | grep totp_secret` (host: the `vukem db:seed` output), add the secret to an authenticator app, then sign in. Lost it? Run `vukem migrate:fresh --seed` (wipes the local database) to get a new one.
-- Demo catalog (`vukem demo:catalog`, also run by `db:seed`; deterministic, pt-BR):
-  - 100 sellers (`*@vendedores.example.com`) with one shop each across the 27 UFs and 2000 published products (10 to 30 per shop) with shared placeholder images;
-  - 300 buyers (`*@compradores.example.com`, verified, one address each); sellers and buyers get random passwords nobody knows and are not meant to log in;
-  - about 1500 simulated orders over the last six months in the real order tables (card or PIX, sometimes several items or shops; mostly delivered, some shipped, paid or canceled; fee from `PLATFORM_FEE_BPS`), stock lowered accordingly (restocked first when it would go below zero);
-  - about 1200 reviews of paid, shipped or delivered lines (mostly 4 and 5 stars, some seller replies and "helpful" votes; product ratings recalculated) and about 1200 product questions, most answered by the shop.
-  - The orders are written directly: no Stripe or AbacatePay call, email, webhook, realtime event, queued job or ledger entry (demo shops show sales but a zero balance, so nothing can be paid out).
-  - Re-running adds only what is missing (sellers, buyers, and the activity of buyers that have none) in about a second; a cold run takes 10 to 20 seconds locally.
-  - `vukem demo:catalog --fresh` deletes the demo sellers and buyers and everything hanging off them, then seeds again. It never deletes real users' rows: when real data references the demo catalog (a real order, review, question, vote or cart item on a demo product, a ledger entry or payout of a demo shop) it refuses, says what blocks it, and deletes nothing.
-- Production: the first admin is an existing account promoted with `users:make-admin <email>` (2FA is then required). The demo catalog is never seeded there unless explicitly requested: `vukem demo:catalog --allow-production` (inside the production container, e.g. a `railway ssh` shell: `/app/app demo:catalog --allow-production`; add `--fresh` to rebuild it). Its sellers and buyers have random passwords.
 
 ## Checks
 
