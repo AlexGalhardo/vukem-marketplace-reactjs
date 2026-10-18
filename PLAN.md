@@ -408,6 +408,8 @@ Ids: `F` foundation, `A` auth, `C` catalog, `K` cart & shipping, `P` payments & 
 | Web checks | `bun run lint`, `bun run typecheck`, `bun run build` |
 | E2E | `bunx playwright install chromium` once, stack up, `bun run test:e2e` |
 | Vulns | `go tool govulncheck ./...` |
+| Dev seed | `vukem db:seed`: `buyer@`, `seller@`, `admin@example.com` with `SEED_PASSWORD` (default `marketplace-demo-password`); the admin TOTP secret and recovery codes are logged once; refused in production |
+| Release | `git cliff --tag vX.Y.Z -o CHANGELOG.md`, commit `chore(release): vX.Y.Z`, `git tag -a vX.Y.Z`, push commit and tag (`release.yml` builds the GHCR image and the GitHub release) |
 
 ### 9.2 CI
 
