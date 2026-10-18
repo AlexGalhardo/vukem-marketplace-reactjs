@@ -40,6 +40,7 @@ func TestDefaults(t *testing.T) {
 		flags.GraphQLAPI:        true,
 		flags.ProductQuestions:  true,
 		flags.Reviews:           true,
+		flags.Chat:              true,
 	}
 	if diff := cmp.Diff(want, f.All(t.Context())); diff != "" {
 		t.Fatalf("defaults (-want +got):\n%s", diff)

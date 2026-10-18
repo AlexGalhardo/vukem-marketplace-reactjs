@@ -95,6 +95,10 @@
 				"reviews": {
 					"label": "Avaliações de produtos",
 					"description": "Compradores avaliam o que compraram, marcam avaliações como úteis e as lojas respondem. Desativado: escrever, votar e responder dão 404; as avaliações publicadas continuam visíveis."
+				},
+				"chat": {
+					"label": "Chat entre comprador e vendedor",
+					"description": "Compradores conversam com lojas em tempo real a partir das páginas de produto e dos pedidos. Desligado: páginas, envios e conexões em tempo real do chat respondem 404 e os links somem; as mensagens guardadas são mantidas."
 				}
 			}
 		}
@@ -981,5 +985,81 @@
 			"hide": "Ocultar",
 			"unhide": "Mostrar de novo"
 		}
+	},
+	"chat": {
+		"nav": "Mensagens",
+		"nav_unread": "Mensagens ({count} não lidas)",
+		"cta": "Perguntar ao vendedor por chat",
+		"cta_hint": "Tire dúvidas sobre estoque, frete ou detalhes. As respostas chegam em tempo real.",
+		"cta_login": "Entre para conversar com o vendedor",
+		"order_cta": "Conversar com {shop}",
+		"inbox": {
+			"title_buyer": "Minhas mensagens",
+			"title_seller": "Mensagens de compradores",
+			"intro_buyer": "Suas conversas com vendedores. As respostas chegam aqui em tempo real.",
+			"intro_seller": "Conversas que compradores começaram com a sua loja. Respostas rápidas ajudam na decisão.",
+			"empty_buyer": "Nenhuma conversa ainda. Abra um produto e escolha \"Perguntar ao vendedor por chat\".",
+			"empty_seller": "Nenhuma mensagem de compradores ainda.",
+			"general": "Conversa geral",
+			"about": "Sobre {product}",
+			"you": "Você: {text}",
+			"unread": "{count} novas",
+			"list_label": "Conversas",
+			"pagination": "Páginas de conversas",
+			"previous": "Conversas mais recentes",
+			"next": "Conversas mais antigas",
+			"page_of": "Página {page} de {last}",
+			"live": "Nova mensagem de {name}."
+		},
+		"show": {
+			"back": "Todas as mensagens",
+			"title": "Conversa com {name}",
+			"about": "Sobre {product}",
+			"shop_link": "Visitar a loja",
+			"online": "Online",
+			"offline": "Offline",
+			"typing": "{name} está digitando…",
+			"seen": "Vista",
+			"sent": "Enviada",
+			"you": "Você",
+			"log_label": "Mensagens com {name}",
+			"empty": "Nenhuma mensagem ainda. Diga olá e faça sua pergunta.",
+			"composer_label": "Sua mensagem",
+			"composer_hint": "Texto simples, até {max} caracteres. Links, e-mails e telefones não são permitidos.",
+			"send": "Enviar",
+			"sending": "Enviando…",
+			"chars": "{count}/{max}",
+			"failed": "Sua mensagem não foi enviada. Tente de novo.",
+			"status_live": "Ao vivo",
+			"status_connecting": "Conectando…",
+			"status_reconnecting": "Conexão perdida. Reconectando…",
+			"status_fallback": "Atualização ao vivo limitada. Novas mensagens são verificadas a cada poucos segundos."
+		},
+		"errors": {
+			"no_contact": "Para sua segurança, mantenha a conversa na plataforma: links, e-mails, perfis de redes sociais e telefones não são permitidos.",
+			"own_shop": "Você não pode conversar com a sua própria loja.",
+			"empty": "Escreva uma mensagem.",
+			"too_long": "Use no máximo {max} caracteres.",
+			"rate_limited": "Você está enviando mensagens rápido demais. Aguarde um momento e tente de novo."
+		},
+		"mail": {
+			"subject": "{from} enviou uma mensagem para você",
+			"hello": "Olá, {name}.",
+			"body": "{from} escreveu para você enquanto você estava fora ({count} não lidas):",
+			"action": "Abrir a conversa",
+			"footer": "Para sua segurança, mantenha a conversa e o pagamento na plataforma."
+		},
+		"admin": {
+			"link": "Ler conversas entre compradores e vendedores",
+			"title": "Conversas",
+			"intro": "Visualização somente leitura para moderação. Abrir uma conversa fica registrado no log de auditoria.",
+			"empty": "Nenhuma conversa ainda.",
+			"between": "{buyer} e {shop}",
+			"read_only": "Somente leitura: administradores não podem escrever nas conversas.",
+			"back": "Todas as conversas",
+			"buyer": "Comprador",
+			"seller": "Vendedor"
+		},
+		"seller_nav": "Mensagens"
 	}
 }

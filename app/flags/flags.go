@@ -49,6 +49,9 @@ const (
 	// Reviews lets buyers review what they bought, vote reviews helpful and
 	// shops reply; existing reviews stay visible while it is off.
 	Reviews Key = "reviews"
+	// Chat lets buyers message shop owners (pages, sends and the realtime
+	// sockets). Off: every chat route answers 404 and the links disappear.
+	Chat Key = "chat"
 )
 
 // Definition describes a flag.
@@ -72,6 +75,7 @@ func Definitions() []Definition {
 		{Key: GraphQLAPI, Default: true},
 		{Key: ProductQuestions, Default: true},
 		{Key: Reviews, Default: true},
+		{Key: Chat, Default: true},
 	}
 }
 

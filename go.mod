@@ -15,6 +15,8 @@ require (
 	github.com/AlexGalhardo/vukem/drivers/postgres v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/redis v0.4.0
 	github.com/AlexGalhardo/vukem/drivers/s3 v0.3.0
+	github.com/AlexGalhardo/vukem/drivers/websocket v0.1.1
+	github.com/coder/websocket v1.8.15
 	github.com/google/go-cmp v0.7.0
 	github.com/google/uuid v1.6.0
 	go.mongodb.org/mongo-driver/v2 v2.9.2

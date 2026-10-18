@@ -1,0 +1,11 @@
+{{/* layout: none */}}
+<!doctype html>
+<html lang="{{locale}}">
+<body>
+	<p>{{t "chat.mail.hello" "name" .Name}}</p>
+	<p>{{t "chat.mail.body" "from" .From "count" .Unread}}</p>
+	<blockquote>{{.Preview}}</blockquote>
+	<p><a href="{{.Link}}">{{t "chat.mail.action"}}</a></p>
+	<p>{{t "chat.mail.footer"}}</p>
+</body>
+</html>
