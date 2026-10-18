@@ -166,13 +166,9 @@ func Allow(scope string) func(http.Handler) http.Handler {
 	}
 }
 
-// fail renders an auth error as problem+json whatever the Accept header
-// says, like vukem's APIGuard failures: API routes never answer HTML.
-// Only the error path sees the forced Accept.
+// fail renders an auth error through the router's error handler; the API
+// routes sit behind auth.ProblemJSON, so 401/403 are always problem+json.
 func fail(w http.ResponseWriter, r *http.Request, err error) {
-	// workaround(vukem): auth cannot force problem+json for custom API authenticators
-	r = r.Clone(r.Context())
-	r.Header.Set("Accept", "application/json")
 	web.NewCtx(w, r, web.ServicesFrom(r.Context())).HandleError(err)
 }
 

@@ -1,72 +1,100 @@
 package platform
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"os"
 
 	vukem "github.com/AlexGalhardo/vukem"
+	"github.com/AlexGalhardo/vukem/cache"
 	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/drivers/redis"
+	"github.com/AlexGalhardo/vukem/queue"
+	"github.com/AlexGalhardo/vukem/session"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/realtime"
 )
 
-// RedisConfig is read from the environment before vukem.New runs.
+// RedisConfig is read from the app's configuration (REDIS_URL from the
+// environment, .env or vukemtest).
 type RedisConfig struct {
 	URL    string `env:"REDIS_URL"`
 	Prefix string `env:"REDIS_PREFIX" default:"mkt:"`
 }
 
-// RedisOptions opens Redis when REDIS_URL is set and returns the vukem
-// options that move sessions, cache and queues onto it. Without
-// REDIS_URL it returns no options (memory/cookie defaults: unit tests).
-//
-// workaround(vukem): stores must be passed to vukem.New, but the app only
-// loads .env inside New, so the URL is resolved here from the same sources
-// (process env first, then .env files in the working directory). The
-// lazy WithCacheStoreFunc/WithSessionStoreFunc/WithQueueDriverFunc of
-// v0.25.0 cannot fall back to the configured default (cookie sessions,
-// sync queue) when REDIS_URL is unset, so they do not fit yet.
-func RedisOptions(deps *Deps) ([]vukem.Option, error) {
-	src, err := config.LoadSource(os.DirFS("."), os.LookupEnv, os.ReadFile)
-	if err != nil {
-		return nil, fmt.Errorf("platform: load env: %w", err)
-	}
+var errRedisRequired = errors.New("platform: REDIS_URL is required in production")
 
-	cfg, err := config.Load[RedisConfig](src)
-	if err != nil {
-		return nil, fmt.Errorf("platform: redis config: %w", err)
-	}
-
-	// Process-local until Redis is configured below.
+// RedisOptions returns the vukem options that move sessions, cache and
+// queues onto Redis when REDIS_URL is set. The stores are built lazily,
+// after the configuration loaded; without REDIS_URL they fall back to the
+// configured defaults (vukem.ErrUseDefault: unit tests, minimal local
+// runs), and production refuses to boot.
+func RedisOptions(deps *Deps) []vukem.Option {
+	// Process-local until Redis is configured.
 	deps.Realtime = realtime.NewHub(nil, "", nil)
 
-	if cfg.URL == "" {
-		if src.Env() == config.Production {
-			return nil, errRedisRequired
-		}
-
-		return nil, nil
-	}
-
-	// Lazy: the app boots while Redis is down; /ready reports it and the
-	// first command connects.
-	rc, err := redis.OpenLazy(cfg.URL)
-	if err != nil {
-		return nil, fmt.Errorf("platform: open redis: %w", err)
-	}
-
-	deps.Redis = rc
-	deps.redisPrefix = cfg.Prefix
-	deps.AddCheck("redis", rc.Ping)
-	deps.Realtime = realtime.NewHub(rc, cfg.Prefix+"realtime", nil)
-
 	return []vukem.Option{
-		vukem.WithCacheStore(rc.CacheStore(cfg.Prefix + "cache:")),
-		vukem.WithSessionStore(rc.SessionStore(cfg.Prefix + "session:")),
-		vukem.WithQueueDriver(rc.Queue(redis.QueueOptions{Prefix: "{" + cfg.Prefix + "queue}:"})),
-	}, nil
+		vukem.WithCacheStoreFunc(func(app *vukem.App) (cache.Store, error) {
+			rc, prefix, err := deps.openRedis(app)
+			if err != nil || rc == nil {
+				return nil, err
+			}
+
+			return rc.CacheStore(prefix + "cache:"), nil
+		}),
+		vukem.WithSessionStoreFunc(func(app *vukem.App) (session.Store, error) {
+			rc, prefix, err := deps.openRedis(app)
+			if err != nil || rc == nil {
+				return nil, err
+			}
+
+			return rc.SessionStore(prefix + "session:"), nil
+		}),
+		vukem.WithQueueDriverFunc(func(app *vukem.App) (queue.Driver, error) {
+			rc, prefix, err := deps.openRedis(app)
+			if err != nil || rc == nil {
+				return nil, err
+			}
+
+			return rc.Queue(redis.QueueOptions{Prefix: "{" + prefix + "queue}:"}), nil
+		}),
+	}
 }
 
-var errRedisRequired = errors.New("platform: REDIS_URL is required in production")
+// openRedis opens the shared client once. Without REDIS_URL it returns
+// vukem.ErrUseDefault outside production and errRedisRequired in
+// production.
+func (d *Deps) openRedis(app *vukem.App) (*redis.Client, string, error) {
+	d.redisOnce.Do(func() {
+		cfg, err := config.Load[RedisConfig](app.Source)
+		if err != nil {
+			d.redisErr = fmt.Errorf("platform: redis config: %w", err)
+			return
+		}
+
+		if cfg.URL == "" {
+			d.redisErr = vukem.ErrUseDefault
+			if app.Config.IsProduction() {
+				d.redisErr = errRedisRequired
+			}
+
+			return
+		}
+
+		// Lazy: the app boots while Redis is down; /ready reports it and the
+		// first command connects.
+		rc, err := redis.OpenLazy(cfg.URL)
+		if err != nil {
+			d.redisErr = fmt.Errorf("platform: open redis: %w", err)
+			return
+		}
+
+		d.Redis = rc
+		d.redisPrefix = cfg.Prefix
+		d.Realtime = realtime.NewHub(rc, cfg.Prefix+"realtime", nil)
+		d.AddCheck("redis", rc.Ping)
+		app.OnShutdown(func(context.Context) error { return rc.Close() })
+	})
+
+	return d.Redis, d.redisPrefix, d.redisErr
+}

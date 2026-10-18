@@ -3,8 +3,6 @@
 package bootstrap
 
 import (
-	"context"
-
 	vukem "github.com/AlexGalhardo/vukem"
 	"github.com/AlexGalhardo/vukem/drivers/postgres"
 	"github.com/AlexGalhardo/vukem/inertia"
@@ -23,11 +21,6 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 	deps := &platform.Deps{}
 	jobBinding := &jobs.Binding{}
 
-	redisOpts, err := platform.RedisOptions(deps)
-	if err != nil {
-		return nil, err
-	}
-
 	base := []vukem.Option{
 		vukem.WithDatabaseDrivers(postgres.Driver()),
 		vukem.WithProviders(append(Providers(), platform.MongoProvider{Deps: deps})...),
@@ -41,7 +34,7 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 		vukem.WithTranslations(resources.Lang()),
 		vukem.WithInertia(inertia.Config{}),
 	}
-	base = append(base, redisOpts...)
+	base = append(base, platform.RedisOptions(deps)...)
 
 	for _, fn := range routes.All(deps) {
 		base = append(base, vukem.WithRoutes(fn))
@@ -62,10 +55,6 @@ func New(opts ...vukem.Option) (*vukem.App, error) {
 
 	jobBinding.Bind(app)
 	deps.Bind(app)
-
-	if deps.Redis != nil {
-		app.OnShutdown(func(context.Context) error { return deps.Redis.Close() })
-	}
 
 	app.AddCommand(Commands()...)
 

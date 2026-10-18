@@ -2,6 +2,7 @@
 package routes
 
 import (
+	"cmp"
 	"net/http"
 
 	vukem "github.com/AlexGalhardo/vukem"
@@ -10,6 +11,7 @@ import (
 	"github.com/AlexGalhardo/vukem/inertia"
 	"github.com/AlexGalhardo/vukem/middleware"
 	"github.com/AlexGalhardo/vukem/router"
+	"github.com/AlexGalhardo/vukem/web"
 
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/app/controllers"
 	"github.com/AlexGalhardo/vukem-micro-mercadolivre-reactjs/resources"
@@ -31,7 +33,7 @@ func Web() func(r *router.Router, app *vukem.App) error {
 		r.UseServer(probes.Middleware)
 		r.UseServer(middleware.StaticFS(resources.Public(), middleware.StaticConfig{Prefix: "/"}))
 		r.Use(app.Inertia.Middleware, shareProps(app))
-		r.Services().Errors = controllers.ErrorPages
+		r.Services().ErrorPage = errorPage(app)
 
 		// "/" (home) is registered by the catalog routes.
 		r.Post("/locale", controllers.SetLocale(app.I18n, app.Config.Env != config.Development)).Name("locale.update")
@@ -56,5 +58,26 @@ func shareProps(app *vukem.App) func(http.Handler) http.Handler {
 			inertia.Share(ctx, "locales", locales)
 			next.ServeHTTP(w, r)
 		})
+	}
+}
+
+// errorPage renders the Inertia "Error" page for Inertia visits (vukem's
+// own hook) and for full page loads, which vukem leaves as a raw HTML
+// status page; unmatched routes (no Inertia middleware) keep that page.
+//
+// workaround(vukem): inertia.ErrorPage only handles Inertia visits.
+func errorPage(app *vukem.App) web.ErrorPageFunc {
+	return func(c *web.Ctx, e web.ErrorPage) bool {
+		if app.Inertia.ErrorPage(c, e) {
+			return true
+		}
+
+		if e.Status < 400 || e.Status > 599 {
+			return false
+		}
+
+		props := inertia.Props{"status": e.Status, "title": e.Title, "message": cmp.Or(e.Detail, e.Title)}
+
+		return inertia.RenderStatus(c, e.Status, "Error", props) == nil
 	}
 }

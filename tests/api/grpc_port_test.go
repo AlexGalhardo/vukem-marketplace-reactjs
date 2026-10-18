@@ -52,8 +52,8 @@ func TestGRPCPortProductionRule(t *testing.T) {
 			port: api.GRPCPort{}, wantErr: vgrpc.ErrCleartextInProduction,
 		},
 		{
-			name: "production with the plaintext opt-in", env: config.Production,
-			port: api.GRPCPort{InsecurePlaintext: true}, wantRun: true,
+			name: "production with the cleartext opt-in", env: config.Production,
+			port: api.GRPCPort{InsecureCleartext: true}, wantRun: true,
 		},
 		{
 			name: "production with tls files", env: config.Production,

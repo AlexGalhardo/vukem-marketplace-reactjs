@@ -32,13 +32,10 @@ func env(t *testing.T, name string) string {
 func TestReadyAgainstRealServices(t *testing.T) {
 	dbURL := env(t, "TEST_DATABASE_URL")
 	mongoURL := env(t, "TEST_MONGO_URL")
-	// Redis is resolved before vukem.New reads the app source (see
-	// platform.RedisOptions), so it comes from the process environment.
-	t.Setenv("REDIS_URL", env(t, "TEST_REDIS_URL"))
-
 	app := vukemtest.New(t, bootstrap.New, vukemtest.Options{Env: map[string]string{
 		"DATABASE_URL": dbURL,
 		"MONGO_URL":    mongoURL,
+		"REDIS_URL":    env(t, "TEST_REDIS_URL"),
 	}})
 
 	app.Client(t).Get("/ready").AssertOK().
