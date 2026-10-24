@@ -3,10 +3,11 @@ import type { JSX } from "react";
 import { formatCep, useSavedCep } from "../../lib/cep";
 import { useT } from "../../lib/i18n";
 import type { SharedProps } from "../../types";
-import { CartIcon, ChatIcon, PinIcon, SearchIcon, UserIcon } from "../icons";
+import { CartIcon, ChatIcon, PinIcon, UserIcon } from "../icons";
 import LocaleMenu from "../LocaleMenu";
 import ThemeToggle from "../ThemeToggle";
 import Logo from "./Logo";
+import SearchBox from "./SearchBox";
 
 const pill = "shrink-0 whitespace-nowrap rounded-full px-2.5 py-1.5 hover:bg-header-hover";
 
@@ -81,28 +82,7 @@ export default function SiteHeader(): JSX.Element {
 						<Logo name={t("app.name")} compact />
 					</Link>
 					<search className="min-w-0 flex-1 md:max-w-xl">
-						<form action="/search" method="get" className="flex h-10 rounded-sm bg-card shadow-card">
-							<label htmlFor="q" className="sr-only">
-								{t("nav.search")}
-							</label>
-							<input
-								id="q"
-								name="q"
-								type="search"
-								defaultValue={q}
-								key={q}
-								placeholder={t("nav.search_placeholder")}
-								className="h-full min-w-0 flex-1 rounded-l-sm border-0 bg-transparent px-3.5 text-[0.95rem] text-ink placeholder:text-muted focus:outline-none"
-							/>
-							<button
-								type="submit"
-								className="flex h-full w-11 shrink-0 items-center justify-center rounded-r-sm text-muted hover:text-ink"
-							>
-								<span aria-hidden="true" className="h-6 w-px bg-line" />
-								<SearchIcon className="mx-auto size-5" />
-								<span className="sr-only">{t("nav.search")}</span>
-							</button>
-						</form>
+						<SearchBox initial={q} key={q} />
 					</search>
 					<CartLink count={cartCount} className="md:hidden" />
 					{/* Top row, not the link row: axe spots the open (modal) locale menu by sampling

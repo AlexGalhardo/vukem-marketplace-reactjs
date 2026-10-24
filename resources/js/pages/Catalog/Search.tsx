@@ -208,6 +208,7 @@ export default function Search({ query, results, category, categories, ufs }: Pr
 										<input
 											id="min"
 											inputMode="decimal"
+											maxLength={12}
 											placeholder={t("catalog.search.min")}
 											value={min}
 											onChange={(e) => setMin(e.target.value)}
@@ -222,6 +223,7 @@ export default function Search({ query, results, category, categories, ufs }: Pr
 										<input
 											id="max"
 											inputMode="decimal"
+											maxLength={12}
 											placeholder={t("catalog.search.max")}
 											value={max}
 											onChange={(e) => setMax(e.target.value)}

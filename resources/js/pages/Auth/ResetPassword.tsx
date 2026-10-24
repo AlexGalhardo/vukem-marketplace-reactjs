@@ -2,7 +2,9 @@ import { Head, useForm } from "@inertiajs/react";
 import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import PasswordField from "../../components/PasswordField";
 import { button, card, heading } from "../../components/ui";
+import { PASSWORD_MIN } from "../../lib/credentials";
 import { useT } from "../../lib/i18n";
 
 export default function ResetPassword({ token, email }: { token: string; email: string }): JSX.Element {
@@ -28,19 +30,18 @@ export default function ResetPassword({ token, email }: { token: string; email: 
 					onChange={(e) => form.setData("email", e.target.value)}
 					error={form.errors.email}
 				/>
-				<Field
+				<PasswordField
 					label={t("account.common.new_password")}
-					type="password"
+					requirements
 					autoComplete="new-password"
-					minLength={12}
+					minLength={PASSWORD_MIN}
 					required
 					value={form.data.password}
 					onChange={(e) => form.setData("password", e.target.value)}
 					error={form.errors.password}
 				/>
-				<Field
+				<PasswordField
 					label={t("account.common.confirm_password")}
-					type="password"
 					autoComplete="new-password"
 					required
 					value={form.data.password_confirmation}

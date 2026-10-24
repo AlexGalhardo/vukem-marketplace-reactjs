@@ -6,6 +6,7 @@
 	"nav": {
 		"search_placeholder": "Search products, brands and more…",
 		"search": "Search",
+		"search_suggestions": "Product suggestions",
 		"categories": "Categories",
 		"offers": "Offers",
 		"sell": "Sell",
@@ -152,12 +153,23 @@
 			"email": "Email",
 			"password": "Password",
 			"current_password": "Current password",
-			"new_password": "New password (at least 12 characters)",
+			"new_password": "New password (8 to 32 characters)",
 			"confirm_password": "Confirm password",
 			"name": "Name",
 			"save": "Save",
 			"back_dashboard": "Back to the dashboard",
 			"name_hint": "4 to 24 characters."
+		},
+		"password": {
+			"show": "Show password",
+			"hide": "Hide password",
+			"met": "Met:",
+			"unmet": "Not met:",
+			"rule_length": "8 to 32 characters",
+			"rule_lower": "At least 1 lowercase letter",
+			"rule_upper": "At least 1 uppercase letter",
+			"rule_digit": "At least 1 number",
+			"rule_special": "At least 1 special character"
 		},
 		"login": {
 			"title": "Log in",
@@ -168,7 +180,7 @@
 		},
 		"register": {
 			"title": "Create an account",
-			"password": "Password (at least 12 characters)",
+			"password": "Password (8 to 32 characters)",
 			"submit": "Create account",
 			"have_account": "Already registered?"
 		},
@@ -270,6 +282,9 @@
 			"social_no_email": "The sign-in provider did not share an email address.",
 			"social_email_taken": "An account with this email already exists. Log in with your password first.",
 			"name_length": "Your name must have 4 to 24 characters.",
+			"password_length": "Your password must have 8 to 32 characters.",
+			"password_weak": "Your password needs a lowercase letter, an uppercase letter, a number and a special character.",
+			"email_length": "Your email must have 12 to 48 characters.",
 			"two_factor_unavailable": "Two-factor authentication is not available right now."
 		},
 		"mail": {

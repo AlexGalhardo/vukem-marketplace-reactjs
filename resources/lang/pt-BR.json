@@ -6,6 +6,7 @@
 	"nav": {
 		"search_placeholder": "Buscar produtos, marcas e muito mais…",
 		"search": "Buscar",
+		"search_suggestions": "Sugestões de produtos",
 		"categories": "Categorias",
 		"offers": "Ofertas",
 		"sell": "Vender",
@@ -152,12 +153,23 @@
 			"email": "E-mail",
 			"password": "Senha",
 			"current_password": "Senha atual",
-			"new_password": "Nova senha (mínimo de 12 caracteres)",
+			"new_password": "Nova senha (de 8 a 32 caracteres)",
 			"confirm_password": "Confirme a senha",
 			"name": "Nome",
 			"save": "Salvar",
 			"back_dashboard": "Voltar ao painel",
 			"name_hint": "De 4 a 24 caracteres."
+		},
+		"password": {
+			"show": "Mostrar senha",
+			"hide": "Ocultar senha",
+			"met": "Atendido:",
+			"unmet": "Não atendido:",
+			"rule_length": "De 8 a 32 caracteres",
+			"rule_lower": "Pelo menos 1 letra minúscula",
+			"rule_upper": "Pelo menos 1 letra maiúscula",
+			"rule_digit": "Pelo menos 1 número",
+			"rule_special": "Pelo menos 1 caractere especial"
 		},
 		"login": {
 			"title": "Entrar",
@@ -168,7 +180,7 @@
 		},
 		"register": {
 			"title": "Criar uma conta",
-			"password": "Senha (mínimo de 12 caracteres)",
+			"password": "Senha (de 8 a 32 caracteres)",
 			"submit": "Criar conta",
 			"have_account": "Já tem cadastro?"
 		},
@@ -270,6 +282,9 @@
 			"social_no_email": "O provedor de login não compartilhou um endereço de e-mail.",
 			"social_email_taken": "Já existe uma conta com este e-mail. Entre com sua senha primeiro.",
 			"name_length": "Seu nome deve ter de 4 a 24 caracteres.",
+			"password_length": "Sua senha deve ter de 8 a 32 caracteres.",
+			"password_weak": "Sua senha precisa de uma letra minúscula, uma maiúscula, um número e um caractere especial.",
+			"email_length": "Seu email deve ter de 12 a 48 caracteres.",
 			"two_factor_unavailable": "A autenticação em dois fatores não está disponível no momento."
 		},
 		"mail": {

@@ -2,10 +2,12 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import PasswordField from "../../components/PasswordField";
 import SocialButtons from "../../components/SocialButtons";
 import { button, card, heading, link } from "../../components/ui";
+import { EMAIL_MAX, EMAIL_MIN, PASSWORD_MIN } from "../../lib/credentials";
 import { useT } from "../../lib/i18n";
-import { capitalizeName, parseName } from "../../lib/name";
+import { capitalizeName, NAME_MAX, NAME_MIN, parseName } from "../../lib/name";
 import type { AuthPageProps } from "../../types";
 
 export default function Register({ socialProviders = [] }: AuthPageProps): JSX.Element {
@@ -41,6 +43,8 @@ export default function Register({ socialProviders = [] }: AuthPageProps): JSX.E
 					hint={t("account.common.name_hint")}
 					autoComplete="name"
 					autoCapitalize="words"
+					minLength={NAME_MIN}
+					maxLength={NAME_MAX}
 					required
 					value={form.data.name}
 					onChange={(e) => {
@@ -56,24 +60,25 @@ export default function Register({ socialProviders = [] }: AuthPageProps): JSX.E
 					label={t("account.common.email")}
 					type="email"
 					autoComplete="email"
+					minLength={EMAIL_MIN}
+					maxLength={EMAIL_MAX}
 					required
 					value={form.data.email}
 					onChange={(e) => form.setData("email", e.target.value)}
 					error={form.errors.email}
 				/>
-				<Field
+				<PasswordField
 					label={t("account.register.password")}
-					type="password"
+					requirements
 					autoComplete="new-password"
-					minLength={12}
+					minLength={PASSWORD_MIN}
 					required
 					value={form.data.password}
 					onChange={(e) => form.setData("password", e.target.value)}
 					error={form.errors.password}
 				/>
-				<Field
+				<PasswordField
 					label={t("account.common.confirm_password")}
-					type="password"
 					autoComplete="new-password"
 					required
 					value={form.data.password_confirmation}

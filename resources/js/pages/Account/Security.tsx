@@ -2,7 +2,9 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import type { FormEvent, JSX } from "react";
 
 import Field from "../../components/Field";
+import PasswordField from "../../components/PasswordField";
 import { button, heading, link, muted, panel, secondaryButton, subheading } from "../../components/ui";
+import { PASSWORD_MIN } from "../../lib/credentials";
 import { useT } from "../../lib/i18n";
 import type { SecurityProps } from "../../types";
 
@@ -44,19 +46,18 @@ export default function Security({
 						onChange={(e) => password.setData("current_password", e.target.value)}
 						error={password.errors.current_password}
 					/>
-					<Field
+					<PasswordField
 						label={t("account.common.new_password")}
-						type="password"
+						requirements
 						autoComplete="new-password"
-						minLength={12}
+						minLength={PASSWORD_MIN}
 						required
 						value={password.data.password}
 						onChange={(e) => password.setData("password", e.target.value)}
 						error={password.errors.password}
 					/>
-					<Field
+					<PasswordField
 						label={t("account.common.confirm_password")}
-						type="password"
 						autoComplete="new-password"
 						required
 						value={password.data.password_confirmation}
