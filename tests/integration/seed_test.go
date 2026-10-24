@@ -10,7 +10,6 @@ import (
 
 	"github.com/AlexGalhardo/vukem/auth/hash"
 	"github.com/AlexGalhardo/vukem/database"
-	"github.com/AlexGalhardo/vukem/storage"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/reviews"
@@ -57,11 +56,10 @@ func demoStats(t *testing.T, db *database.DB) (sellers, products, lo, hi int) {
 func TestDemoCatalogFullSizeOnPostgres(t *testing.T) {
 	e := commerceOnPostgres(t, commercetest.Options{})
 	ctx := t.Context()
-	disk := storage.NewMemory("")
 
 	start := time.Now()
 
-	res, err := seeders.DemoCatalog{}.Run(ctx, e.DB, disk)
+	res, err := seeders.DemoCatalog{}.Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +98,7 @@ func TestDemoCatalogFullSizeOnPostgres(t *testing.T) {
 	// Idempotent: a second run creates nothing and is fast.
 	start = time.Now()
 
-	again, err := seeders.DemoCatalog{}.Run(ctx, e.DB, disk)
+	again, err := seeders.DemoCatalog{}.Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -159,7 +157,7 @@ func TestDemoPurgeOnPostgres(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := small.Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+	if _, err := small.Run(ctx, e.DB); err != nil {
 		t.Fatal(err)
 	}
 
@@ -179,7 +177,7 @@ func TestDemoPurgeOnPostgres(t *testing.T) {
 	}
 
 	// A real order of a demo product: the purge refuses and keeps everything.
-	if _, err := small.Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+	if _, err := small.Run(ctx, e.DB); err != nil {
 		t.Fatal(err)
 	}
 
