@@ -20,7 +20,7 @@ const combos = [
 
 type Combo = (typeof combos)[number];
 
-const product = "/p/furadeira-de-impacto-650-w";
+const product = "/p/impact-drill-650-w";
 
 async function prepare(context: BrowserContext, combo: Combo, cookies: Cookie[] = []): Promise<void> {
 	const baseURL = test.info().project.use.baseURL ?? "http://localhost:3200";
@@ -58,7 +58,7 @@ for (const combo of combos) {
 			await prepare(context, combo);
 			await scanAll(page, combo, [
 				"/",
-				"/search?q=furadeira",
+				"/search?q=impact",
 				"/search?q=zzzz-nothing",
 				"/c/tools",
 				product,

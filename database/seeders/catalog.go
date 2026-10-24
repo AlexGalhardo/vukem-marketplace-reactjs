@@ -85,17 +85,17 @@ var demoProducts = []struct {
 	from, to        color.RGBA
 }{
 	{"Smartphone Galaxy Nova 128 GB", "phones", 189900, 25, 400, rgb(30, 64, 175), rgb(96, 165, 250)},
-	{"Fone de Ouvido Bluetooth Pulse", "electronics", 15990, 80, 250, rgb(17, 24, 39), rgb(107, 114, 128)},
-	{"Notebook Ultra 14\" 16 GB RAM", "computers", 459900, 8, 1800, rgb(55, 65, 81), rgb(156, 163, 175)},
-	{"Máquina de Café Inox 1,2 L", "appliances", 24990, 30, 2100, rgb(127, 29, 29), rgb(248, 113, 113)},
-	{"Tênis de Corrida Leve", "sports", 29990, 40, 700, rgb(6, 95, 70), rgb(52, 211, 153)},
-	{"Camiseta Algodão Orgânico", "fashion", 7990, 120, 200, rgb(146, 64, 14), rgb(251, 191, 36)},
-	{"Kit Skincare Vitamina C", "beauty", 11990, 50, 450, rgb(157, 23, 77), rgb(244, 114, 182)},
-	{"Blocos de Montar 500 Peças", "toys", 13990, 35, 1200, rgb(161, 98, 7), rgb(250, 204, 21)},
-	{"Furadeira de Impacto 650 W", "tools", 27990, 15, 2300, rgb(30, 58, 138), rgb(251, 146, 60)},
-	{"Luminária de Mesa LED", "home", 8990, 60, 900, rgb(68, 64, 60), rgb(253, 230, 138)},
-	{"Livro: Go na Prática", "books", 6990, 100, 500, rgb(8, 47, 73), rgb(56, 189, 248)},
-	{"Suporte Veicular Magnético", "car-parts", 4990, 200, 150, rgb(63, 63, 70), rgb(161, 161, 170)},
+	{"Pulse Bluetooth Headphones", "electronics", 15990, 80, 250, rgb(17, 24, 39), rgb(107, 114, 128)},
+	{"Ultra Laptop 14\" 16 GB RAM", "computers", 459900, 8, 1800, rgb(55, 65, 81), rgb(156, 163, 175)},
+	{"Stainless Steel Coffee Maker 1.2 L", "appliances", 24990, 30, 2100, rgb(127, 29, 29), rgb(248, 113, 113)},
+	{"Lightweight Running Shoes", "sports", 29990, 40, 700, rgb(6, 95, 70), rgb(52, 211, 153)},
+	{"Organic Cotton T-Shirt", "fashion", 7990, 120, 200, rgb(146, 64, 14), rgb(251, 191, 36)},
+	{"Vitamin C Skincare Kit", "beauty", 11990, 50, 450, rgb(157, 23, 77), rgb(244, 114, 182)},
+	{"500-Piece Building Blocks", "toys", 13990, 35, 1200, rgb(161, 98, 7), rgb(250, 204, 21)},
+	{"Impact Drill 650 W", "tools", 27990, 15, 2300, rgb(30, 58, 138), rgb(251, 146, 60)},
+	{"LED Desk Lamp", "home", 8990, 60, 900, rgb(68, 64, 60), rgb(253, 230, 138)},
+	{"Book: Practical Go", "books", 6990, 100, 500, rgb(8, 47, 73), rgb(56, 189, 248)},
+	{"Magnetic Car Phone Mount", "car-parts", 4990, 200, 150, rgb(63, 63, 70), rgb(161, 161, 170)},
 }
 
 func rgb(r, g, b uint8) color.RGBA { return color.RGBA{R: r, G: g, B: b, A: 255} }
@@ -141,7 +141,7 @@ func (d DemoShop) SeedApp(ctx context.Context, app *vukem.App) error {
 
 	if _, err := svc.MyShop(ctx, seller.ID); errors.Is(err, catalog.ErrNoShop) {
 		_, err = svc.OpenShop(ctx, seller.ID, catalog.ShopInput{
-			Name:        "Loja Demo Vukem",
+			Name:        "Vukem Demo Shop",
 			Description: "Demo shop seeded for local development: everything here is fake.",
 			ShipFromUF:  "SP",
 		})

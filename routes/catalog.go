@@ -50,6 +50,7 @@ func Catalog(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 
 		r.Get("/", pub.Home).Name("home")
 		r.Get("/search", pub.Search).Name("catalog.search")
+		r.Get("/search/suggest", pub.Suggest).Name("catalog.suggest")
 		r.Get("/c/{slug}", pub.Category).Name("catalog.category")
 		r.Get("/p/{slug}", pub.Product).Name("catalog.product")
 		r.Get("/s/{slug}", pub.Shop).Name("shop.show")

@@ -1,24 +1,23 @@
-//nolint:misspell // pt-BR demo vocabulary, not English typos.
 package seeders
 
-// Demo activity vocabulary (pt-BR): buyer names and addresses, review and
-// question texts. Every text passes moderation.ContainsContact (no links,
-// emails, handles or digit runs) and leaves "furadeira" out (see
+// Demo activity vocabulary: buyer names and addresses, review and question
+// texts. Every text passes moderation.ContainsContact (no links, emails,
+// handles or digit runs) and leaves "drill" and "impact" out (see
 // demo_catalog_data.go). Generic on purpose: it fits any category.
 
 var (
 	buyerFirstNames = []string{
-		"Adriana", "Alice", "André", "Antônio", "Beatriz", "Bernardo", "Bianca", "Caio", "Camila", "Carlos",
-		"Cecília", "Clara", "Daniel", "Daniela", "Davi", "Eduardo", "Enzo", "Fábio", "Fernanda", "Flávia",
-		"Francisco", "Giovana", "Guilherme", "Helena", "Heitor", "Igor", "Isadora", "Júlia", "Juliana", "Larissa",
-		"Laura", "Leonardo", "Letícia", "Lorena", "Luana", "Luiz", "Manuela", "Marcelo", "Márcia", "Mariana",
-		"Mateus", "Miguel", "Natália", "Otávio", "Patrícia", "Paulo", "Priscila", "Renata", "Ricardo", "Rodrigo",
-		"Sabrina", "Sérgio", "Sofia", "Thiago", "Valentina", "Vanessa", "Vinícius", "Yasmin",
+		"Amanda", "Alice", "Andrew", "Anthony", "Bella", "Benjamin", "Brianna", "Caleb", "Chloe", "Carl",
+		"Cecilia", "Clara", "Daniel", "Daniela", "David", "Edward", "Ethan", "Fabian", "Fiona", "Flora",
+		"Francis", "Grace", "Gabriel", "Helen", "Henry", "Ivan", "Isabel", "Julia", "Julian", "Lily",
+		"Laura", "Leonard", "Leah", "Lauren", "Luna", "Louis", "Mandy", "Marcus", "Martha", "Maria",
+		"Matthew", "Michael", "Natalie", "Oliver", "Patricia", "Paul", "Priscilla", "Rebecca", "Richard", "Robert",
+		"Sabrina", "Samuel", "Sophia", "Thomas", "Valerie", "Vanessa", "Victor", "Hannah",
 	}
 	buyerLastNames = []string{
-		"Araújo", "Azevedo", "Batista", "Cardoso", "Carvalho", "Castro", "Correia", "Cunha", "Fernandes",
-		"Freitas", "Lopes", "Machado", "Mendes", "Monteiro", "Moraes", "Moreira", "Nascimento", "Pinto",
-		"Ramos", "Rocha", "Rodrigues", "Sampaio", "Siqueira", "Tavares", "Vieira",
+		"Anderson", "Adams", "Bailey", "Baker", "Campbell", "Carter", "Coleman", "Collins", "Cooper",
+		"Davis", "Evans", "Foster", "Gray", "Hayes", "Hughes", "Johnson", "Kelly", "Lewis",
+		"Morgan", "Murphy", "Parker", "Reed", "Russell", "Taylor", "Wright",
 	}
 )
 
@@ -57,12 +56,12 @@ var buyerCities = []buyerCity{
 }
 
 var buyerStreets = []string{
-	"Rua das Flores", "Avenida Brasil", "Rua São José", "Rua XV de Novembro", "Avenida Getúlio Vargas",
-	"Rua Sete de Setembro", "Rua Tiradentes", "Avenida Santos Dumont", "Rua dos Andradas", "Rua Bela Vista",
-	"Rua Dom Pedro II", "Avenida Paulista", "Rua Rui Barbosa", "Travessa das Palmeiras", "Rua da Paz",
+	"Maple Street", "Oak Avenue", "Main Street", "Second Street", "Park Avenue",
+	"Cedar Road", "Elm Street", "Pine Street", "Lake Drive", "Washington Street",
+	"Church Street", "Hill Road", "Willow Lane", "Spring Street", "River Road",
 }
 
-var buyerComplements = []string{"", "", "", "Apto 12", "Apto 304", "Casa 2", "Bloco B", "Fundos", "Sala 5"}
+var buyerComplements = []string{"", "", "", "Apt 12", "Apt 304", "House 2", "Building B", "Rear", "Suite 5"}
 
 // Carriers of the simulated shipments.
 var demoCarriers = []string{"Correios", "Jadlog", "Loggi", "Total Express"}
@@ -70,56 +69,56 @@ var demoCarriers = []string{"Correios", "Jadlog", "Loggi", "Total Express"}
 // Review texts by rating (index 0 is one star).
 var (
 	reviewTitles = [5][]string{
-		{"Não recomendo", "Veio com defeito", "Decepcionante", "Muito abaixo do esperado"},
-		{"Deixou a desejar", "Qualidade fraca", "Esperava mais", "Só o básico"},
-		{"Razoável", "Cumpre o que promete", "Bom, mas poderia ser melhor", "Custo-benefício ok"},
-		{"Muito bom", "Gostei bastante", "Boa compra", "Recomendo", "Ótimo custo-benefício"},
-		{"Excelente!", "Perfeito", "Superou as expectativas", "Compraria de novo", "Nota máxima"},
+		{"Not recommended", "Arrived defective", "Disappointing", "Well below expectations"},
+		{"Left something to be desired", "Poor quality", "Expected more", "Basic at best"},
+		{"Fair", "Does what it promises", "Good, but could be better", "Decent value"},
+		{"Very good", "Really liked it", "Good purchase", "Recommended", "Great value"},
+		{"Excellent!", "Perfect", "Exceeded expectations", "Would buy again", "Top marks"},
 	}
 	reviewBodies = [5][]string{
 		{
-			"Chegou com defeito e o acabamento é bem ruim. Não gostei.",
-			"Parou de funcionar na primeira semana de uso.",
-			"O produto não corresponde às fotos do anúncio.",
-			"Material frágil, quebrou logo nos primeiros dias.",
+			"Arrived defective and the finish is quite poor. I did not like it.",
+			"Stopped working in the first week of use.",
+			"The product does not match the photos in the listing.",
+			"Fragile material, it broke within the first few days.",
 		},
 		{
-			"Funciona, mas a qualidade é inferior ao que eu esperava pelo preço.",
-			"A entrega atrasou e a embalagem chegou amassada.",
-			"Serve para o básico, mas não vale o que paguei.",
-			"O tamanho é menor do que parece nas fotos.",
+			"It works, but the quality is below what I expected for the price.",
+			"Delivery was late and the packaging arrived crushed.",
+			"Good for basics, but not worth what I paid.",
+			"It is smaller than it looks in the photos.",
 		},
 		{
-			"Cumpre o prometido, nada além disso.",
-			"Produto ok. O acabamento poderia ser melhor.",
-			"Bom para o dia a dia, mas tem alguns detalhes que incomodam.",
-			"Chegou dentro do prazo. Qualidade mediana.",
+			"Does what it promises, nothing more.",
+			"Product is okay. The finish could be better.",
+			"Good for everyday use, but a few details are annoying.",
+			"Arrived on time. Average quality.",
 		},
 		{
-			"Produto de boa qualidade e chegou antes do prazo.",
-			"Muito bom pelo preço, estou satisfeito com a compra.",
-			"Gostei bastante, só achei a embalagem simples.",
-			"Atendeu bem ao que eu precisava. O vendedor foi atencioso.",
-			"Bem acabado e fácil de usar. Recomendo.",
+			"Good quality product and it arrived before the deadline.",
+			"Very good for the price, I am happy with the purchase.",
+			"I really liked it, I just found the packaging plain.",
+			"It met what I needed. The seller was attentive.",
+			"Well made and easy to use. Recommended.",
 		},
 		{
-			"Excelente! Exatamente como no anúncio e chegou super rápido.",
-			"Qualidade impecável, superou minhas expectativas.",
-			"Perfeito, já é a segunda vez que compro nesta loja.",
-			"Muito bem embalado e funciona perfeitamente. Recomendo demais!",
-			"Vale cada centavo. Comprei para presente e fez sucesso.",
-			"Ótimo produto, entrega rápida e vendedor muito atencioso.",
+			"Excellent! Exactly as in the listing and it arrived super fast.",
+			"Flawless quality, exceeded my expectations.",
+			"Perfect, this is already my second purchase from this store.",
+			"Very well packed and works perfectly. Highly recommended!",
+			"Worth every cent. I bought it as a gift and it was a hit.",
+			"Great product, fast delivery and a very attentive seller.",
 		},
 	}
 	sellerRepliesPositive = []string{
-		"Muito obrigado pela avaliação! Ficamos felizes que tenha gostado.",
-		"Agradecemos a preferência e esperamos vê-lo novamente na loja!",
-		"Obrigado pelo retorno! Bom uso do produto.",
+		"Thank you very much for the review! We are glad you liked it.",
+		"Thank you for your preference, we hope to see you again in the store!",
+		"Thanks for the feedback! Enjoy the product.",
 	}
 	sellerRepliesNegative = []string{
-		"Sentimos muito pelo ocorrido. Abra uma solicitação pela plataforma que resolvemos a troca.",
-		"Lamentamos a experiência. Já revisamos nosso processo de embalagem e envio.",
-		"Obrigado pelo retorno sincero. Vamos analisar o caso e melhorar o produto.",
+		"We are very sorry about what happened. Open a request through the platform and we will sort out the exchange.",
+		"We are sorry for the experience. We have already reviewed our packaging and shipping process.",
+		"Thank you for your honest feedback. We will look into the case and improve the product.",
 	}
 )
 
@@ -130,59 +129,59 @@ type demoQA struct {
 }
 
 var demoQuestions = []demoQA{
-	{"Olá, o produto é novo e tem nota fiscal?", []string{
-		"Olá! Sim, o produto é novo, lacrado e enviamos com nota fiscal.",
-		"Sim, todos os nossos produtos são novos e acompanham nota fiscal.",
+	{"Hi, is the product new and does it come with an invoice?", []string{
+		"Hi! Yes, the product is new, sealed, and shipped with an invoice.",
+		"Yes, all our products are new and come with an invoice.",
 	}},
-	{"Qual é o prazo de garantia?", []string{
-		"Oferecemos garantia de doze meses contra defeitos de fabricação.",
-		"A garantia é de noventa dias pelo vendedor, mais a garantia do fabricante.",
+	{"What is the warranty period?", []string{
+		"We offer a twelve-month warranty against manufacturing defects.",
+		"The warranty is ninety days from the seller, plus the manufacturer's warranty.",
 	}},
-	{"Vocês enviam no mesmo dia da compra?", []string{
-		"Sim! Compras aprovadas até as catorze horas são enviadas no mesmo dia útil.",
-		"Enviamos em até um dia útil após a confirmação do pagamento.",
+	{"Do you ship on the same day as the purchase?", []string{
+		"Yes! Orders approved by two in the afternoon ship the same business day.",
+		"We ship within one business day after payment confirmation.",
 	}},
-	{"Tem disponível em outra cor?", []string{
-		"No momento temos apenas as cores do anúncio. Novas cores chegam em breve!",
-		"As cores disponíveis são as que aparecem nas opções do anúncio.",
+	{"Is it available in another color?", []string{
+		"We currently only have the colors shown in the listing. New colors are coming soon!",
+		"The available colors are the ones shown in the listing options.",
 	}},
-	{"Serve como presente? Vem em caixa fechada?", []string{
-		"Sim, vem na caixa original lacrada, ótimo para presente.",
-		"Vem na embalagem original. Podemos incluir um bilhete se quiser!",
+	{"Is it a good gift? Does it come in a sealed box?", []string{
+		"Yes, it comes in the sealed original box, great for gifts.",
+		"It comes in the original packaging. We can include a card if you want!",
 	}},
-	{"Quais são as medidas exatas do produto?", []string{
-		"As medidas estão na descrição do anúncio, logo abaixo das fotos.",
-		"Todas as dimensões estão detalhadas na descrição. Qualquer dúvida, estamos aqui!",
+	{"What are the exact dimensions of the product?", []string{
+		"The measurements are in the listing description, just below the photos.",
+		"All dimensions are detailed in the description. Any questions, we are here!",
 	}},
-	{"Aceita devolução se não servir?", []string{
-		"Sim, você tem sete dias após o recebimento para devolver pela plataforma.",
-		"Aceitamos devolução em até sete dias, seguindo a política da plataforma.",
+	{"Do you accept returns if it does not fit?", []string{
+		"Yes, you have seven days after delivery to return it through the platform.",
+		"We accept returns within seven days, following the platform policy.",
 	}},
-	{"O frete para o Nordeste demora quanto tempo?", []string{
-		"O prazo aparece no carrinho ao informar o seu CEP, normalmente uma semana.",
-		"Para o Nordeste costuma levar de cinco a oito dias úteis.",
+	{"How long does shipping to the Northeast take?", []string{
+		"The estimate appears in the cart when you enter your postal code, usually one week.",
+		"For the Northeast it usually takes five to eight business days.",
 	}},
-	{"Tem pronta entrega ou é sob encomenda?", []string{
-		"Temos pronta entrega, o estoque do anúncio é real.",
-		"Pronta entrega! Enviamos assim que o pagamento for aprovado.",
+	{"Is it ready to ship or made to order?", []string{
+		"We have it ready to ship, the listed stock is real.",
+		"Ready to ship! We send it as soon as payment is approved.",
 	}},
-	{"Qual é o material do produto?", []string{
-		"O material está descrito na ficha do anúncio. É de ótima qualidade!",
-		"É feito com material resistente, conforme a descrição do anúncio.",
+	{"What is the product made of?", []string{
+		"The material is described in the listing details. It is of great quality!",
+		"It is made of durable material, as described in the listing.",
 	}},
-	{"Consigo comprar mais unidades com desconto?", []string{
-		"Para várias unidades o carrinho já calcula um frete único. Aproveite!",
-		"No momento o preço é o mesmo por unidade, mas o frete sai mais em conta.",
+	{"Can I buy more units at a discount?", []string{
+		"For several units the cart already calculates a single shipping fee. Go for it!",
+		"At the moment the price is the same per unit, but shipping works out cheaper.",
 	}},
-	{"Funciona em voltagem bivolt?", []string{
-		"Depende do modelo; a voltagem está indicada no título e na descrição.",
-		"Sim, este modelo é bivolt.",
+	{"Does it work on dual voltage?", []string{
+		"It depends on the model; the voltage is shown in the title and description.",
+		"Yes, this model is dual voltage.",
 	}},
-	{"Boa tarde, ainda tem estoque?", []string{
-		"Boa tarde! Sim, temos estoque disponível.",
-		"Temos sim! Pode comprar que enviamos rapidinho.",
+	{"Good afternoon, is there still stock?", []string{
+		"Good afternoon! Yes, we have stock available.",
+		"We do! You can buy now and we will ship quickly.",
 	}},
-	{"Vocês emitem nota fiscal no CNPJ?", []string{
-		"Sim, emitimos nota no CNPJ. Informe os dados após a compra pela plataforma.",
+	{"Do you issue invoices for businesses (CNPJ)?", []string{
+		"Yes, we issue invoices under the company tax ID. Send us the details through the platform after the purchase.",
 	}},
 }

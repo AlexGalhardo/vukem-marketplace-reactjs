@@ -1,7 +1,7 @@
 import { type Cookie, expect, type Page, test } from "@playwright/test";
 
 // Catalog flows against the seeded stack (`vukem db:seed`: categories, the
-// demo shop "Loja Demo Vukem" with 12 published products owned by
+// demo shop "Vukem Demo Shop" with 12 published products owned by
 // seller@example.com). The seller tests log in as that user; set
 // E2E_SELLER_PASSWORD when SEED_PASSWORD differs (the users seeder creates seller@example.com first).
 const sellerEmail = "seller@example.com";
@@ -33,19 +33,19 @@ test.describe("storefront", () => {
 
 	test("search, filter and open a product, then see it as recently viewed", async ({ page }) => {
 		await page.goto("/");
-		await page.getByRole("searchbox").fill("Furadeira");
+		await page.getByRole("searchbox").fill("Impact");
 		await page.getByRole("searchbox").press("Enter");
-		await expect(page).toHaveURL(/\/search\?q=Furadeira/);
-		await expect(page.getByRole("heading", { level: 1 })).toContainText("Furadeira");
+		await expect(page).toHaveURL(/\/search\?q=Impact/);
+		await expect(page.getByRole("heading", { level: 1 })).toContainText("Impact");
 
 		await page.getByLabel("Sort by").selectOption("price_desc");
 		await expect(page).toHaveURL(/sort=price_desc/);
 
-		await page.locator('a[href="/p/furadeira-de-impacto-650-w"]').click();
-		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Furadeira de Impacto 650 W");
+		await page.locator('a[href="/p/impact-drill-650-w"]').click();
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Impact Drill 650 W");
 		await expect(page.getByText(/R\$\s?279\.90/)).toBeAttached();
 		await expect(page.getByRole("heading", { name: "Shipping" })).toBeVisible();
-		await expect(page.getByRole("link", { name: "Loja Demo Vukem" })).toBeVisible();
+		await expect(page.getByRole("link", { name: "Vukem Demo Shop" })).toBeVisible();
 
 		await page.goto("/");
 		await expect(page.getByRole("heading", { name: "Recently viewed" })).toBeVisible();
@@ -55,7 +55,7 @@ test.describe("storefront", () => {
 		await page.goto("/c/tools");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tools");
 		await page.goto("/s/loja-demo-vukem");
-		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Loja Demo Vukem");
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Vukem Demo Shop");
 		await expect(page.locator('a[href^="/p/"]')).not.toHaveCount(0);
 	});
 
@@ -69,7 +69,7 @@ test.describe("storefront", () => {
 	test("Portuguese prices use BRL formatting", async ({ browser }) => {
 		const context = await browser.newContext({ locale: "pt-BR" });
 		const page = await context.newPage();
-		await page.goto("/p/furadeira-de-impacto-650-w");
+		await page.goto("/p/impact-drill-650-w");
 		await expect(page.getByText(/R\$\s279,90/)).toBeAttached();
 		await expect(page.getByRole("heading", { name: "Frete" })).toBeVisible();
 		await context.close();

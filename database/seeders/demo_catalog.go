@@ -1,16 +1,11 @@
 package seeders
 
 import (
-	"bytes"
-	"cmp"
 	"context"
 	"crypto/rand"
-	"crypto/sha256"
 	"database/sql"
-	"encoding/base32"
 	"errors"
 	"fmt"
-	"image/color"
 	"runtime"
 	"slices"
 	"strconv"
@@ -24,7 +19,6 @@ import (
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/factory"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/storage"
 
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
@@ -56,9 +50,6 @@ var ErrDemoCatalogInProduction = errors.New(
 // per transaction: a seller is either fully seeded or absent.
 const sellerChunk = 25
 
-// placeholdersPerCategory shared images exist per category.
-const placeholdersPerCategory = 3
-
 // DemoCatalog seeds demo sellers, one shop each, and their published
 // products with shared placeholder images, then demo buyers who bought
 // from those shops over the last six months (orders, reviews with votes
@@ -89,10 +80,6 @@ type DemoCatalog struct {
 	Env config.Env
 	// Hasher hashes the random passwords; nil uses hash.Default().
 	Hasher hash.Hasher
-	// PlaceholderSize caps the side of the generated placeholder images
-	// (default 900); unit tests use a few pixels, since encoding the large
-	// images dominates their run time under the race detector.
-	PlaceholderSize int
 }
 
 // DemoCatalogResult reports what one run created.
@@ -150,12 +137,7 @@ func (d DemoCatalog) RunApp(ctx context.Context, app *vukem.App) (DemoCatalogRes
 		return DemoCatalogResult{}, err
 	}
 
-	disk, err := catalog.OpenDisk(app.Source, app.Config.Env, app.Kind == vukem.KindTest)
-	if err != nil {
-		return DemoCatalogResult{}, fmt.Errorf("seed demo catalog: %w", err)
-	}
-
-	return d.Run(ctx, db, disk)
+	return d.Run(ctx, db)
 }
 
 func (d DemoCatalog) allowed() error {
@@ -206,9 +188,9 @@ func (d DemoCatalog) withDefaults() DemoCatalog {
 	return d
 }
 
-// Run seeds the catalog into db, storing the shared placeholders on disk.
+// Run seeds the catalog into db; its images are embedded in the binary.
 // It does not check the environment: SeedApp and demo:catalog do.
-func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk) (DemoCatalogResult, error) {
+func (d DemoCatalog) Run(ctx context.Context, db *database.DB) (DemoCatalogResult, error) {
 	start := time.Now()
 	d = d.withDefaults()
 
@@ -221,10 +203,7 @@ func (d DemoCatalog) Run(ctx context.Context, db *database.DB, disk storage.Disk
 		return DemoCatalogResult{}, err
 	}
 
-	images, err := storePlaceholders(ctx, disk, cmp.Or(d.PlaceholderSize, placeholderSize))
-	if err != nil {
-		return DemoCatalogResult{}, err
-	}
+	images := sharedImages()
 
 	now := time.Now().UTC()
 	plan := d.plan(catIDs, images, now)
@@ -515,13 +494,13 @@ func demoProduct(f *factory.Faker, cat demoCategory, categoryID int64, images []
 
 	var b strings.Builder
 
-	b.WriteString(title + ".\n\nDestaques:\n")
+	b.WriteString(title + ".\n\nHighlights:\n")
 
 	for _, feat := range k.features {
 		b.WriteString("- " + feat + "\n")
 	}
 
-	fmt.Fprintf(&b, "\n%s %s Enviamos a partir de %s.\n\n", factory.Pick(f, productClosings...),
+	fmt.Fprintf(&b, "\n%s %s Ships from %s.\n\n", factory.Pick(f, productClosings...),
 		factory.Pick(f, productClosings...), uf)
 	b.WriteString("Anúncio de demonstração: produto e loja fictícios, gerados para desenvolvimento.")
 
@@ -676,65 +655,17 @@ func insertSellers(ctx context.Context, tx *database.Tx, chunk []plannedSeller) 
 	return nil
 }
 
-// storePlaceholders makes sure the shared placeholder images exist on disk
-// (already processed: every width variant is drawn directly, so no
-// thumbnail job runs) and returns, per category, image rows pointing at
-// them.
-func storePlaceholders(ctx context.Context, disk storage.Disk, size int) (map[string][]catalog.ProductImage, error) {
+// sharedImages returns, per category, the image rows pointing at the
+// WebP embedded in the binary (catalog.SharedImage serves them), so the
+// seed writes nothing to disk and the images survive any redeploy.
+func sharedImages() map[string][]catalog.ProductImage {
 	out := make(map[string][]catalog.ProductImage, len(demoCategories))
 
 	for _, cat := range demoCategories {
-		from, to := categoryColors(cat.slug)
-
-		for n := range placeholdersPerCategory {
-			key := sharedKey(cat.slug, n)
-			largest := min(catalog.Widths[0], size)
-
-			for _, w := range catalog.Widths {
-				obj := catalog.VariantKey(key, w)
-
-				ok, err := disk.Exists(ctx, obj)
-				if err != nil {
-					return nil, fmt.Errorf("check placeholder %s: %w", obj, err)
-				}
-
-				if ok {
-					continue
-				}
-
-				img, err := placeholder(min(w, size), from, to, n*5+len(cat.slug))
-				if err != nil {
-					return nil, err
-				}
-
-				if err := disk.Put(ctx, obj, bytes.NewReader(img)); err != nil {
-					return nil, fmt.Errorf("store placeholder %s: %w", obj, err)
-				}
-			}
-
-			out[cat.slug] = append(out[cat.slug], catalog.ProductImage{Key: key, Width: largest, Height: largest})
-		}
+		out[cat.slug] = []catalog.ProductImage{{
+			Key: catalog.SharedKey(cat.slug), Width: catalog.SharedImageSize, Height: catalog.SharedImageSize,
+		}}
 	}
 
-	return out, nil
-}
-
-// sharedKey is the stored key of placeholder n of a category: a fixed
-// name in the catalog's object format under catalog.SharedDir.
-func sharedKey(slug string, n int) string {
-	sum := sha256.Sum256([]byte("vukem-demo-placeholder:" + slug + ":" + strconv.Itoa(n)))
-	name := strings.ToLower(base32.StdEncoding.EncodeToString(sum[:]))[:26]
-
-	return catalog.SharedDir + "/" + name + ".png"
-}
-
-// categoryColors reuses the DemoShop gradient of the category.
-func categoryColors(slug string) (color.RGBA, color.RGBA) {
-	for _, p := range demoProducts {
-		if p.category == slug {
-			return p.from, p.to
-		}
-	}
-
-	return rgb(55, 65, 81), rgb(156, 163, 175)
+	return out
 }

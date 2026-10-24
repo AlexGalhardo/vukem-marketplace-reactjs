@@ -8,7 +8,6 @@ import (
 
 	"github.com/AlexGalhardo/vukem/auth/hash"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/storage"
 
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/models"
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/qna"
@@ -23,7 +22,7 @@ import (
 func activityCatalog(buyers int) seeders.DemoCatalog {
 	return seeders.DemoCatalog{
 		Sellers: 8, MinProducts: 3, MaxProducts: 7, Buyers: buyers, MaxOrders: 9, MaxQuestions: 6,
-		Hasher: hash.Fake(), PlaceholderSize: 8,
+		Hasher: hash.Fake(),
 	}
 }
 
@@ -33,7 +32,7 @@ func TestDemoActivitySimulatesConsistentPurchases(t *testing.T) {
 	e := commercetest.New(t, commercetest.Options{})
 	ctx := t.Context()
 
-	res, err := activityCatalog(40).Run(ctx, e.DB, storage.NewMemory(""))
+	res, err := activityCatalog(40).Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,14 +144,13 @@ func TestDemoActivityRerunAddsOnlyWhatIsMissing(t *testing.T) {
 
 	e := commercetest.New(t, commercetest.Options{})
 	ctx := t.Context()
-	disk := storage.NewMemory("")
 
-	first, err := activityCatalog(6).Run(ctx, e.DB, disk)
+	first, err := activityCatalog(6).Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	again, err := activityCatalog(6).Run(ctx, e.DB, disk)
+	again, err := activityCatalog(6).Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,7 +165,7 @@ func TestDemoActivityRerunAddsOnlyWhatIsMissing(t *testing.T) {
 	}
 
 	// More buyers: only the new ones get activity; the first six keep theirs.
-	more, err := activityCatalog(10).Run(ctx, e.DB, disk)
+	more, err := activityCatalog(10).Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,7 +189,7 @@ func TestDemoActivityRerunAddsOnlyWhatIsMissing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	healed, err := activityCatalog(10).Run(ctx, e.DB, disk)
+	healed, err := activityCatalog(10).Run(ctx, e.DB)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +231,7 @@ func TestDemoPurgeDeletesOnlyDemoRows(t *testing.T) {
 		JOIN seller_orders so ON so.id = i.seller_order_id JOIN orders o ON o.id = so.order_id WHERE i.id = ?`,
 		time.Now(), time.Now(), item)
 
-	if _, err := activityCatalog(10).Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+	if _, err := activityCatalog(10).Run(ctx, e.DB); err != nil {
 		t.Fatal(err)
 	}
 
@@ -308,7 +306,7 @@ func TestDemoPurgeRefusesWhenRealDataReferencesTheCatalog(t *testing.T) {
 			ctx := t.Context()
 			buyer, _ := realShopper(t, e)
 
-			if _, err := activityCatalog(5).Run(ctx, e.DB, storage.NewMemory("")); err != nil {
+			if _, err := activityCatalog(5).Run(ctx, e.DB); err != nil {
 				t.Fatal(err)
 			}
 

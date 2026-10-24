@@ -6,7 +6,7 @@ import { demoPassword, register, sessionCookies, testPassword, uniqueEmail } fro
 // live at once: a fresh buyer opens a conversation from a demo product,
 // seller@example.com answers over the WebSocket without reloading, and the
 // typing indicator, read receipts and header badge follow.
-const product = "/p/furadeira-de-impacto-650-w";
+const product = "/p/impact-drill-650-w";
 const sellerPassword = process.env.E2E_SELLER_PASSWORD ?? demoPassword;
 
 // One seller login for the file: logging in per test trips the login

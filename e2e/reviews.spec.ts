@@ -7,8 +7,8 @@ import { appCommand, canRunAppCommands, demoPassword, logIn, register, testPassw
 // and the product page shows the review with its badge and the new
 // average; the demo seller (seller@example.com owns the drill) replies and
 // another buyer votes it helpful.
-const product = "/p/furadeira-de-impacto-650-w";
-const slug = "furadeira-de-impacto-650-w";
+const product = "/p/impact-drill-650-w";
+const slug = "impact-drill-650-w";
 
 test.describe.configure({ mode: "serial" });
 test.skip(!canRunAppCommands, "needs the compose app container or E2E_APP_BIN for dev:paid-order");

@@ -15,7 +15,6 @@ import (
 	"github.com/AlexGalhardo/vukem/config"
 	"github.com/AlexGalhardo/vukem/database"
 	"github.com/AlexGalhardo/vukem/orm"
-	"github.com/AlexGalhardo/vukem/storage"
 	"github.com/AlexGalhardo/vukem/vukemtest"
 
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/app/catalog"
@@ -27,7 +26,7 @@ import (
 func smallCatalog() seeders.DemoCatalog {
 	return seeders.DemoCatalog{
 		Sellers: 7, MinProducts: 2, MaxProducts: 6, Buyers: 5, MaxOrders: 3, MaxQuestions: 2,
-		Hasher: hash.Fake(), PlaceholderSize: 8,
+		Hasher: hash.Fake(),
 	}
 }
 
@@ -64,10 +63,9 @@ func TestDemoCatalogSeedsSellersShopsAndProducts(t *testing.T) {
 
 	app := vukemtest.New(t, bootstrap.New)
 	db := seedDB(t, app)
-	disk := storage.NewMemory("")
 	ctx := t.Context()
 
-	res, err := smallCatalog().Run(ctx, db, disk)
+	res, err := smallCatalog().Run(ctx, db)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +133,7 @@ func TestDemoCatalogSeedsSellersShopsAndProducts(t *testing.T) {
 		if p.PriceCents <= 0 || p.Stock <= 0 || p.WeightGrams <= 0 || !p.CategoryID.Valid || !p.PublishedAt.Valid ||
 			len(
 				p.Title,
-			) > catalog.MaxTitleLen || strings.Contains(strings.ToLower(p.Title+p.Description), "furadeira") {
+			) > catalog.MaxTitleLen || strings.Contains(strings.ToLower(p.Title+p.Description), "drill") {
 			t.Errorf("unexpected product %+v", p)
 		}
 	}
@@ -161,8 +159,8 @@ func TestDemoCatalogSeedsSellersShopsAndProducts(t *testing.T) {
 				t.Fatalf("%s is not a servable media object", obj)
 			}
 
-			if ok, err := disk.Exists(ctx, obj); err != nil || !ok {
-				t.Fatalf("%s missing on the disk (err %v)", obj, err)
+			if _, ok := catalog.SharedImage(obj); !ok {
+				t.Fatalf("%s is not embedded", obj)
 			}
 		}
 	}
@@ -178,15 +176,14 @@ func TestDemoCatalogIsIdempotentAndDeterministic(t *testing.T) {
 	ctx := t.Context()
 	app := vukemtest.New(t, bootstrap.New)
 	db := seedDB(t, app)
-	disk := storage.NewMemory("")
 
-	if _, err := smallCatalog().Run(ctx, db, disk); err != nil {
+	if _, err := smallCatalog().Run(ctx, db); err != nil {
 		t.Fatal(err)
 	}
 
 	first := demoTitles(t, db)
 
-	res, err := smallCatalog().Run(ctx, db, disk)
+	res, err := smallCatalog().Run(ctx, db)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +199,7 @@ func TestDemoCatalogIsIdempotentAndDeterministic(t *testing.T) {
 	other := vukemtest.New(t, bootstrap.New)
 	otherDB := seedDB(t, other)
 
-	if _, err := smallCatalog().Run(ctx, otherDB, storage.NewMemory("")); err != nil {
+	if _, err := smallCatalog().Run(ctx, otherDB); err != nil {
 		t.Fatal(err)
 	}
 
@@ -226,7 +223,7 @@ func TestDemoCatalogIsIdempotentAndDeterministic(t *testing.T) {
 	vukemtest.AssertDatabaseCount(t, app, "orders", 0)
 	vukemtest.AssertDatabaseCount(t, app, "product_questions", 0)
 
-	if _, err := smallCatalog().Run(ctx, db, disk); err != nil {
+	if _, err := smallCatalog().Run(ctx, db); err != nil {
 		t.Fatal(err)
 	}
 

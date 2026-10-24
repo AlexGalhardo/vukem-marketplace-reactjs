@@ -6,7 +6,7 @@ import { demoPassword, logIn, register, testPassword, uniqueEmail } from "./supp
 // demo product (a new account per run keeps clear of the per-user ask
 // limit), seller@example.com answers from the seller inbox and a guest
 // sees the answer on the product page.
-const product = "/p/furadeira-de-impacto-650-w";
+const product = "/p/impact-drill-650-w";
 const sellerPassword = process.env.E2E_SELLER_PASSWORD ?? demoPassword;
 
 test("ask, answer from the seller inbox, see the answer", async ({ browser }) => {

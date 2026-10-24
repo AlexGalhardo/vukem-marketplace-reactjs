@@ -166,6 +166,17 @@ func (h *Handlers) Search(c *web.Ctx) error {
 	return h.results(c, q, nil)
 }
 
+// Suggest serves /search/suggest?q=: the navbar's product suggestions as
+// JSON (see catalog.Suggest).
+func (h *Handlers) Suggest(c *web.Ctx) error {
+	out, err := h.svc.Suggest(c.Context(), c.Request().URL.Query().Get("q"), i18n.Locale(c.Context()), h.userID(c) == 0)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, out)
+}
+
 // Category renders /c/{slug}: the search page scoped to one category.
 func (h *Handlers) Category(c *web.Ctx) error {
 	cat, err := h.svc.CategoryBySlug(c.Context(), c.Param("slug"))
@@ -293,6 +304,19 @@ func (h *Handlers) Media(c *web.Ctx) error {
 	ctype, ok := catalog.MediaObject(p)
 	if !ok {
 		return catalog.ErrNotFound
+	}
+
+	if b, ok := catalog.SharedImage(p); ok {
+		w := c.Writer()
+		w.Header().Set("Content-Type", ctype)
+		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Content-Security-Policy", "default-src 'none'; sandbox")
+		w.WriteHeader(http.StatusOK)
+
+		_, err := w.Write(b)
+
+		return err
 	}
 
 	rc, err := h.svc.Disk().Open(c.Context(), p)

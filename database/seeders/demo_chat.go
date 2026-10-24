@@ -26,20 +26,24 @@ const demoChatThreads = 6
 // demoChatScripts are the seeded dialogues (buyer first, then alternating).
 var demoChatScripts = [][]string{
 	{
-		"Olá! Esse produto ainda está disponível?",
-		"Olá! Está sim, temos pronta entrega.",
-		"Ótimo, vou finalizar a compra hoje.",
+		"Hi! Is this product still available?",
+		"Hi! It is, we have it ready to ship.",
+		"Great, I'll finish the purchase today.",
 	},
 	{
-		"Boa tarde, qual o prazo de entrega para Belo Horizonte?",
-		"Boa tarde! Costuma chegar em 4 a 6 dias úteis.",
-		"Perfeito, obrigado!",
-		"Tem garantia de fábrica?",
+		"Good afternoon, what is the delivery time to Belo Horizonte?",
+		"Good afternoon! It usually arrives in 4 to 6 business days.",
+		"Perfect, thank you!",
+		"Does it come with a manufacturer's warranty?",
 	},
-	{"Oi, vem com nota fiscal?", "Oi! Sim, todos os pedidos saem com nota fiscal."},
+	{"Hi, does it come with an invoice?", "Hi! Yes, all orders ship with an invoice."},
 	{"Hi! Does it work with 220V?", "Hi! Yes, it is bivolt (110V and 220V).", "Great, thanks for the quick answer."},
-	{"Vocês têm em outra cor?", "Temos em preto e em cinza, é só escolher no anúncio.", "Vou de cinza então."},
-	{"Consigo trocar se não servir?", "Consegue sim, você tem 7 dias para pedir a troca pela plataforma."},
+	{
+		"Do you have it in another color?",
+		"We have black and gray, just choose it in the listing.",
+		"I'll go with gray then.",
+	},
+	{"Can I exchange it if it doesn't fit?", "You can, you have 7 days to request the exchange through the platform."},
 }
 
 // DemoChat seeds a few conversations between demo buyers

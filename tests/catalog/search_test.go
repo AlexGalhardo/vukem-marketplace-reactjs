@@ -1,8 +1,10 @@
 package catalog_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -176,4 +178,36 @@ func TestSearchCardsCarryRating(t *testing.T) {
 	app.Client(t).Inertia("").Get("/search?q=lanterna").AssertOK().AssertInertia("Catalog/Search").
 		PropEquals("results.data.0.rating_avg_x100", float64(450)).
 		PropEquals("results.data.0.rating_count", float64(12))
+}
+
+func TestSearchSuggest(t *testing.T) {
+	t.Parallel()
+
+	app := searchFixture(t)
+
+	for _, q := range []string{"", "fo", "zzzzzz"} {
+		if got := app.Client(t).
+			Get("/search/suggest?q=" + url.QueryEscape(q)).
+			AssertOK().
+			Body(); strings.TrimSpace(
+			got,
+		) != "[]" {
+			t.Fatalf("suggest %q = %s, want []", q, got)
+		}
+	}
+
+	var got []catalog.Suggestion
+
+	body := app.Client(t).Get("/search/suggest?q=fone").AssertOK().Body()
+	if err := json.Unmarshal([]byte(body), &got); err != nil {
+		t.Fatalf("decode %s: %v", body, err)
+	}
+
+	if len(got) != 3 {
+		t.Fatalf("suggestions = %d, want the 3 published phones: %s", len(got), body)
+	}
+
+	if got[0].Category != "Electronics, Audio & Video" || got[0].PriceCents == 0 || got[0].Slug == "" {
+		t.Fatalf("incomplete suggestion %+v", got[0])
+	}
 }
