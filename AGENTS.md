@@ -4,6 +4,7 @@ Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framewor
 
 ## Start here
 
+0. At the start of every session load the `karpathy-guidelines` skill, caveman mode and `graphify` (`graphify query "<question>"` before reading many files; `graphify update .` when the graph is stale).
 1. Read [PLAN.md](PLAN.md): briefing, decisions, architecture; pick the first unchecked task of the current phase.
 2. Read the `.claude/rules/*` that match the files you touch.
 3. Test first; tick the task only when its `→ verify:` line passes; the commit message feeds `CHANGELOG.md` (git-cliff, never edited by hand).
@@ -20,13 +21,23 @@ Vukem Marketplace: a Mercado Livre-inspired marketplace on the vukem Go framewor
 - Chat (`app/chat`, flag `chat`): vukem broadcast channels `private-chat.{id}`, `presence-chat.{id}`, `private-inbox.{userId}` served on `/broadcast/ws` (drivers/websocket, same-origin only) and `/broadcast/sse` (fallback), fanned out over Redis with the `REDIS_PREFIX` + `chat:` channel prefix; `CHAT_NOTIFY_AFTER` (default `10m`) is the away time before an unread message is emailed; demo threads come from the `DemoChat` seeder (demo accounts only)
 - E2E against a local binary: `E2E_DOCKER=0 E2E_APP_BIN=<path to the app binary>` (run Playwright with the app's env so `users:make-admin` reaches the same database); `E2E_GOOGLE=1` when the stack has `SOCIAL_GOOGLE_CLIENT_ID` set (any value)
 
+## Docs
+
+- [docs/architecture-system-design.md](docs/architecture-system-design.md), [docs/tooling.md](docs/tooling.md)
+- Setup: [with Docker](docs/setup-local-with-docker.md), [without Docker](docs/setup-local-without-docker.md), [Railway](docs/setup-deploy-railway.md)
+- [docs/demo-data-and-images.md](docs/demo-data-and-images.md): English seeds, embedded WebP images (`go run internal/tools/genplaceholders/main.go`)
+- [docs/telegram-logging.md](docs/telegram-logging.md): backend alerts (Vukem Telegram) and browser errors (`services/client-logger`, telegram-logger)
+- [vukem-feedback.md](vukem-feedback.md): framework findings; append there, tag workarounds `// workaround(vukem): <title>`
+
 ## Rules
 
-- vukem is pinned by tag, never `replace`. Framework bugs, gaps and docs issues go to `../framework-feedback/marketplace.md`; workarounds are tagged `// workaround(vukem): <title>`. Upgrade flow: [PLAN.md section 9.3](PLAN.md#93-framework-upgrade-flow).
+- vukem is pinned by tag, never `replace`. Framework bugs, gaps and docs issues go to `vukem-feedback.md`; workarounds are tagged `// workaround(vukem): <title>`. Upgrade flow: [PLAN.md section 9.3](PLAN.md#93-framework-upgrade-flow).
 - Money: `int64` cents, server-side pricing, a ledger row per money event, idempotent webhooks (`.claude/rules/money.md`).
 - UI strings live in `resources/lang/{en,pt-BR}.json` only; both files keep the same keys.
 - JS via Bun only; exact dependency pins; no new dependency without the owner's OK.
 - Conventional Commits in English; push to `main`, then `gh run list` and fix CI before new work.
 - Never commit `.env` or `.claude/settings.local.json` (owner-local agent settings, currently `{"disableAllHooks": true}`).
+- Every text input has a minimum and a maximum (Go `z` schema as the source of truth, React form mirrors it): name 4-24, signup email 12-48, password 8-32 with lower, upper, digit and special; `Field` caps other inputs at 255.
+- Seeds are English only; demo images are embedded in the binary (`app/catalog/assets/shared`), never remote URLs.
 - Never create git worktrees without explicit owner confirmation.
 - Everything (code, comments, docs, commits) in English.

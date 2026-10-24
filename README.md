@@ -12,18 +12,54 @@
 
 Vukem Marketplace is an open-source multi-seller marketplace built with the [Vukem](https://github.com/AlexGalhardo/vukem) Go framework, Inertia v3, React 19, Base UI and Tailwind CSS v4. Its layout is inspired by the big Latin American e-commerce sites (not affiliated, no brand assets). It runs in production at <https://marketplace.vukem.dev> and is the flagship battle test for Vukem 1.0.
 
+## See it working
+
+### Create an account
+
+Name, email and password limits with a live password checklist and a show/hide toggle, all validated by Vukem `z` on the server.
+
+![Sign-up with live password rules](docs/media/register.gif)
+
+### Search, suggestions and cart
+
+Suggestions from 3 characters: the 8 best products with image, title, category and price. Keyboard friendly.
+
+![Navbar search suggestions, then add to cart](docs/media/search.gif)
+
+### Dark and light themes
+
+![Theme toggle](docs/media/theme.gif)
+
+### Checkout
+
+Cart, delivery address and the review-and-pay step with server-side freight and totals. PIX (AbacatePay) and card (Stripe Connect) are enabled by adding the provider sandbox keys; the local stack in this recording has none, so both show as unavailable.
+
+![Cart to the payment step](docs/media/checkout.gif)
+
+### Live chat with the seller
+
+WebSocket chat between a buyer and a seller in two separate sessions.
+
+![Buyer and seller chat in real time](docs/media/chat.gif)
+
+### Tests
+
+![Go tests passing](docs/media/tests.gif)
+
+All GIFs are recorded against the local stack with `bun scripts/record-readme-gifs.ts` (see [tooling](docs/tooling.md)).
+
 ## Summary
 
 | Area | What you get |
 | --- | --- |
-| **Storefront** | Home sections, Postgres full-text and trigram search with filters and sorting, category, product and shop pages, recently viewed products, EN/PT-BR and dark/light themes. |
+| **Storefront** | Home sections, Postgres full-text and trigram search with filters, sorting and live suggestions in the navbar, category, product and shop pages, recently viewed products, EN/PT-BR and dark/light themes. |
 | **Sellers** | One shop per seller, products (draft/published/archived) with S3 images and 320/640/1280 thumbnails made by a queue job, orders, balance from a ledger and payout requests. |
 | **Cart and checkout** | Server-priced multi-seller cart, address book with ViaCEP autofill, freight table by weight band and region, card through Stripe Connect (Accounts v2, 10% platform fee) and PIX through AbacatePay. |
 | **Community** | Reviews of paid order lines with votes, replies and moderation; product questions answered by the shop; live buyer-seller chat over WebSockets with SSE/polling fallback. |
 | **Auth** | Email/password, Google sign-in, email verification, password reset, TOTP two-factor with recovery codes, account and security pages; admin area behind the admin role and confirmed 2FA. |
 | **Public APIs** | REST `/api/v1` with OpenAPI 3.1 and Scalar docs, GraphQL with depth/complexity limits, gRPC/Connect, scoped API keys and signed, retried, SSRF-safe seller webhooks. |
-| **Operations** | Queue worker and scheduler inside `serve`, `/health` and `/ready` probes, OpenTelemetry traces, Telegram alerts for 5xx errors and the contact form, feature flags in `/admin/flags`. |
-| **Demo data** | A deterministic pt-BR catalog: 100 shops, 2000 products, 300 buyers, ~1500 orders, ~1200 reviews and ~1200 questions. |
+| **Operations** | Queue worker and scheduler inside `serve`, `/health` and `/ready` probes, OpenTelemetry traces, Telegram alerts for backend errors and browser errors (telegram-logger), feature flags in `/admin/flags`. |
+| **Demo data** | A deterministic English catalog with embedded WebP images: 100 shops, 2000 products, 300 buyers, ~1500 orders, ~1200 reviews and ~1200 questions. |
 
 ## Why this project
 
@@ -37,7 +73,7 @@ Vukem Marketplace is an open-source multi-seller marketplace built with the [Vuk
 
 | Layer | Choice |
 | --- | --- |
-| Backend | Go 1.27, Vukem v0.28.0 (`contrib/graphql`, `contrib/grpc`, `contrib/stripe`, `contrib/imaging`, Postgres, Redis, MongoDB, S3, WebSocket and OpenTelemetry drivers) |
+| Backend | Go 1.27, Vukem (`contrib/graphql`, `contrib/grpc`, `contrib/stripe`, `contrib/imaging`, Postgres, Redis, MongoDB, S3, WebSocket and OpenTelemetry drivers) |
 | Frontend | Inertia 3.9, React 19.3, TypeScript 7, Base UI 1.9, Tailwind 4.3, Vite 8 |
 | Data | PostgreSQL 18 (core), Redis 8 (sessions, cache, queues, rate limits, chat fan-out), MongoDB 8 (audit, history, telemetry), S3-compatible storage (RustFS locally) |
 | Payments | Stripe Connect (card, test mode), AbacatePay PIX (sandbox) |
@@ -47,27 +83,52 @@ Vukem Marketplace is an open-source multi-seller marketplace built with the [Vuk
 
 ## Quick start
 
-Requirements: Go 1.27.2, Bun 1.4.3, Docker, and the Vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@v0.28.0`).
+Requirements: Docker with Compose, Bun 1.4.3 and the Vukem CLI (`go install github.com/AlexGalhardo/vukem/cmd/vukem@latest`).
 
-```sh
-cp .env.example .env
-vukem key:generate              # writes APP_KEY to .env
-bun install                     # JS deps + git hooks
-docker compose up -d --build    # app on http://localhost:3200 + all services
-curl http://localhost:3200/ready
-```
+1. Clone the repository and enter it.
 
-Develop on the host with hot reload:
+   ```sh
+   git clone https://github.com/AlexGalhardo/vukem-marketplace-reactjs.git
+   cd vukem-marketplace-reactjs
+   ```
 
-```sh
-docker compose up -d postgres redis mongo mailpit rustfs
-vukem migrate
-vukem serve                     # http://localhost:3000, Vite HMR
-```
+2. Create your environment file.
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Generate the app key (it is written to `.env`).
+
+   ```sh
+   vukem key:generate
+   ```
+
+4. Install the JS dependencies and git hooks.
+
+   ```sh
+   bun install
+   ```
+
+5. Start the whole stack (app, worker, scheduler, databases, storage, mail catcher).
+
+   ```sh
+   docker compose up -d --build
+   ```
+
+6. Check that it is ready, then open <http://localhost:3200>.
+
+   ```sh
+   curl http://localhost:3200/ready
+   ```
+
+7. Log in with a demo account: `buyer@example.com`, `seller@example.com` or `admin@example.com` (password `marketplace-demo-password`, development only).
+
+Prefer hot reload on the host? See [setup without Docker](docs/setup-local-without-docker.md).
 
 | Service | URL |
 | --- | --- |
-| App (compose) | <http://localhost:3200> |
+| App | <http://localhost:3200> |
 | Mailpit | <http://localhost:8035> |
 | RustFS console | <http://localhost:9201> |
 | Postgres / Redis / Mongo | `localhost:5442` / `6389` / `27027` |
@@ -84,7 +145,14 @@ Integration tests and the email-testing setup (Mailtrap) are described in [PLAN.
 
 ## Documentation
 
-- [PLAN.md](PLAN.md): architecture, data model, money flows, routes, APIs, OWASP checklist, roadmap
+- [Architecture and system design](docs/architecture-system-design.md)
+- [Local setup with Docker](docs/setup-local-with-docker.md) and [without Docker](docs/setup-local-without-docker.md)
+- [Deploy on Railway](docs/setup-deploy-railway.md)
+- [Tooling](docs/tooling.md)
+- [Demo data and images](docs/demo-data-and-images.md)
+- [Telegram logging](docs/telegram-logging.md) (backend with Vukem, browser with telegram-logger)
+- [PLAN.md](PLAN.md): decisions, data model, money flows, routes, APIs, OWASP checklist, roadmap
+- [vukem-feedback.md](vukem-feedback.md): bugs, gaps and ideas found while building on Vukem
 - [CHANGELOG.md](CHANGELOG.md): every release, each entry linked to its commit
 - [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md): rules for coding agents
 

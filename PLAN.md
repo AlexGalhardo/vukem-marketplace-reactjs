@@ -6,7 +6,7 @@ Main onboarding file for every session and agent. Read this first, then `AGENTS.
 
 A mini marketplace inspired by Mercado Livre's layout (never its brand), live at <https://marketplace.vukem.dev>. Buyers browse shops and products, fill a multi-seller cart, pay with card (Stripe Connect Express) or PIX (AbacatePay), and follow their orders in real time. Sellers open a shop, list products with images, ship orders and get paid. Admins moderate.
 
-It is also the **flagship battle test for vukem 1.0** (<https://github.com/AlexGalhardo/vukem>, docs <https://vukem.dev>): every vukem bug, missing feature, awkward API, security issue or docs problem goes to `../framework-feedback/marketplace.md` (rule: `.claude/rules/framework-feedback.md`), with a local workaround tagged `// workaround(vukem): <entry title>`.
+It is also the **flagship battle test for vukem 1.0** (<https://github.com/AlexGalhardo/vukem>, docs <https://vukem.dev>): every vukem bug, missing feature, awkward API, security issue or docs problem goes to `vukem-feedback.md` (rule: `.claude/rules/framework-feedback.md`), with a local workaround tagged `// workaround(vukem): <entry title>`.
 
 Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only at `../_reference-nuxt-marketplace`). This project reaches feature parity with it (section 11 maps every feature) and adds auth hardening, PIX, i18n, three data stores, three API styles and the framework showcase items.
 
@@ -422,7 +422,7 @@ When the coordinator announces a vukem release (tag + changelog):
 1. `go get github.com/AlexGalhardo/vukem@vX.Y.Z` (and every `drivers/*`, `contrib/*` module in `go.mod` to its new tag), `go mod tidy`.
 2. Search `workaround(vukem)` and remove the ones the release fixed.
 3. Run `go test ./...`, the integration suite and e2e; push and wait for CI green.
-4. Commit `build(deps): bump vukem to vX.Y.Z`; mark the related entries in `../framework-feedback/marketplace.md` as `Status: fixed in vX.Y.Z`.
+4. Commit `build(deps): bump vukem to vX.Y.Z`; mark the related entries in `vukem-feedback.md` as `Status: fixed in vX.Y.Z`.
 5. Known heads-up: from the next release `api.Idempotency` refuses keyed requests with an empty `Scope` → always set Scope to the user or API key id.
 
 ## 10. Lessons carried from the Nuxt reference
