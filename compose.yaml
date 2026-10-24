@@ -148,7 +148,7 @@ services:
   # S3-compatible object storage (stands in for the Railway bucket). MinIO
   # stopped publishing images, so RustFS is the local replacement.
   rustfs:
-    image: rustfs/rustfs:1.0.2
+    image: rustfs/rustfs:1.0.3
     environment:
       RUSTFS_ACCESS_KEY: rustfsadmin
       RUSTFS_SECRET_KEY: rustfsadmin
