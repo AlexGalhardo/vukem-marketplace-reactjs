@@ -29,7 +29,8 @@ func TestTwoFactorBypassPendingLoginIsNotALogin(t *testing.T) {
 		c.Get(path).AssertRedirect("/login")
 	}
 
-	c.PostJSON("/user/two-factor/disable", map[string]any{"password": "correct horse battery"}).AssertRedirect("/login")
+	c.PostJSON("/user/two-factor/disable", map[string]any{"password": "Correct-Horse-9-Battery"}).
+		AssertRedirect("/login")
 	c.PostJSON("/user/two-factor", nil).AssertRedirect("/login")
 	c.Get("/two-factor-challenge").AssertInertia("Auth/TwoFactorChallenge").PropEquals("auth.user", nil)
 }

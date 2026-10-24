@@ -113,7 +113,7 @@ func enableTwoFactor(t *testing.T, app *vukemtest.App, c *vukemtest.Client, emai
 
 func passwordStep(c *vukemtest.Client, email string, remember bool) *vukemtest.Response {
 	return c.PostJSON("/login", map[string]any{
-		"email": email, "password": "correct horse battery", "remember": remember,
+		"email": email, "password": "Correct-Horse-9-Battery", "remember": remember,
 	})
 }
 
@@ -228,7 +228,7 @@ func TestTwoFactorDisableNeedsPassword(t *testing.T) {
 		map[string]any{"password": "not my password"})
 	c.Get("/user/two-factor").AssertInertia("Auth/TwoFactor").PropEquals("enabled", true)
 
-	c.PostJSON("/user/two-factor/disable", map[string]any{"password": "correct horse battery"}).
+	c.PostJSON("/user/two-factor/disable", map[string]any{"password": "Correct-Horse-9-Battery"}).
 		AssertRedirect("/user/two-factor")
 	c.Get("/user/two-factor").AssertInertia("Auth/TwoFactor").PropEquals("enabled", false).PropEquals("pending", false)
 

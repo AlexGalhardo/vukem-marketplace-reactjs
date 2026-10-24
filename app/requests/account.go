@@ -27,7 +27,7 @@ type ChangePassword struct {
 // ChangePasswordSchema validates ChangePassword (same rules as Register).
 var ChangePasswordSchema = z.Struct[ChangePassword](z.Shape{
 	"current_password":      z.String().Min(1).Max(256),
-	"password":              z.String().Min(12).Max(256),
+	"password":              PasswordSchema(),
 	"password_confirmation": z.String(),
 }).Refine(func(r ChangePassword) error {
 	if r.Password != r.PasswordConfirmation {

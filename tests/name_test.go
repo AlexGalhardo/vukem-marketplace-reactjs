@@ -16,7 +16,7 @@ func TestNamesAreNormalizedOnSignUpAndProfile(t *testing.T) {
 
 	c.PostJSON("/register", map[string]any{
 		"name": "  álvaro   de  souza ", "email": "alvaro@example.com",
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/dashboard")
 	vukemtest.AssertDatabaseHas(
 		t,
@@ -39,7 +39,7 @@ func TestNamesAreNormalizedOnSignUpAndProfile(t *testing.T) {
 		reg := app.Client(t).Inertia("").WithHeader("Accept-Language", tc.locale).WithHeader("Referer", "/register")
 		reg.PostJSON("/register", map[string]any{
 			"name": tc.name, "email": "short@example.com",
-			"password": "correct horse battery", "password_confirmation": "correct horse battery",
+			"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 		}).AssertRedirect("/register")
 		reg.Get("/register").AssertInertia("Auth/Register").PropEquals("errors.name", tc.want)
 

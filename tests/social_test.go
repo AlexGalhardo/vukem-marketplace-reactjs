@@ -47,7 +47,7 @@ func TestSocialDoesNotTakeOverUnverifiedEmails(t *testing.T) {
 
 	app.Client(t).PostForm("/register", url.Values{
 		"name": {"Owner"}, "email": {"owner@example.com"},
-		"password": {"correct horse battery"}, "password_confirmation": {"correct horse battery"},
+		"password": {"Correct-Horse-9-Battery"}, "password_confirmation": {"Correct-Horse-9-Battery"},
 	})
 
 	signIn(t, app.Client(t)).AssertStatus(409)

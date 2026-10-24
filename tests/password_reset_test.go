@@ -18,7 +18,7 @@ import (
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
 )
 
-const newPassword = "a brand new password"
+const newPassword = "A-Brand-New-Pass-1"
 
 // resetToken returns the token of the last reset link mailed to email.
 func resetToken(t *testing.T, app *vukemtest.App, email string) string {
@@ -169,7 +169,7 @@ func TestResetEndsOtherSessions(t *testing.T) {
 
 	// An attacker holds a live session and a remember-me cookie.
 	attacker := app.Client(t).Inertia("")
-	passwordLoginRemember(attacker, "cid.reset@example.com", "correct horse battery").AssertRedirect("/dashboard")
+	passwordLoginRemember(attacker, "cid.reset@example.com", "Correct-Horse-9-Battery").AssertRedirect("/dashboard")
 	attacker.Get("/dashboard").AssertInertia("Dashboard")
 
 	remembered := app.Client(t).Inertia("").WithCookie("remember_web", attacker.CookieValue("remember_web"))

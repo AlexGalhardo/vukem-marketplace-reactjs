@@ -43,7 +43,7 @@ func TestVerificationEmailThroughMailtrap(t *testing.T) {
 	c := app.Client(t).Inertia(version)
 	c.PostJSON("/register", map[string]any{
 		"name": "Mail Test", "email": email,
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/email/verify")
 
 	msg, err := inbox.WaitFor(t.Context(), email, "Verify your email address", time.Minute)

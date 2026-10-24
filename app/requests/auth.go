@@ -11,8 +11,8 @@ type Login struct {
 
 // LoginSchema validates Login.
 var LoginSchema = z.Struct[Login](z.Shape{
-	"email":    z.String().Trim().Email(),
-	"password": z.String().Min(1),
+	"email":    z.String().Trim().Min(3).Max(255).Email(),
+	"password": z.String().Min(1).Max(256),
 	"remember": z.Bool().Optional(),
 })
 
@@ -27,8 +27,8 @@ type Register struct {
 // RegisterSchema validates Register (password rules live here).
 var RegisterSchema = z.Struct[Register](z.Shape{
 	"name":                  NameSchema(),
-	"email":                 z.String().Trim().Email().Max(255),
-	"password":              z.String().Min(12).Max(256),
+	"email":                 EmailSchema(),
+	"password":              PasswordSchema(),
 	"password_confirmation": z.String(),
 }).Refine(func(r Register) error {
 	if r.Password != r.PasswordConfirmation {
@@ -58,7 +58,7 @@ type ResetPassword struct {
 var ResetPasswordSchema = z.Struct[ResetPassword](z.Shape{
 	"token":                 z.String().Min(1),
 	"email":                 z.String().Trim().Email(),
-	"password":              z.String().Min(12).Max(256),
+	"password":              PasswordSchema(),
 	"password_confirmation": z.String(),
 }).Refine(func(r ResetPassword) error {
 	if r.Password != r.PasswordConfirmation {

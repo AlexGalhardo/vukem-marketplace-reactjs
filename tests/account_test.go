@@ -9,7 +9,7 @@ import (
 	"github.com/AlexGalhardo/vukem-marketplace-reactjs/internal/testing/flagtest"
 )
 
-const oldPassword = "correct horse battery"
+const oldPassword = "Correct-Horse-9-Battery"
 
 // loggedIn registers email (unless done) and returns a client logged in
 // with password, optionally remembered.

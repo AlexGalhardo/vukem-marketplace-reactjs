@@ -24,11 +24,15 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 			want: "Essas credenciais não correspondem aos nossos registros.",
 		},
 		{
-			name: "built-in rule", page: "/register", path: "/register", component: "Auth/Register", field: "password",
+			name:      "password length",
+			page:      "/register",
+			path:      "/register",
+			component: "Auth/Register",
+			field:     "password",
 			body: map[string]any{
 				"name": "Tomas", "email": "tom2@example.com", "password": "short", "password_confirmation": "short",
 			},
-			want: "O campo senha deve ter pelo menos 12 caracteres.",
+			want: "Sua senha deve ter de 8 a 32 caracteres.",
 		},
 		{
 			name: "refine message", page: "/register", path: "/register", component: "Auth/Register",
@@ -36,7 +40,7 @@ func TestAccountMessagesFollowTheLocale(t *testing.T) {
 			body: map[string]any{
 				"name":                  "Tomas",
 				"email":                 "tom3@example.com",
-				"password":              "long enough password",
+				"password":              "Long-Enough-Pass-1",
 				"password_confirmation": "x",
 			},
 			want: "A confirmação da senha não confere.",

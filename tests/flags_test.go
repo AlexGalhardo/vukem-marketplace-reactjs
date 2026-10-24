@@ -46,7 +46,7 @@ func TestEmailVerificationOffByDefault(t *testing.T) {
 	// Sign-up lands logged in on the dashboard, with no verification mail.
 	c.PostJSON("/register", map[string]any{
 		"name": "Nina Lopes", "email": "nina@example.com",
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/dashboard")
 	c.Get("/dashboard").AssertInertia("Dashboard").PropEquals("auth.user.email_verified_at", nil)
 
@@ -61,7 +61,7 @@ func TestEmailVerificationOffByDefault(t *testing.T) {
 
 	// An email change sends no mail either.
 	c.PutJSON("/account", map[string]any{
-		"name": "Nina Lopes", "email": "nina.new@example.com", "password": "correct horse battery",
+		"name": "Nina Lopes", "email": "nina.new@example.com", "password": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/account")
 
 	if got := queuedMailJobs(t, fake, "nina.new@example.com"); got != 0 {
@@ -72,7 +72,7 @@ func TestEmailVerificationOffByDefault(t *testing.T) {
 	other := app.Client(t).Inertia("").WithHeader("Referer", "/register")
 	other.PostJSON("/register", map[string]any{
 		"name": "Someone", "email": "NINA.NEW@example.com",
-		"password": "another long password", "password_confirmation": "another long password",
+		"password": "Another-Long-Pass-1", "password_confirmation": "Another-Long-Pass-1",
 	}).AssertRedirect("/register")
 	other.Get("/register").AssertInertia("Auth/Register").HasProp("errors.email").PropEquals("auth.user", nil)
 
@@ -116,7 +116,7 @@ func TestTwoFactorFlag(t *testing.T) {
 	vukemtest.AssertDatabaseHas(t, app, "users", map[string]any{"email": "no2fa@example.com", "two_factor_secret": nil})
 
 	login := app.Client(t).Inertia("")
-	passwordLogin(login, "kept2fa@example.com", "correct horse battery").AssertRedirect("/two-factor-challenge")
+	passwordLogin(login, "kept2fa@example.com", "Correct-Horse-9-Battery").AssertRedirect("/two-factor-challenge")
 	login.PostJSON("/two-factor-challenge", map[string]any{"code": totpCode(t, secret, 1)}).
 		AssertRedirect("/dashboard")
 
@@ -174,7 +174,7 @@ func TestAdminFlagsPage(t *testing.T) {
 	c := app.Client(t).Inertia("")
 	c.PostJSON("/register", map[string]any{
 		"name": "Otto Lima", "email": "otto@example.com",
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/email/verify")
 
 	admin.PostJSON("/admin/flags", map[string]any{"flag": "no_such_flag", "enabled": true}).AssertNotFound()

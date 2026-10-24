@@ -48,7 +48,7 @@ func TestRegisteredUsersAreNotAdmins(t *testing.T) {
 	// A role smuggled into the registration body is ignored (mass assignment).
 	c.PostJSON("/register", map[string]any{
 		"name": "Evelyn", "email": "eve@example.com", "role": "admin",
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	}).AssertRedirect("/dashboard")
 
 	vukemtest.AssertDatabaseHas(t, app, "users", map[string]any{"email": "eve@example.com", "role": "user"})

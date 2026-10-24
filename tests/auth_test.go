@@ -45,7 +45,7 @@ func register(t *testing.T, c *vukemtest.Client, email string) {
 
 	r := c.PostJSON("/register", map[string]any{
 		"name": "Ana Silva", "email": email,
-		"password": "correct horse battery", "password_confirmation": "correct horse battery",
+		"password": "Correct-Horse-9-Battery", "password_confirmation": "Correct-Horse-9-Battery",
 	})
 	if loc := r.Header("Location"); loc != "/dashboard" && loc != "/email/verify" {
 		t.Fatalf("register %s: status %d, redirect %q", email, r.Status(), loc)
@@ -80,7 +80,7 @@ func TestRegisterAndVerifyEmail(t *testing.T) {
 	other := app.Client(t).Inertia("").WithHeader("Referer", "/register")
 	other.PostJSON("/register", map[string]any{
 		"name": "Other", "email": "ANA@example.com",
-		"password": "another long password", "password_confirmation": "another long password",
+		"password": "Another-Long-Pass-1", "password_confirmation": "Another-Long-Pass-1",
 	}).AssertRedirect("/register")
 	other.Get("/register").AssertInertia("Auth/Register").HasProp("errors.email")
 }
@@ -95,7 +95,7 @@ func TestLoginLogoutAndThrottle(t *testing.T) {
 	c.PostJSON("/login", map[string]any{"email": "bob@example.com", "password": "wrong"}).AssertRedirect("/login")
 	c.Get("/login").AssertInertia("Auth/Login").HasProp("errors.email")
 
-	c.PostJSON("/login", map[string]any{"email": "bob@example.com", "password": "correct horse battery"}).
+	c.PostJSON("/login", map[string]any{"email": "bob@example.com", "password": "Correct-Horse-9-Battery"}).
 		AssertRedirect("/dashboard")
 	c.Get("/login").AssertRedirect("/")
 	c.PostJSON("/logout", nil).AssertRedirect("/")
@@ -141,7 +141,7 @@ func TestPasswordReset(t *testing.T) {
 
 	form := map[string]any{
 		"token": token, "email": "cid@example.com",
-		"password": "a brand new password", "password_confirmation": "a brand new password",
+		"password": "A-Brand-New-Pass-1", "password_confirmation": "A-Brand-New-Pass-1",
 	}
 
 	userID := apiTokenFor(t, app, "cid@example.com")
@@ -155,7 +155,7 @@ func TestPasswordReset(t *testing.T) {
 	// Single use.
 	c.WithHeader("Referer", reset).PostJSON("/reset-password", form).AssertRedirect(reset)
 
-	c.PostJSON("/login", map[string]any{"email": "cid@example.com", "password": "a brand new password"}).
+	c.PostJSON("/login", map[string]any{"email": "cid@example.com", "password": "A-Brand-New-Pass-1"}).
 		AssertRedirect("/dashboard")
 }
 

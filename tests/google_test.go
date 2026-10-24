@@ -222,7 +222,7 @@ func TestGoogleVerifiedEmailEndsPreHijackedAccount(t *testing.T) {
 
 	attacker.Get("/dashboard").AssertRedirect("/login")
 	passwordLogin(app.Client(t).Inertia("").WithHeader("Referer", "/login"),
-		"ivy@example.com", "correct horse battery").AssertRedirect("/login")
+		"ivy@example.com", "Correct-Horse-9-Battery").AssertRedirect("/login")
 
 	vukemtest.AssertDatabaseHas(t, app, "users",
 		map[string]any{"email": "ivy@example.com", "two_factor_secret": nil, "two_factor_confirmed_at": nil})
