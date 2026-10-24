@@ -31,7 +31,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | D15 | Telegram bot: contact form messages and rate-limited 5xx alerts | Cheap ops channel |
 | D16 | Images: server-side upload via vukem upload → S3 (Railway bucket; RustFS locally), type/size/pixel caps, resize to fixed widths | Presigned PUT is not bound to size/type in vukem v0.21.1 (audit S8) |
 | D17 | Local object storage is **RustFS** (`rustfs/rustfs:1.0.2`), not MinIO | MinIO stopped publishing images (repo archived) |
-| D18 | JS tooling: Bun 1.4.3, Biome 2.5.15, Playwright 1.64.1; Go 1.27.2, golangci-lint 2.15.0 | Latest stable on 2026-10-17, exact pins |
+| D18 | JS tooling: Bun 1.4.3, Biome 2.5.15, Playwright 1.64.1; Go 1.27.3, golangci-lint 2.15.0 | Latest stable on 2026-10-17, exact pins |
 | D19 | Hosting: Railway (app + Postgres + Redis + Mongo + bucket), Docker image from this repo | Owner choice |
 | D20 | Framework upgrades: after each vukem release the coordinator sends the tag; bump, drop obsolete workarounds, mark feedback `Status: fixed in vX.Y.Z` (section 9.3) | Owner policy 2026-10-17 |
 | D21 | Base UI `CSPProvider` gets the request nonce; Inertia progress bar gets it too | vukem CSP `style-src` is nonce-only (audit S11) |
@@ -43,7 +43,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 
 | Layer | Version |
 | --- | --- |
-| Go toolchain | 1.27.2 |
+| Go toolchain | 1.27.3 |
 | vukem | v0.27.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.4.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.3.0, `drivers/otel` v0.3.0, `contrib/graphql` v0.3.0, `contrib/grpc` v0.4.0, `contrib/stripe` v0.3.0, `contrib/imaging` v0.1.0) |
 | pgx / go-redis / mongo-driver | v5.11.0 / v9.23.0 / v2.9.2 |
 | stripe-go | v87.0.0 (`github.com/stripe/stripe-go/v87`, Payments phase) |
@@ -51,7 +51,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | React / Inertia / Base UI | 19.3.1 / 3.9.1 (`@inertiajs/react`, `@inertiajs/vite`) / 1.9.0 |
 | Vite / Tailwind / TypeScript | 8.3.4 / 4.3.3 / 7.0.2 |
 | Biome / Playwright / commitlint / lefthook / markdownlint-cli2 | 2.5.15 / 1.64.1 / 21.2.3 / 2.2.2 / 0.23.3 |
-| Images | `postgres:18.6-alpine`, `redis:8.10.2-alpine`, `mongo:8.3.13`, `rustfs/rustfs:1.0.2`, `axllent/mailpit:v1.31.6`, `oven/bun:1.4.3-alpine`, `golang:1.27.2-alpine`, `alpine:3.24.2` |
+| Images | `postgres:18.6-alpine`, `redis:8.10.2-alpine`, `mongo:8.3.13`, `rustfs/rustfs:1.0.2`, `axllent/mailpit:v1.31.6`, `oven/bun:1.4.3-alpine`, `golang:1.27.3-alpine`, `alpine:3.24.2` |
 | Actions | checkout v7.0.1, setup-go v7.0.0, setup-bun v2.2.0, golangci-lint-action v9.3.0, upload-artifact v7.0.2, build-push-action v7.4.0, zaproxy/action-baseline v0.15.0, nuclei-action v3.1.0, action-gh-release v3.0.3 |
 
 ### 3.2 Folder layout

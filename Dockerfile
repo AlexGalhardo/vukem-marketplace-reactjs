@@ -10,7 +10,7 @@ COPY resources ./resources
 RUN bun run build
 
 # 2. Static Go binary; views, translations and the Vite manifest are embedded.
-FROM golang:1.27.2-alpine AS build
+FROM golang:1.27.3-alpine AS build
 WORKDIR /src
 ENV CGO_ENABLED=0
 COPY go.mod go.sum ./

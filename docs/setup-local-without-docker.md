@@ -4,7 +4,7 @@ Run the Go server and Vite on your machine with hot reload. The backing services
 
 ## Requirements
 
-- Go 1.27.2
+- Go 1.27.3
 - Bun 1.4.3
 - The Vukem CLI: `go install github.com/AlexGalhardo/vukem/cmd/vukem@latest`
 - PostgreSQL 18, Redis 8, MongoDB 8, an S3-compatible store and an SMTP catcher
