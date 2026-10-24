@@ -5,7 +5,7 @@ import { expect, test } from "@playwright/test";
 // The slug is deterministic (seed 20261018): the first demo product in slug
 // order, the head of the simulated sales; tests/integration/seed_test.go
 // asserts it has reviews and answered questions.
-const showcase = "/p/air-fryer-brisa-k17-air-5-5-l-analogica-127-v-dm05321";
+const showcase = "/p/29-mountain-bike-21-speed-frame-17-disc-brakes-atletica-dm03106";
 
 test("a seeded product shows reviews and answered questions", async ({ page }) => {
 	await page.goto(showcase);

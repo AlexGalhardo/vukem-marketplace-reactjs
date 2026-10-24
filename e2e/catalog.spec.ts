@@ -33,8 +33,8 @@ test.describe("storefront", () => {
 
 	test("search, filter and open a product, then see it as recently viewed", async ({ page }) => {
 		await page.goto("/");
-		await page.getByRole("searchbox").fill("Impact");
-		await page.getByRole("searchbox").press("Enter");
+		await page.getByRole("combobox").fill("Impact");
+		await page.getByRole("combobox").press("Enter");
 		await expect(page).toHaveURL(/\/search\?q=Impact/);
 		await expect(page.getByRole("heading", { level: 1 })).toContainText("Impact");
 
@@ -54,7 +54,7 @@ test.describe("storefront", () => {
 	test("category and storefront pages", async ({ page }) => {
 		await page.goto("/c/tools");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tools");
-		await page.goto("/s/loja-demo-vukem");
+		await page.goto("/s/vukem-demo-shop");
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Vukem Demo Shop");
 		await expect(page.locator('a[href^="/p/"]')).not.toHaveCount(0);
 	});

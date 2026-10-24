@@ -45,10 +45,9 @@ test("sign-up name rules: live capitalization, length and spaces", async ({ page
 	await expect(page.getByText(nameError)).toBeVisible();
 	await expect(page).toHaveURL(/\/register$/);
 
-	// Too long (25 characters).
+	// Too long: the input stops at 24 characters (the server rejects more).
 	await name.fill("Bartholomew Fitzgerald Jr");
-	await name.blur();
-	await expect(page.getByText(nameError)).toBeVisible();
+	await expect(name).toHaveValue("Bartholomew Fitzgerald J");
 
 	// Spaces are trimmed and collapsed before counting and saving.
 	await name.fill("  ana    maria  ");
