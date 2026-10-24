@@ -261,12 +261,28 @@ var ErrDemoPurgeBlocked = errors.New("seeders: real data references the demo cat
 // Subqueries selecting the demo users (sellers and buyers, by their email
 // domain), the demo shops and the demo products. Each "?" pair takes
 // demoPatterns().
+//
+// A demo shop that a real buyer ordered from is kept with its owner and
+// products (keptShopsSQL): deleting it would delete the real order. It is
+// left out of every demo set below, so Purge removes the rest of the demo
+// catalog around it.
 const (
-	demoUsersSQL    = `SELECT id FROM users WHERE email LIKE ? OR email LIKE ?`
+	baseUsersSQL = `SELECT id FROM users WHERE email LIKE ? OR email LIKE ?`
+	baseShopsSQL = `SELECT id FROM shops WHERE owner_id IN (` + baseUsersSQL + `)`
+
+	keptShopsSQL = `SELECT shop_id FROM seller_orders WHERE shop_id IN (` + baseShopsSQL +
+		`) AND order_id NOT IN (SELECT id FROM orders WHERE buyer_id IN (` + baseUsersSQL + `))`
+	keptOwnersSQL = `SELECT owner_id FROM shops WHERE id IN (` + keptShopsSQL + `)`
+
+	demoUsersSQL    = `SELECT id FROM users WHERE (email LIKE ? OR email LIKE ?) AND id NOT IN (` + keptOwnersSQL + `)`
 	demoShopsSQL    = `SELECT id FROM shops WHERE owner_id IN (` + demoUsersSQL + `)`
 	demoProductsSQL = `SELECT id FROM products WHERE shop_id IN (` + demoShopsSQL + `)`
 	demoOrdersSQL   = `SELECT id FROM orders WHERE buyer_id IN (` + demoUsersSQL + `)`
 	demoReviewsSQL  = `SELECT id FROM reviews WHERE product_id IN (` + demoProductsSQL + `)`
+
+	// Reviews by demo buyers of the kept shops' products go with the demo buyers.
+	keptReviewsByDemoSQL = `SELECT id FROM reviews WHERE buyer_id IN (` + demoUsersSQL +
+		`) AND product_id IN (SELECT id FROM products WHERE shop_id IN (` + keptShopsSQL + `))`
 )
 
 func demoPatterns() []any { return []any{"%@" + DemoSellerDomain, "%@" + DemoBuyerDomain} }
@@ -276,10 +292,8 @@ func demoPatterns() []any { return []any{"%@" + DemoSellerDomain, "%@" + DemoBuy
 var purgeBlockers = []struct {
 	what, sql string
 }{
-	{"orders of real buyers at demo shops", `SELECT COUNT(*) FROM seller_orders WHERE shop_id IN (` + demoShopsSQL +
-		`) AND order_id NOT IN (` + demoOrdersSQL + `)`},
 	{"sales of real shops to demo buyers", `SELECT COUNT(*) FROM seller_orders WHERE order_id IN (` + demoOrdersSQL +
-		`) AND shop_id NOT IN (` + demoShopsSQL + `)`},
+		`) AND shop_id NOT IN (` + demoShopsSQL + `) AND shop_id NOT IN (` + keptShopsSQL + `)`},
 	{"ledger entries of demo shops or orders", `SELECT COUNT(*) FROM ledger_entries WHERE shop_id IN (` +
 		demoShopsSQL + `) OR order_id IN (` + demoOrdersSQL + `)`},
 	{"payouts of demo shops", `SELECT COUNT(*) FROM payouts WHERE shop_id IN (` + demoShopsSQL + `)`},
@@ -288,7 +302,7 @@ var purgeBlockers = []struct {
 	{"real users' votes on demo reviews", `SELECT COUNT(*) FROM review_votes WHERE review_id IN (` +
 		demoReviewsSQL + `) AND user_id NOT IN (` + demoUsersSQL + `)`},
 	{"demo users' votes on real reviews", `SELECT COUNT(*) FROM review_votes WHERE user_id IN (` + demoUsersSQL +
-		`) AND review_id NOT IN (` + demoReviewsSQL + `)`},
+		`) AND review_id NOT IN (` + demoReviewsSQL + `) AND review_id NOT IN (` + keptReviewsByDemoSQL + `)`},
 	{"questions by real users on demo products", `SELECT COUNT(*) FROM product_questions WHERE shop_id IN (` +
 		demoShopsSQL + `) AND asker_id NOT IN (` + demoUsersSQL + `)`},
 	{"real users' cart items with demo products", `SELECT COUNT(*) FROM cart_items WHERE product_id IN (` +
@@ -298,8 +312,9 @@ var purgeBlockers = []struct {
 // Purge deletes the demo catalog: the demo buyers' orders (with their
 // seller orders, lines, reviews and votes), the demo shops (products,
 // images, questions) and the demo users (addresses, questions, votes), in
-// that order. It never deletes or changes a real user's row: when one
-// references the demo catalog (a real order at a demo shop, a real review,
+// that order. It never deletes or changes a real user's row: demo shops with
+// a real order are kept whole, and when a real row references the rest of the
+// demo catalog (a real review,
 // question, vote or cart item, a ledger entry or payout) it fails with
 // ErrDemoPurgeBlocked, listing them, and deletes nothing.
 func (DemoCatalog) Purge(ctx context.Context, db *database.DB) error {
@@ -330,7 +345,8 @@ func (DemoCatalog) Purge(ctx context.Context, db *database.DB) error {
 			{"shops", `DELETE FROM shops WHERE id IN (` + demoShopsSQL + `)`},
 			{"users", `DELETE FROM users WHERE id IN (` + demoUsersSQL + `)`},
 		} {
-			if _, err := tx.ExecContext(ctx, database.Rebind(d, step.sql), demoPatterns()...); err != nil {
+			args := slices.Repeat(demoPatterns(), strings.Count(step.sql, "?")/2)
+			if _, err := tx.ExecContext(ctx, database.Rebind(d, step.sql), args...); err != nil {
 				return fmt.Errorf("purge demo %s: %w", step.what, err)
 			}
 		}

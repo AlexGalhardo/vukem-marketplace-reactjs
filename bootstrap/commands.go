@@ -126,7 +126,8 @@ func (*demoCatalog) Description() string {
 func (d *demoCatalog) Flags(fs *flag.FlagSet) {
 	d.allowProduction = fs.Bool("allow-production", false, "allow seeding when APP_ENV=production")
 	d.fresh = fs.Bool("fresh", false,
-		"delete the demo sellers and buyers (and everything they own) first; refuses if real data references them")
+		"delete the demo sellers and buyers (and everything they own) first; keeps demo shops with a real order; "+
+			"refuses if other real data references them")
 }
 
 func (d *demoCatalog) Run(ctx context.Context, app *vukem.App, _ []string) error {

@@ -275,13 +275,6 @@ func TestDemoPurgeRefusesWhenRealDataReferencesTheCatalog(t *testing.T) {
 	t.Parallel()
 
 	for name, touch := range map[string]func(t *testing.T, e *commercetest.Env, buyer models.User, demoSlug string){
-		"a real order of a demo product": func(t *testing.T, e *commercetest.Env, buyer models.User, demoSlug string) {
-			t.Helper()
-
-			if _, err := reviews.DemoPurchase(t.Context(), e.DB, buyer.Email, demoSlug, time.Now().UTC()); err != nil {
-				t.Fatal(err)
-			}
-		},
 		"a real question on a demo product": func(t *testing.T, e *commercetest.Env, buyer models.User, demoSlug string) {
 			t.Helper()
 
@@ -334,5 +327,56 @@ func TestDemoPurgeRefusesWhenRealDataReferencesTheCatalog(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+// A demo shop with an order of a real buyer survives the purge whole, with
+// its owner, products and the real order; the rest of the demo catalog goes.
+func TestDemoPurgeKeepsShopsWithARealOrder(t *testing.T) {
+	t.Parallel()
+
+	e := commercetest.New(t, commercetest.Options{})
+	ctx := t.Context()
+	buyer, _ := realShopper(t, e)
+
+	if _, err := activityCatalog(5).Run(ctx, e.DB); err != nil {
+		t.Fatal(err)
+	}
+
+	demo := "%@" + seeders.DemoSellerDomain
+	slug := e.String(t, `SELECT p.slug FROM products p JOIN shops s ON s.id = p.shop_id
+		JOIN users u ON u.id = s.owner_id WHERE u.email LIKE ? ORDER BY p.id LIMIT 1`, demo)
+
+	if _, err := reviews.DemoPurchase(ctx, e.DB, buyer.Email, slug, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+
+	shopID := e.Int64(t, `SELECT shop_id FROM products WHERE slug = ?`, slug)
+	realOrders := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders WHERE buyer_id = ?`, buyer.ID)
+	sellers := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users WHERE email LIKE ?`, demo)
+
+	if err := (seeders.DemoCatalog{}).Purge(ctx, e.DB); err != nil {
+		t.Fatalf("Purge: %v", err)
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM shops WHERE id = ?`, shopID); n != 1 {
+		t.Errorf("the shop with a real order was deleted")
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM products WHERE slug = ?`, slug); n != 1 {
+		t.Errorf("the ordered product was deleted")
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders WHERE buyer_id = ?`, buyer.ID); n != realOrders {
+		t.Errorf("real orders = %d after the purge, want %d", n, realOrders)
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users WHERE email LIKE ?`, demo); n != 1 {
+		t.Errorf("demo sellers left = %d, want only the owner of the kept shop (had %d)", n, sellers)
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM shops s JOIN users u ON u.id = s.owner_id
+		WHERE u.email LIKE ?`, demo); n != 1 {
+		t.Errorf("demo shops left = %d, want 1", n)
 	}
 }

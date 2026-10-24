@@ -31,3 +31,16 @@ go run internal/tools/genplaceholders/main.go
 It needs `ffmpeg` with libwebp and rewrites the files in `app/catalog/assets/shared`; commit the result.
 
 Real seller uploads still go to S3 and get their 320/640/1280 variants from a queue job.
+
+## Refreshing the demo catalog
+
+`demo:catalog --fresh` deletes the demo sellers and buyers (`@vendedores.example.com`, `@compradores.example.com`) with everything they own, then seeds the catalog again. It runs in one transaction and never touches a real user's rows:
+
+- A demo shop that a real buyer ordered from is kept whole (owner, products and the order); the rest is replaced.
+- If another real row references the demo catalog (a review, question, vote, cart item, ledger entry or payout), the command stops and deletes nothing, listing what blocks it.
+
+On Railway, from your terminal (Git Bash needs `MSYS_NO_PATHCONV=1` so `/app/app` is not rewritten):
+
+```sh
+railway ssh -s marketplace -- /app/app demo:catalog --fresh --allow-production
+```

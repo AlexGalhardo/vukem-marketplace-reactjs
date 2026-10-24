@@ -4,7 +4,6 @@ package integration
 
 import (
 	"errors"
-	"strings"
 	"testing"
 	"time"
 
@@ -176,7 +175,8 @@ func TestDemoPurgeOnPostgres(t *testing.T) {
 		}
 	}
 
-	// A real order of a demo product: the purge refuses and keeps everything.
+	// A real order at a demo shop: the purge keeps that shop, its owner and the
+	// order, and removes the rest of the demo catalog.
 	if _, err := small.Run(ctx, e.DB); err != nil {
 		t.Fatal(err)
 	}
@@ -187,17 +187,19 @@ func TestDemoPurgeOnPostgres(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	users := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users`)
-	orders := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders`)
+	orders := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders WHERE buyer_id = ?`, buyer.ID)
 
-	err := (seeders.DemoCatalog{}).Purge(ctx, e.DB)
-	if !errors.Is(err, seeders.ErrDemoPurgeBlocked) || !strings.Contains(err.Error(), "1 orders of real buyers") {
-		t.Fatalf("err = %v, want ErrDemoPurgeBlocked naming the real order", err)
+	if err := (seeders.DemoCatalog{}).Purge(ctx, e.DB); err != nil {
+		t.Fatalf("Purge: %v", err)
 	}
 
-	if u, o := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM users`), seedtest.Count(t, e.DB,
-		`SELECT COUNT(*) FROM orders`); u != users || o != orders {
-		t.Fatalf("refused purge changed rows: users %d→%d, orders %d→%d", users, u, orders, o)
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM orders WHERE buyer_id = ?`, buyer.ID); n != orders {
+		t.Fatalf("real orders = %d after the purge, want %d", n, orders)
+	}
+
+	if n := seedtest.Count(t, e.DB, `SELECT COUNT(*) FROM shops s JOIN users u ON u.id = s.owner_id
+		WHERE u.email LIKE ?`, "%@"+seeders.DemoSellerDomain); n != 1 {
+		t.Fatalf("demo shops left = %d, want only the one with the real order", n)
 	}
 }
 
