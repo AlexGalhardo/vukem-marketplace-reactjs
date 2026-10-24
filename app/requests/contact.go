@@ -30,3 +30,22 @@ var WebhookEndpointSchema = z.Struct[WebhookEndpoint](z.Shape{
 	"url":    z.String().Trim().Min(1).Max(2048),
 	"events": z.Slice(z.String().Max(64)).Max(10),
 })
+
+// ClientLog is a browser error report (see controllers.ClientLog).
+type ClientLog struct {
+	Level     string `json:"level"`
+	Message   string `json:"message"`
+	Stack     string `json:"stack,omitempty"`
+	URL       string `json:"url,omitempty"`
+	UserAgent string `json:"userAgent,omitempty"`
+}
+
+// ClientLogSchema validates ClientLog; every field has a hard cap because
+// the endpoint is public.
+var ClientLogSchema = z.Struct[ClientLog](z.Shape{
+	"level":     z.String().OneOf("warn", "error", "fatal"),
+	"message":   z.String().Trim().Min(1).Max(500),
+	"stack":     z.String().Max(2000).Optional(),
+	"url":       z.String().Max(300).Optional(),
+	"userAgent": z.String().Max(200).Optional(),
+})

@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/AlexGalhardo/vukem"
@@ -42,6 +43,14 @@ func Ops(deps *platform.Deps) func(r *router.Router, app *vukem.App) error {
 
 		r.Get("/contact", contact.Show).Name("contact")
 		r.Post("/contact", contact.Store).Name("contact.store").Use(contactLimit)
+
+		// Browser error reports: public, so 10 per minute per IP.
+		clientLog := controllers.ClientLog{
+			URL: app.Source.Get("CLIENT_LOGGER_URL"), Key: app.Source.Get("CLIENT_LOGGER_KEY"),
+			Client: &http.Client{Timeout: 5 * time.Second}, Log: app.Log,
+		}
+		r.Post("/client-log", clientLog.Store).Name("client-log.store").
+			Use(ratelimit.Middleware(limiters("client-log", 10, time.Minute), ratelimit.ByIP))
 
 		wh, err := webhooks.New(app)
 		if err != nil {

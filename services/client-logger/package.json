@@ -1,0 +1,8 @@
+{
+	"name": "client-logger",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"@galhardoalex/telegram-logger": "1.0.1"
+	}
+}

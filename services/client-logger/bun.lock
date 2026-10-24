@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "client-logger",
+      "dependencies": {
+        "@galhardoalex/telegram-logger": "1.0.1",
+      },
+    },
+  },
+  "packages": {
+    "@galhardoalex/telegram-logger": ["@galhardoalex/telegram-logger@1.0.1", "", {}, "sha512-0moMyuATPFKcOnYlCVhMmcRwslVxDF6M0jIUVwkCa2xM1JtCj1M06380rWA2LX/AwVym/gIhZ55SVvaPwLlTKw=="],
+  }
+}

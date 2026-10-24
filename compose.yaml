@@ -29,9 +29,17 @@ services:
       S3_USE_PATH_STYLE: "true"
       S3_INSECURE_HTTP: "true"
       LOG_FORMAT: json
-      # Telegram (when TELEGRAM_BOT_TOKEN/CHAT_ID are added) sends only the
-      # alerts and contact jobs, never forwarded error logs.
-      TELEGRAM_LOG: "false"
+      # Telegram: empty token/chat id keeps every send a no-op. Set them in
+      # .env to get 5xx alerts and contact messages; TELEGRAM_LOG=true also
+      # forwards warn/error/fatal logs (panics included) to the same chat.
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
+      TELEGRAM_LOG: "${TELEGRAM_LOG:-false}"
+      TELEGRAM_MIN_LEVEL: "${TELEGRAM_MIN_LEVEL:-warn}"
+      # Browser errors: POST /client-log is forwarded to the client-logger
+      # service below (telegram-logger).
+      CLIENT_LOGGER_URL: http://client-logger:3100
+      CLIENT_LOGGER_KEY: "${CLIENT_LOGGER_KEY:-dev-client-logger-key}"
       # The worker and scheduler services below do this work, so serve
       # does not run them in process (the single-service default).
       QUEUE_IN_SERVE: "false"
@@ -103,6 +111,17 @@ services:
     depends_on:
       app:
         condition: service_healthy
+
+  # Browser error reports to Telegram with telegram-logger (Bun). Same
+  # TELEGRAM_BOT_TOKEN/CHAT_ID as the app; see docs/telegram-logging.md.
+  client-logger:
+    build: ./services/client-logger
+    environment:
+      CLIENT_LOGGER_KEY: "${CLIENT_LOGGER_KEY:-dev-client-logger-key}"
+      TELEGRAM_BOT_TOKEN: "${TELEGRAM_BOT_TOKEN:-}"
+      TELEGRAM_CHAT_ID: "${TELEGRAM_CHAT_ID:-}"
+      APP_ENV: development
+    restart: unless-stopped
 
   postgres:
     image: postgres:18.6-alpine
