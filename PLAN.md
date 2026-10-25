@@ -44,7 +44,7 @@ Previous version: the owner's Nuxt 4 marketplace (resell.sh, v1.1.0, read-only a
 | Layer | Version |
 | --- | --- |
 | Go toolchain | 1.27.3 |
-| vukem | v0.27.0 (+ `drivers/postgres` v0.4.0, `drivers/redis` v0.4.0, `drivers/mongo` v0.2.0, `drivers/s3` v0.3.0, `drivers/otel` v0.3.0, `contrib/graphql` v0.3.0, `contrib/grpc` v0.4.0, `contrib/stripe` v0.3.0, `contrib/imaging` v0.1.0) |
+| vukem | Core plus `drivers/postgres`, `drivers/redis`, `drivers/mongo`, `drivers/s3`, `drivers/otel`, `contrib/graphql`, `contrib/grpc`, `contrib/stripe`, `contrib/imaging` (versions in `go.mod`) |
 | pgx / go-redis / mongo-driver | v5.11.0 / v9.23.0 / v2.9.2 |
 | stripe-go | v87.0.0 (`github.com/stripe/stripe-go/v87`, Payments phase) |
 | Bun | 1.4.3 |
