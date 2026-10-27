@@ -24,6 +24,7 @@ Set on `app`, `worker` and `scheduler` (use Railway references for the plugin UR
 | `APP_ENV=production`, `APP_URL`, `APP_KEY` | key from `vukem key:generate`; never reuse the local one |
 | `DATABASE_URL`, `REDIS_URL`, `MONGO_URL` | from the plugins |
 | `S3_*` | from the bucket |
+| `BLOB_READ_WRITE_TOKEN` | optional: Vercel Blob (public store) token; when set, images go to Vercel Blob instead of S3 |
 | `STRIPE_*`, `ABACATEPAY_*`, `SOCIAL_GOOGLE_*`, `MAILTRAP_*`/`SMTP_*` | see [PLAN.md section 7](../PLAN.md#7-developer-actions-owner-to-do) |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_LOG=true`, `TELEGRAM_MIN_LEVEL=warn` | ops channel, see [telegram-logging.md](telegram-logging.md) |
 | `CLIENT_LOGGER_URL`, `CLIENT_LOGGER_KEY` | URL of the `client-logger` private domain (`http://client-logger.railway.internal:3100`) and the shared secret |
