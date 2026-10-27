@@ -11,16 +11,18 @@ import (
 	"github.com/AlexGalhardo/vukem/storage"
 )
 
-// DiskConfig picks where images live (MEDIA_DISK): "s3", "local" or
-// "memory". Empty means s3 when S3_BUCKET is set, otherwise memory in tests
-// and the local directory in development; production requires s3.
+// DiskConfig picks where images live (MEDIA_DISK): "vercel-blob", "s3",
+// "local" or "memory". Empty means vercel-blob when BLOB_READ_WRITE_TOKEN is
+// set, s3 when S3_BUCKET is set, otherwise memory in tests and the local
+// directory in development; production requires a remote disk (blob or s3).
 type DiskConfig struct {
 	Driver   string `env:"MEDIA_DISK"`
 	Bucket   string `env:"S3_BUCKET"`
+	Blob     string `env:"BLOB_READ_WRITE_TOKEN"`
 	LocalDir string `env:"MEDIA_LOCAL_DIR" default:"storage/app/media"`
 }
 
-var errDiskRequired = errors.New("catalog: S3_BUCKET is required in production (MEDIA_DISK=s3)")
+var errDiskRequired = errors.New("catalog: BLOB_READ_WRITE_TOKEN or S3_BUCKET is required in production (MEDIA_DISK=vercel-blob or s3)")
 
 // OpenDisk returns the image disk configured in src.
 func OpenDisk(src config.Lookuper, env config.Env, test bool) (storage.Disk, error) {
@@ -35,6 +37,8 @@ func OpenDisk(src config.Lookuper, env config.Env, test bool) (storage.Disk, err
 		case test:
 			// Tests never reach a real bucket by accident (.env may set one).
 			driver = "memory"
+		case cfg.Blob != "":
+			driver = "vercel-blob"
 		case cfg.Bucket != "":
 			driver = "s3"
 		default:
@@ -42,7 +46,7 @@ func OpenDisk(src config.Lookuper, env config.Env, test bool) (storage.Disk, err
 		}
 	}
 
-	if env == config.Production && driver != "s3" {
+	if env == config.Production && driver != "s3" && driver != "vercel-blob" {
 		return nil, errDiskRequired
 	}
 
@@ -54,12 +58,19 @@ func OpenDisk(src config.Lookuper, env config.Env, test bool) (storage.Disk, err
 		}
 
 		return s3.New(s3cfg)
+	case "vercel-blob":
+		bcfg, err := config.Load[BlobConfig](src)
+		if err != nil {
+			return nil, fmt.Errorf("catalog: blob config: %w", err)
+		}
+
+		return NewVercelBlob(bcfg)
 	case "local":
 		return storage.NewLocal(cfg.LocalDir, "")
 	case "memory":
 		return storage.NewMemory(""), nil
 	default:
-		return nil, fmt.Errorf("catalog: unknown MEDIA_DISK %q (s3, local or memory)", driver)
+		return nil, fmt.Errorf("catalog: unknown MEDIA_DISK %q (vercel-blob, s3, local or memory)", driver)
 	}
 }
 
