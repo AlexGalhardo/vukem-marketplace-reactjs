@@ -21,7 +21,7 @@ ARG APP_VERSION=dev
 RUN go build -trimpath -ldflags="-s -w" -o /out/app ./cmd/app
 
 # 3. Runtime: small, non-root.
-FROM alpine:3.24.2
+FROM alpine:3.24.3
 RUN apk add --no-cache ca-certificates tzdata \
 	&& addgroup -S app && adduser -S -G app -h /app app
 WORKDIR /app
