@@ -181,7 +181,7 @@ services:
   # Fully offline mail catcher. Dev/staging/e2e email assertions use the
   # Mailtrap Email Sandbox instead (SMTP_* + MAILTRAP_* in .env).
   mailpit:
-    image: axllent/mailpit:v1.31.6
+    image: axllent/mailpit:v1.32.0
     ports:
       - "${MKT_SMTP_PORT:-1035}:1025"
       - "${MKT_MAILPIT_PORT:-8035}:8025"
