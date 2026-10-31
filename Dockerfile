@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # 1. Frontend assets (Vite + Tailwind) with Bun.
-FROM oven/bun:1.4.3-alpine AS assets
+FROM oven/bun:1.4.4-alpine AS assets
 WORKDIR /src
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile --ignore-scripts
